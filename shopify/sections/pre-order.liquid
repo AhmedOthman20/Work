@@ -1,0 +1,249 @@
+{%- comment -%}
+  Reusable pre-order page (template: page.pre-order).
+  Each page sets its own data from page metafields (Pages > page > Metafields):
+    custom.pre_order_products  list of products the customer can choose from
+    custom.pre_order_key       secret key; page content only shows with ?k=KEY
+    custom.pre_order_subtitle  text under the heading
+    custom.pre_order_deposit   deposit / offer line
+    custom.pre_order_end       countdown end (date & time)
+    custom.pre_order_image     hero image (falls back to first product image)
+  Heading = page title, page content = details / terms.
+  Set the page's "seo.hidden" metafield to 1 to keep it out of search & sitemap.
+{%- endcomment -%}
+
+{%- liquid
+  assign mf = page.metafields.custom
+  assign products = mf.pre_order_products.value
+  assign first_product = products | first
+  assign key = mf.pre_order_key.value | strip
+  assign subtitle = mf.pre_order_subtitle.value | default: section.settings.subtitle
+  assign deposit = mf.pre_order_deposit.value | default: section.settings.deposit_text
+  assign end_date = mf.pre_order_end.value
+  assign hero = mf.pre_order_image.value | default: first_product.featured_image
+  assign accent = section.settings.accent_color
+-%}
+
+<style>
+  #po-{{ section.id }} { --po-accent: {{ accent }}; direction: rtl; text-align: right; }
+  #po-{{ section.id }} .po-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 16px 64px; }
+  #po-{{ section.id }} .po-locked { text-align: center; padding: 96px 16px; }
+  #po-{{ section.id }} .po-hero { display: grid; gap: 32px; align-items: center; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { #po-{{ section.id }} .po-hero { grid-template-columns: 1fr 1fr; } }
+  #po-{{ section.id }} .po-hero img { width: 100%; height: auto; border-radius: 16px; display: block; }
+  #po-{{ section.id }} .po-badge { display: inline-block; background: var(--po-accent); color: #fff; padding: 4px 14px; border-radius: 999px; font-size: 14px; margin-bottom: 12px; }
+  #po-{{ section.id }} h1 { font-size: clamp(28px, 4vw, 44px); line-height: 1.2; margin: 0 0 12px; }
+  #po-{{ section.id }} .po-sub { font-size: 18px; opacity: .8; margin: 0 0 16px; }
+  #po-{{ section.id }} .po-price { font-size: 26px; font-weight: 700; color: var(--po-accent); margin: 0 0 4px; }
+  #po-{{ section.id }} .po-deposit { font-size: 16px; margin: 0 0 20px; }
+  #po-{{ section.id }} .po-countdown { display: flex; gap: 10px; margin: 0 0 24px; flex-wrap: wrap; }
+  #po-{{ section.id }} .po-countdown div { background: rgba(127,127,127,.12); border-radius: 12px; padding: 10px 14px; min-width: 64px; text-align: center; }
+  #po-{{ section.id }} .po-countdown b { display: block; font-size: 24px; }
+  #po-{{ section.id }} .po-countdown span { font-size: 12px; opacity: .7; }
+  #po-{{ section.id }} .po-features { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin: 48px 0; }
+  #po-{{ section.id }} .po-feature { border: 1px solid rgba(127,127,127,.25); border-radius: 14px; padding: 20px; }
+  #po-{{ section.id }} .po-feature h3 { margin: 0 0 6px; font-size: 18px; }
+  #po-{{ section.id }} .po-feature p { margin: 0; opacity: .8; }
+  #po-{{ section.id }} .po-card { border: 1px solid rgba(127,127,127,.25); border-radius: 16px; padding: 24px; max-width: 680px; margin: 0 auto; }
+  #po-{{ section.id }} .po-card h2 { margin-top: 0; }
+  #po-{{ section.id }} .po-field { display: block; font-weight: 600; margin: 16px 0 6px; }
+  #po-{{ section.id }} .po-input { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid rgba(127,127,127,.4); border-radius: 10px; font: inherit; background: #fff; color: #111; }
+  #po-{{ section.id }} .po-options { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  #po-{{ section.id }} .po-options input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  #po-{{ section.id }} .po-option { display: block; border: 1px solid rgba(127,127,127,.4); border-radius: 12px; padding: 10px; cursor: pointer; text-align: center; font-size: 14px; }
+  #po-{{ section.id }} .po-option img { width: 100%; height: 110px; object-fit: contain; margin-bottom: 6px; }
+  #po-{{ section.id }} .po-option small { display: block; color: var(--po-accent); font-weight: 700; margin-top: 4px; }
+  #po-{{ section.id }} .po-options input:checked + .po-option { border-color: var(--po-accent); box-shadow: 0 0 0 2px var(--po-accent); }
+  #po-{{ section.id }} .po-btn { display: block; width: 100%; box-sizing: border-box; margin-top: 20px; padding: 16px; border: 0; border-radius: 12px; background: var(--po-accent); color: #fff; font-size: 18px; font-weight: 700; cursor: pointer; text-align: center; text-decoration: none; }
+  #po-{{ section.id }} .po-btn--wa { background: #25D366; }
+  #po-{{ section.id }} .po-or { text-align: center; margin: 16px 0 0; opacity: .6; }
+  #po-{{ section.id }} .po-success { background: #e8f8ee; color: #135c2f; padding: 16px; border-radius: 12px; }
+  #po-{{ section.id }} .po-error { background: #fdecec; color: #8a1c1c; padding: 16px; border-radius: 12px; }
+  #po-{{ section.id }} .po-details { max-width: 680px; margin: 40px auto 0; }
+</style>
+
+<div id="po-{{ section.id }}">
+  {%- if key != blank -%}
+    <div class="po-locked" data-po-locked>
+      <h2>{{ section.settings.locked_text }}</h2>
+    </div>
+  {%- endif -%}
+
+  <div class="po-wrap" data-po-content {% if key != blank %}hidden{% endif %}>
+    <div class="po-hero">
+      <div>
+        {%- if hero -%}
+          {{ hero | image_url: width: 1200 | image_tag: loading: 'eager', alt: page.title }}
+        {%- endif -%}
+      </div>
+      <div>
+        {%- if section.settings.badge != blank -%}<span class="po-badge">{{ section.settings.badge }}</span>{%- endif -%}
+        <h1>{{ page.title }}</h1>
+        {%- if subtitle != blank -%}<p class="po-sub">{{ subtitle }}</p>{%- endif -%}
+        {%- if first_product -%}
+          <p class="po-price">
+            {%- if products.size > 1 and first_product.price_min != first_product.price_max -%}يبدأ من {% endif -%}
+            {{ first_product.price | money }}
+          </p>
+        {%- endif -%}
+        {%- if deposit != blank -%}<p class="po-deposit">{{ deposit }}</p>{%- endif -%}
+        {%- if end_date != blank -%}
+          <div class="po-countdown" data-po-countdown="{{ end_date | date: '%Y-%m-%dT%H:%M:%S%z' }}">
+            <div><b data-d>0</b><span>يوم</span></div>
+            <div><b data-h>0</b><span>ساعة</span></div>
+            <div><b data-m>0</b><span>دقيقة</span></div>
+            <div><b data-s>0</b><span>ثانية</span></div>
+          </div>
+        {%- endif -%}
+        <a class="po-btn" href="#po-form-{{ section.id }}">{{ section.settings.cta_label }}</a>
+      </div>
+    </div>
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="po-features">
+        {%- for block in section.blocks -%}
+          <div class="po-feature" {{ block.shopify_attributes }}>
+            <h3>{{ block.settings.title }}</h3>
+            <p>{{ block.settings.text }}</p>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    <div class="po-card" id="po-form-{{ section.id }}">
+      <h2>{{ section.settings.form_heading }}</h2>
+
+      {%- form 'contact', id: 'po-contact-form' -%}
+        {%- if form.posted_successfully? -%}
+          <p class="po-success">{{ section.settings.success_text }}</p>
+        {%- elsif form.errors -%}
+          <div class="po-error">{{ form.errors | default_errors }}</div>
+        {%- endif -%}
+
+        <input type="hidden" name="contact[صفحة الحجز]" value="{{ page.title | escape }}">
+
+        {%- if products.size > 1 -%}
+          <span class="po-field">{{ section.settings.choose_label }}</span>
+          <div class="po-options">
+            {%- for p in products -%}
+              <input type="radio" name="contact[الموديل المطلوب]" id="po-p-{{ section.id }}-{{ p.id }}" value="{{ p.title | escape }}" required {% if forloop.first %}checked{% endif %}>
+              <label class="po-option" for="po-p-{{ section.id }}-{{ p.id }}">
+                {%- if p.featured_image -%}{{ p.featured_image | image_url: width: 300 | image_tag: loading: 'lazy', alt: p.title }}{%- endif -%}
+                {{ p.title }}
+                <small>{{ p.price | money }}</small>
+              </label>
+            {%- endfor -%}
+          </div>
+        {%- elsif first_product -%}
+          <input type="hidden" name="contact[الموديل المطلوب]" value="{{ first_product.title | escape }}">
+        {%- endif -%}
+
+        <label class="po-field" for="po-name-{{ section.id }}">الاسم بالكامل</label>
+        <input class="po-input" id="po-name-{{ section.id }}" name="contact[name]" autocomplete="name" required>
+
+        <label class="po-field" for="po-phone-{{ section.id }}">رقم الموبايل</label>
+        <input class="po-input" id="po-phone-{{ section.id }}" name="contact[phone]" type="tel" inputmode="tel" pattern="^01[0125][0-9]{8}$" title="رقم موبايل مصري 11 رقم يبدأ بـ 01" autocomplete="tel" required>
+
+        <label class="po-field" for="po-email-{{ section.id }}">البريد الإلكتروني</label>
+        <input class="po-input" id="po-email-{{ section.id }}" name="contact[email]" type="email" autocomplete="email" required>
+
+        <label class="po-field" for="po-city-{{ section.id }}">المحافظة</label>
+        <select class="po-input" id="po-city-{{ section.id }}" name="contact[المحافظة]" required>
+          <option value="">اختر المحافظة</option>
+          {%- assign govs = 'القاهرة,الجيزة,الإسكندرية,القليوبية,الشرقية,الدقهلية,الغربية,المنوفية,البحيرة,كفر الشيخ,دمياط,بورسعيد,الإسماعيلية,السويس,الفيوم,بني سويف,المنيا,أسيوط,سوهاج,قنا,الأقصر,أسوان,البحر الأحمر,الوادي الجديد,مطروح,شمال سيناء,جنوب سيناء' | split: ',' -%}
+          {%- for g in govs -%}<option>{{ g }}</option>{%- endfor -%}
+        </select>
+
+        <label class="po-field" for="po-address-{{ section.id }}">العنوان بالتفصيل</label>
+        <input class="po-input" id="po-address-{{ section.id }}" name="contact[العنوان]" autocomplete="street-address" required>
+
+        <label class="po-field" for="po-notes-{{ section.id }}">ملاحظات (اختياري)</label>
+        <textarea class="po-input" id="po-notes-{{ section.id }}" name="contact[body]" rows="3"></textarea>
+
+        <button type="submit" class="po-btn">{{ section.settings.submit_label }}</button>
+      {%- endform -%}
+
+      {%- if section.settings.whatsapp != blank -%}
+        {%- capture wa_text -%}{{ section.settings.whatsapp_message }} {{ page.title }}{%- endcapture -%}
+        <p class="po-or">أو</p>
+        <a class="po-btn po-btn--wa" target="_blank" rel="noopener"
+           href="https://wa.me/{{ section.settings.whatsapp | remove: '+' | remove: ' ' }}?text={{ wa_text | url_encode }}">احجز عن طريق واتساب</a>
+      {%- endif -%}
+    </div>
+
+    {%- if page.content != blank -%}
+      <div class="po-details rte">{{ page.content }}</div>
+    {%- endif -%}
+  </div>
+</div>
+
+<script>
+  (function () {
+    var root = document.getElementById('po-{{ section.id }}');
+    if (!root) return;
+
+    // Secret-link gate; the key is remembered for the browser tab so refreshes
+    // and the post-submit reload (which drops ?k=) keep the page open.
+    var key = {{ key | json }};
+    if (key) {
+      var storeKey = 'po-key-{{ page.id }}';
+      var params = new URLSearchParams(location.search);
+      var saved = null;
+      try { saved = sessionStorage.getItem(storeKey); } catch (e) {}
+      if (params.get('k') === key || saved === key || {{ request.design_mode | json }}) {
+        try { sessionStorage.setItem(storeKey, key); } catch (e) {}
+        root.querySelector('[data-po-content]').hidden = false;
+        root.querySelector('[data-po-locked]').hidden = true;
+      }
+    }
+
+    var cd = root.querySelector('[data-po-countdown]');
+    if (cd) {
+      var end = new Date(cd.dataset.poCountdown.replace(/([+-]\d\d)(\d\d)$/, '$1:$2')).getTime();
+      if (isNaN(end)) { cd.hidden = true; return; }
+      var timer;
+      var tick = function () {
+        var t = Math.max(0, end - Date.now());
+        cd.querySelector('[data-d]').textContent = Math.floor(t / 864e5);
+        cd.querySelector('[data-h]').textContent = Math.floor(t / 36e5) % 24;
+        cd.querySelector('[data-m]').textContent = Math.floor(t / 6e4) % 60;
+        cd.querySelector('[data-s]').textContent = Math.floor(t / 1e3) % 60;
+        if (t === 0) clearInterval(timer);
+      };
+      timer = setInterval(tick, 1000);
+      tick();
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Pre-order page",
+  "tag": "section",
+  "class": "section-pre-order",
+  "settings": [
+    { "type": "paragraph", "content": "Products, secret key, subtitle, deposit text, countdown and image are set per page from the page's metafields. The values below are shared defaults." },
+    { "type": "text", "id": "locked_text", "label": "Text shown without the secret link", "default": "الصفحة دي متاحة بدعوة خاصة فقط" },
+    { "type": "text", "id": "badge", "label": "Badge", "default": "حجز مسبق" },
+    { "type": "textarea", "id": "subtitle", "label": "Default subtitle", "default": "احجز جهازك دلوقتي وكن من أول المستلمين" },
+    { "type": "text", "id": "deposit_text", "label": "Default deposit / offer text", "default": "احجز دلوقتي والدفع عند الاستلام" },
+    { "type": "color", "id": "accent_color", "label": "Accent color", "default": "#0a58ff" },
+    { "type": "text", "id": "cta_label", "label": "Hero button", "default": "احجز الآن" },
+    { "type": "text", "id": "form_heading", "label": "Form heading", "default": "بيانات الحجز" },
+    { "type": "text", "id": "choose_label", "label": "Choose product label", "default": "اختر اللون / الموديل" },
+    { "type": "text", "id": "submit_label", "label": "Submit button", "default": "تأكيد الحجز" },
+    { "type": "textarea", "id": "success_text", "label": "Success message", "default": "تم استلام طلب الحجز بنجاح ✅ هنتواصل معاك قريب لتأكيد الطلب." },
+    { "type": "text", "id": "whatsapp", "label": "WhatsApp number (optional)", "info": "International format, e.g. 201001234567" },
+    { "type": "text", "id": "whatsapp_message", "label": "WhatsApp message", "default": "عاوز أحجز" }
+  ],
+  "blocks": [
+    {
+      "type": "feature", "name": "Feature",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "ضمان رسمي" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "ضمان الوكيل لمدة سنة" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Pre-order page" } ]
+}
+{% endschema %}

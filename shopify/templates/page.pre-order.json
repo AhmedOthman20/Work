@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "main": {
+      "type": "pre-order",
+      "blocks": {
+        "feature-1": { "type": "feature", "settings": { "title": "ضمان رسمي", "text": "ضمان الوكيل لمدة سنة" } },
+        "feature-2": { "type": "feature", "settings": { "title": "أولوية الاستلام", "text": "اللي يحجز الأول يستلم الأول" } },
+        "feature-3": { "type": "feature", "settings": { "title": "شحن لكل المحافظات", "text": "توصيل لحد باب البيت" } }
+      },
+      "block_order": ["feature-1", "feature-2", "feature-3"],
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}
