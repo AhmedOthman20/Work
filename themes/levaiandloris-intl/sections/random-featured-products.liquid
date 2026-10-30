@@ -1,0 +1,337 @@
+
+
+{%- render 'section-spacing-collapsing' -%}
+
+<style>
+  {%- assign section_background = section.settings.background_gradient | default: section.settings.background | default: settings.background -%}
+  {%- assign card_background = section.settings.product_card_background | default: settings.product_card_background -%}
+  {%- assign card_blends = false -%}
+
+  {%- unless section_background != 'rgba(0,0,0,0)' and card_background != 'rgba(0,0,0,0)' and section_background != card_background -%}
+    {%- assign card_blends = true -%}
+  {%- endunless -%}
+
+  #shopify-section-{{ section.id }} .product-list {
+    --product-list-gap: {% if section.settings.products_per_row_mobile == '2' %}{% if card_blends %}var(--product-list-row-gap){% endif %} var(--spacing-2){% else %}var(--product-list-row-gap) var(--product-list-column-gap){% endif %};
+    --product-list-items-per-row: {{ section.settings.products_per_row_mobile | times: 1 }};
+    --product-list-grid: auto / repeat(var(--product-list-items-per-row), minmax(0, 1fr));
+  }
+
+  @media screen and (min-width: 700px) {
+    #shopify-section-{{ section.id }} .product-list {
+      --product-list-gap: var(--product-list-row-gap) var(--product-list-column-gap);
+      --product-list-items-per-row: 2;
+    }
+  }
+
+  @media screen and (min-width: 1000px) {
+    #shopify-section-{{ section.id }} .product-list {
+      --product-list-items-per-row: {{ section.settings.products_per_row_desktop }};
+    }
+  }
+
+  /* Hidden by default — JS reveals exactly the randomly-chosen cards below.
+     [handle] excludes onboarding placeholder cards (no handle attribute),
+     which should stay visible as-is when the store has no products yet. */
+  #shopify-section-{{ section.id }} .product-list > product-card[handle]:not(.is-rfp-selected) {
+    display: none;
+  }
+</style>
+
+<div {% render 'section-properties' %}>
+  <div class="section-stack">
+    {%- assign link_url = section.settings.link_url -%}
+    {%- render 'section-header', subheading: section.settings.subheading, heading: section.settings.title, heading_color: section.settings.heading_color, heading_gradient: section.settings.heading_gradient, content: section.settings.content, link_text: section.settings.link_text, link_url: link_url -%}
+
+    <div
+      id="rfp-section-{{ section.id }}"
+      data-random-featured-products
+      data-count="{{ section.settings.products_count }}"
+      {%- if template contains 'product' and product %}
+      data-context="product"
+      data-current-handle="{{ product.handle }}"
+      {%- elsif template contains 'collection' %}
+      data-context="collection"
+      {%- else %}
+      data-context="other"
+      {%- endif %}
+    >
+      <product-list class="product-list" data-rfp-grid>
+        {%- assign rfp_rendered_count = 0 -%}
+        {%- paginate collections.all.products by section.settings.pool_size -%}
+          {%- for product in collections.all.products -%}
+            {%- if product.available -%}
+              {%- assign rfp_rendered_count = rfp_rendered_count | plus: 1 -%}
+              {%- render 'product-card', product: product, stacked: true, position: forloop.index, background: section.settings.product_card_background, text_color: section.settings.product_card_text_color, show_badges: true -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endpaginate -%}
+
+        {%- comment -%} No available products anywhere in the store yet (fresh/empty store) — show onboarding placeholders instead of an empty section {%- endcomment -%}
+        {%- if rfp_rendered_count == 0 -%}
+          {%- for i in (1..section.settings.products_count) -%}
+            {%- capture placeholder_image -%}product-{% cycle '1', '2', '3', '4', '5', '6' %}{%- endcapture -%}
+            {%- render 'product-card-placeholder', stacked: true, placeholder_image: placeholder_image, background: section.settings.product_card_background, text_color: section.settings.product_card_text_color, text_alignment: settings.product_info_alignment -%}
+          {%- endfor -%}
+        {%- endif -%}
+      </product-list>
+    </div>
+  </div>
+</div>
+
+<noscript>
+  <style>#rfp-section-{{ section.id }} { display: none; }</style>
+</noscript>
+
+<script>
+(function () {
+  var root = document.getElementById('rfp-section-{{ section.id }}');
+  if (!root) return;
+  var grid = root.querySelector('[data-rfp-grid]');
+  if (!grid) return;
+
+  var SHOWN_KEY = 'rfp:shown:v2';
+  var count = parseInt(root.getAttribute('data-count'), 10) || 6;
+  var context = root.getAttribute('data-context');
+  var currentHandle = root.getAttribute('data-current-handle');
+
+  function safeGet(key) {
+    try {
+      var raw = sessionStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function safeSet(key, value) {
+    try {
+      sessionStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+      /* sessionStorage unavailable/full — degrades to "no memory across refreshes" */
+    }
+  }
+
+  function getCollectionGridHandles() {
+    var handles = {};
+    var main = document.querySelector('main') || document.body;
+    var links = main.querySelectorAll('a[href*="/products/"]');
+    for (var i = 0; i < links.length; i++) {
+      var a = links[i];
+      if (a.closest('[data-random-featured-products]')) continue;
+      var match = a.getAttribute('href').match(/\/products\/([^/?#]+)/);
+      if (match && match[1]) {
+        try { handles[decodeURIComponent(match[1])] = true; } catch (e) { handles[match[1]] = true; }
+      }
+    }
+    return handles;
+  }
+
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  function pickProducts(candidates, shownHandles, needed) {
+    var pool = shuffle(candidates.slice());
+    var shownSet = {};
+    for (var i = 0; i < shownHandles.length; i++) shownSet[shownHandles[i]] = true;
+
+    var unseen = pool.filter(function (p) { return !shownSet[p.handle]; });
+    var selected = unseen.slice(0, needed);
+
+    if (selected.length < needed && selected.length < pool.length) {
+      // Cycle exhausted (or nearly): start a fresh cycle, topping up without
+      // repeating a product within this same selection.
+      var pickedSet = {};
+      for (var j = 0; j < selected.length; j++) pickedSet[selected[j].handle] = true;
+      var remaining = pool.filter(function (p) { return !pickedSet[p.handle]; });
+      selected = selected.concat(remaining.slice(0, needed - selected.length));
+      shownHandles = []; // new cycle starts from this selection
+    }
+
+    var newShown = shownHandles.concat(selected.map(function (p) { return p.handle; }));
+    return { selected: selected, shown: newShown };
+  }
+
+  function init() {
+    var cards = Array.prototype.slice.call(grid.querySelectorAll('product-card'));
+    if (!cards.length) { root.hidden = true; return; }
+
+    // Onboarding placeholders (empty/fresh store) have no "handle" attribute.
+    // Leave them as-is — they're already visible via CSS — and skip selection.
+    var hasPlaceholders = cards.some(function (el) { return !el.getAttribute('handle'); });
+    if (hasPlaceholders) return;
+
+    var exclude = {};
+    if (context === 'product' && currentHandle) {
+      exclude[currentHandle] = true;
+    } else if (context === 'collection') {
+      exclude = getCollectionGridHandles();
+    }
+
+    var candidates = cards
+      .map(function (el) { return { handle: el.getAttribute('handle'), el: el }; })
+      .filter(function (p) { return p.handle && !exclude[p.handle]; });
+
+    if (!candidates.length) { root.hidden = true; return; }
+
+    var needed = Math.min(count, candidates.length);
+    var shownHandles = safeGet(SHOWN_KEY) || [];
+    var result = pickProducts(candidates, shownHandles, needed);
+    safeSet(SHOWN_KEY, result.shown);
+
+    result.selected.forEach(function (p) { p.el.classList.add('is-rfp-selected'); });
+    root.hidden = false;
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Random Featured Products",
+  "class": "shopify-section--random-featured-products",
+  "tag": "section",
+  "disabled_on": {
+    "templates": ["password"],
+    "groups": ["header", "custom.overlay"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "You Might Also Like"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "Content"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "Link URL",
+      "info": "Optional — e.g. link to your full catalog."
+    },
+    {
+      "type": "text",
+      "id": "link_text",
+      "label": "Link text",
+      "default": "View all"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full width",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Randomization"
+    },
+    {
+      "type": "range",
+      "id": "products_count",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "label": "Products to show",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "pool_size",
+      "min": 12,
+      "max": 300,
+      "step": 6,
+      "label": "Product pool size",
+      "default": 48,
+      "info": "The random rotation is drawn from this many of your available products. Shopify limits a single pull to 250 products — if your catalog is smaller than this number, every available product is included."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "products_per_row_mobile",
+      "label": "Products per row (mobile)",
+      "options": [
+        { "value": "1", "label": "1" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "range",
+      "id": "products_per_row_desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "Products per row (desktop)",
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Colors",
+      "info": "Gradient replaces solid colors when set."
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background"
+    },
+    {
+      "type": "color_background",
+      "id": "background_gradient",
+      "label": "Background gradient"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color"
+    },
+    {
+      "type": "color_background",
+      "id": "heading_gradient",
+      "label": "Heading gradient"
+    },
+    {
+      "type": "color",
+      "id": "product_card_background",
+      "label": "Product card background"
+    },
+    {
+      "type": "color",
+      "id": "product_card_text_color",
+      "label": "Product card text"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Random Featured Products",
+      "category": "Collections"
+    }
+  ]
+}
+{% endschema %}

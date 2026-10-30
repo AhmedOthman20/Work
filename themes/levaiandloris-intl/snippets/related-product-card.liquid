@@ -1,0 +1,64 @@
+{%- comment -%}
+  Related product card
+  Used by: snippets/related-products-block.liquid, sections/related-products-ajax.liquid
+  Params:
+    - item: product object
+  Card options (vendor, badge, hover image, ratio) are toggled with CSS classes on the
+  parent .rp wrapper, so the same markup works for Liquid and AJAX-loaded products.
+{%- endcomment -%}
+
+{%- liquid
+  assign rp_on_sale = false
+  if item.compare_at_price > item.price
+    assign rp_on_sale = true
+    assign rp_pct = item.compare_at_price | minus: item.price | times: 100.0 | divided_by: item.compare_at_price | round
+  endif
+
+  assign rp_alt = item.featured_media.alt | default: item.title | escape
+
+  assign rp_secondary = blank
+  for media in item.media offset: 1
+    if media.media_type == 'image' or media.preview_image != blank
+      assign rp_secondary = media.preview_image
+      break
+    endif
+  endfor
+-%}
+
+<li class="rp-card{% unless item.available %} rp-card--sold-out{% endunless %}">
+  <a href="{{ item.url }}" class="rp-card__link">
+    <div class="rp-card__media">
+      {%- if item.featured_media != blank -%}
+        {{- item.featured_media | image_url: width: 600 | image_tag: loading: 'lazy', alt: rp_alt, sizes: '(min-width: 1000px) 220px, 45vw', widths: '200,300,400,500,600', class: 'rp-card__img rp-card__img--primary' -}}
+
+        {%- if rp_secondary != blank -%}
+          {{- rp_secondary | image_url: width: 600 | image_tag: loading: 'lazy', alt: '', sizes: '(min-width: 1000px) 220px, 45vw', widths: '200,300,400,500,600', class: 'rp-card__img rp-card__img--secondary' -}}
+        {%- endif -%}
+      {%- else -%}
+        {{- 'product-1' | placeholder_svg_tag: 'rp-card__placeholder' -}}
+      {%- endif -%}
+
+      {%- if rp_on_sale -%}
+        <span class="rp-card__badge">-{{ rp_pct }}%</span>
+      {%- endif -%}
+    </div>
+
+    <div class="rp-card__info">
+      {%- if item.vendor != blank -%}
+        <span class="rp-card__vendor">{{ item.vendor }}</span>
+      {%- endif -%}
+
+      <span class="rp-card__title">{{ item.title }}</span>
+
+      <span class="rp-card__price">
+        <span class="rp-card__price-current{% if rp_on_sale %} rp-card__price-current--sale{% endif %}">
+          {{- item.price | money -}}
+        </span>
+
+        {%- if rp_on_sale -%}
+          <s class="rp-card__price-compare">{{ item.compare_at_price | money }}</s>
+        {%- endif -%}
+      </span>
+    </div>
+  </a>
+</li>
