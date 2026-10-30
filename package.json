@@ -1,0 +1,30 @@
+{
+  "name": "work",
+  "version": "1.0.0",
+  "scripts": {
+    "levai:list": "node scripts/theme.mjs levai list",
+    "levai:pull": "node scripts/theme.mjs levai pull",
+    "levai:push": "node scripts/theme.mjs levai push",
+    "levai:dev": "node scripts/theme.mjs levai dev",
+    "levai:check": "node scripts/theme.mjs levai check",
+    "levai:info": "node scripts/theme.mjs levai info",
+    "dz:list": "node scripts/theme.mjs dz list",
+    "dz:pull": "node scripts/theme.mjs dz pull",
+    "dz:push": "node scripts/theme.mjs dz push",
+    "dz:dev": "node scripts/theme.mjs dz dev",
+    "dz:check": "node scripts/theme.mjs dz check",
+    "dz:info": "node scripts/theme.mjs dz info"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AhmedOthman20/Work.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AhmedOthman20/Work/issues"
+  },
+  "homepage": "https://github.com/AhmedOthman20/Work#readme",
+  "devDependencies": {
+    "@shopify/cli": "5.0.0"
+  },
+  "private": true
+}

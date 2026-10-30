@@ -1,0 +1,10 @@
+# بيئات Shopify CLI لكل متجر. الاستخدام: npx shopify theme <command> -e <environment>
+# كلمات مرور Theme Access لا تُحفظ هنا؛ تُمرَّر عبر متغيرات البيئة (انظر README.md).
+
+[environments.levai]
+store = "levaiandloris-intl.myshopify.com"
+path = "themes/levaiandloris-intl"
+
+[environments.dz]
+store = "u26d27-dz.myshopify.com"
+path = "themes/u26d27-dz"
