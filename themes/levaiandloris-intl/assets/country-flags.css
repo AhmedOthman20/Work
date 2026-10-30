@@ -1,6 +1,6 @@
 .country-flags {
-  background: -webkit-image-set(url("//levaiandloris.com/cdn/shop/t/2/assets/country-flags.png?v=37230036826556269641771965824") 1x, url("//levaiandloris.com/cdn/shop/t/2/assets/country-flags-2x.png?v=119388446682176363021771965824") 2x) no-repeat top left;
-  background: image-set(url("//levaiandloris.com/cdn/shop/t/2/assets/country-flags.png?v=37230036826556269641771965824") 1x, url("//levaiandloris.com/cdn/shop/t/2/assets/country-flags-2x.png?v=119388446682176363021771965824") 2x) no-repeat top left;
+  background: -webkit-image-set(url("//global.levaiandloris.com/cdn/shop/t/2/assets/country-flags.png?v=37230036826556269641779223639") 1x, url("//global.levaiandloris.com/cdn/shop/t/2/assets/country-flags-2x.png?v=119388446682176363021779223639") 2x) no-repeat top left;
+  background: image-set(url("//global.levaiandloris.com/cdn/shop/t/2/assets/country-flags.png?v=37230036826556269641779223639") 1x, url("//global.levaiandloris.com/cdn/shop/t/2/assets/country-flags-2x.png?v=119388446682176363021779223639") 2x) no-repeat top left;
   width: 20px;
   height: 20px;
   flex-shrink: 0;

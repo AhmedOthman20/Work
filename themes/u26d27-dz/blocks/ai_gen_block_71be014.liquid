@@ -1,0 +1,482 @@
+{% doc %}
+  @prompt
+    a section divided in half image and text side by side and i can control which is right and left and it can be assigned from product Metafields and metaobjects and if the filed is blank the section would be hudden
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% liquid
+  assign image_source = null
+  assign text_content = null
+  assign heading_content = null
+
+  if block.settings.content_source == 'metafield'
+    if block.settings.image_metafield != blank
+      assign image_source = product.metafields[block.settings.image_metafield]
+    endif
+    if block.settings.text_metafield != blank
+      assign text_content = product.metafields[block.settings.text_metafield]
+    endif
+    if block.settings.heading_metafield != blank
+      assign heading_content = product.metafields[block.settings.heading_metafield]
+    endif
+  elsif block.settings.content_source == 'metaobject'
+    if block.settings.metaobject_reference != blank
+      assign metaobject_data = product.metafields[block.settings.metaobject_reference]
+      if metaobject_data != blank
+        assign image_source = metaobject_data.image
+        assign text_content = metaobject_data.text
+        assign heading_content = metaobject_data.heading
+      endif
+    endif
+  else
+    assign image_source = block.settings.manual_image
+    assign text_content = block.settings.manual_text
+    assign heading_content = block.settings.manual_heading
+  endif
+
+  assign has_content = false
+  if image_source != blank or text_content != blank or heading_content != blank
+    assign has_content = true
+  endif
+%}
+
+{% if has_content %}
+  {% style %}
+    .ai-split-section-{{ ai_gen_id }} {
+      display: block;
+      width: 100%;
+      background-color: {{ block.settings.background_color }};
+      padding: {{ block.settings.section_padding }}px 0;
+    }
+
+    .ai-split-section__container-{{ ai_gen_id }} {
+      max-width: {{ block.settings.container_width }}px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .ai-split-section__wrapper-{{ ai_gen_id }} {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: {{ block.settings.gap }}px;
+      align-items: {{ block.settings.vertical_alignment }};
+    }
+
+    .ai-split-section__wrapper-{{ ai_gen_id }}.reverse {
+      direction: rtl;
+    }
+
+    .ai-split-section__wrapper-{{ ai_gen_id }}.reverse > * {
+      direction: ltr;
+    }
+
+    .ai-split-section__image-wrapper-{{ ai_gen_id }} {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      border-radius: {{ block.settings.image_border_radius }}px;
+    }
+
+    .ai-split-section__image-{{ ai_gen_id }} {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+
+    .ai-split-section__image-placeholder-{{ ai_gen_id }} {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background-color: #f4f4f4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: {{ block.settings.image_border_radius }}px;
+    }
+
+    .ai-split-section__image-placeholder-{{ ai_gen_id }} svg {
+      width: 100%;
+      height: 100%;
+      max-width: 300px;
+      max-height: 300px;
+    }
+
+    .ai-split-section__content-{{ ai_gen_id }} {
+      padding: {{ block.settings.content_padding }}px;
+    }
+
+    .ai-split-section__heading-{{ ai_gen_id }} {
+      font-family: {{ block.settings.heading_font.family }}, {{ block.settings.heading_font.fallback_families }};
+      font-weight: {{ block.settings.heading_font.weight }};
+      font-size: {{ block.settings.heading_size }}px;
+      color: {{ block.settings.heading_color }};
+      margin: 0 0 {{ block.settings.heading_spacing }}px 0;
+      line-height: 1.2;
+    }
+
+    .ai-split-section__text-{{ ai_gen_id }} {
+      font-size: {{ block.settings.text_size }}px;
+      color: {{ block.settings.text_color }};
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .ai-split-section__text-{{ ai_gen_id }} p {
+      margin: 0 0 16px 0;
+    }
+
+    .ai-split-section__text-{{ ai_gen_id }} p:last-child {
+      margin-bottom: 0;
+    }
+
+    @media screen and (max-width: 749px) {
+      .ai-split-section__wrapper-{{ ai_gen_id }} {
+        grid-template-columns: 1fr;
+        gap: {{ block.settings.mobile_gap }}px;
+      }
+
+      .ai-split-section__wrapper-{{ ai_gen_id }}.reverse {
+        direction: ltr;
+      }
+
+      {% if block.settings.mobile_image_first %}
+        .ai-split-section__image-wrapper-{{ ai_gen_id }} {
+          order: -1;
+        }
+      {% endif %}
+
+      .ai-split-section__heading-{{ ai_gen_id }} {
+        font-size: {{ block.settings.heading_size | times: 0.8 }}px;
+      }
+
+      .ai-split-section__text-{{ ai_gen_id }} {
+        font-size: {{ block.settings.text_size | times: 0.9 }}px;
+      }
+
+      .ai-split-section__content-{{ ai_gen_id }} {
+        padding: {{ block.settings.content_padding | times: 0.5 }}px;
+      }
+    }
+  {% endstyle %}
+
+  <div class="ai-split-section-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+    <div class="ai-split-section__container-{{ ai_gen_id }}">
+      <div class="ai-split-section__wrapper-{{ ai_gen_id }} {% if block.settings.layout == 'text_left' %}reverse{% endif %}">
+        <div class="ai-split-section__image-wrapper-{{ ai_gen_id }}">
+          {% if image_source != blank %}
+            {% if image_source.src %}
+              <img
+                src="{{ image_source | image_url: width: 1200 }}"
+                alt="{{ image_source.alt | escape }}"
+                class="ai-split-section__image-{{ ai_gen_id }}"
+                loading="lazy"
+                width="{{ image_source.width }}"
+                height="{{ image_source.height }}"
+              >
+            {% else %}
+              <img
+                src="{{ image_source | image_url: width: 1200 }}"
+                alt="{{ heading_content | escape }}"
+                class="ai-split-section__image-{{ ai_gen_id }}"
+                loading="lazy"
+              >
+            {% endif %}
+          {% else %}
+            <div class="ai-split-section__image-placeholder-{{ ai_gen_id }}">
+              {{ 'image' | placeholder_svg_tag }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="ai-split-section__content-{{ ai_gen_id }}">
+          {% if heading_content != blank %}
+            <h2 class="ai-split-section__heading-{{ ai_gen_id }}">
+              {{ heading_content }}
+            </h2>
+          {% endif %}
+
+          {% if text_content != blank %}
+            <div class="ai-split-section__text-{{ ai_gen_id }}">
+              {{ text_content }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Split image and text",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content source"
+    },
+    {
+      "type": "select",
+      "id": "content_source",
+      "label": "Source",
+      "options": [
+        {
+          "value": "manual",
+          "label": "Manual"
+        },
+        {
+          "value": "metafield",
+          "label": "Product metafields"
+        },
+        {
+          "value": "metaobject",
+          "label": "Product metaobject"
+        }
+      ],
+      "default": "manual"
+    },
+    {
+      "type": "header",
+      "content": "Manual content"
+    },
+    {
+      "type": "image_picker",
+      "id": "manual_image",
+      "label": "Image"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "manual_heading",
+      "label": "Heading",
+      "default": "Split section heading"
+    },
+    {
+      "type": "richtext",
+      "id": "manual_text",
+      "label": "Text",
+      "default": "<p>Add your content here. This section will automatically hide if all fields are empty.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Metafield settings"
+    },
+    {
+      "type": "paragraph",
+      "content": "Enter metafield keys in format: namespace.key (e.g., custom.feature_image)"
+    },
+    {
+      "type": "text",
+      "id": "image_metafield",
+      "label": "Image metafield key"
+    },
+    {
+      "type": "text",
+      "id": "heading_metafield",
+      "label": "Heading metafield key"
+    },
+    {
+      "type": "text",
+      "id": "text_metafield",
+      "label": "Text metafield key"
+    },
+    {
+      "type": "header",
+      "content": "Metaobject settings"
+    },
+    {
+      "type": "paragraph",
+      "content": "Enter metaobject reference key. The metaobject should have fields named: image, heading, and text"
+    },
+    {
+      "type": "text",
+      "id": "metaobject_reference",
+      "label": "Metaobject reference key"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Desktop layout",
+      "options": [
+        {
+          "value": "image_left",
+          "label": "Image left, text right"
+        },
+        {
+          "value": "text_left",
+          "label": "Text left, image right"
+        }
+      ],
+      "default": "image_left"
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "Vertical alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "end",
+          "label": "Bottom"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_image_first",
+      "label": "Show image first on mobile",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "container_width",
+      "label": "Container width",
+      "min": 1000,
+      "max": 1800,
+      "step": 100,
+      "unit": "px",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap between columns",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "mobile_gap",
+      "label": "Mobile gap",
+      "min": 0,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "label": "Section padding",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "content_padding",
+      "label": "Content padding",
+      "min": 0,
+      "max": 80,
+      "step": 10,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Heading style"
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Font",
+      "default": "raleway_n7"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Size",
+      "min": 20,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "heading_spacing",
+      "label": "Spacing below",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Text style"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "header",
+      "content": "Image style"
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Split image and text"
+    }
+  ]
+}
+{% endschema %}

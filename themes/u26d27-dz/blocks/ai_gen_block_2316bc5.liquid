@@ -1,0 +1,1063 @@
+{% doc %}
+  @prompt
+    create a videos carousel  with the videos dimensions of the Instagram reels and the option to add the videos as separate elements also i can link the video to certain product and auto play and show a controller of the volume wither be mute or not for every video and the section can show 5 videos per row with the option to increase it or decrease it also in the mobile view it can be displayed as carousel slider with arrows to navigate right and left and the product widget should contain a small image of the product and to be displayed under each video , make the desktop display as slider carousel can be navigated left and right not a grid , also make the videos height unified  , also adapt to the video's width ,don't change the video dimensions after assigning the product , don't change the video width to adapt to the product title width , you divide the product title into 2 lines
+    there is no thumbnails and play button for videos
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-video-carousel-{{ ai_gen_id }} {
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    position: relative;
+    display: block;
+  }
+
+  .ai-video-carousel__container-{{ ai_gen_id }} {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-video-carousel__track-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.gap }}px;
+    transition: transform 0.4s ease;
+  }
+
+  .ai-video-carousel__item-{{ ai_gen_id }} {
+    flex: 0 0 calc((100% - ({{ block.settings.videos_per_row | minus: 1 }} * {{ block.settings.gap }}px)) / {{ block.settings.videos_per_row }});
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .ai-video-carousel__video-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    background-color: #000000;
+    border-radius: {{ block.settings.video_border_radius }}px;
+    overflow: hidden;
+  }
+
+  .ai-video-carousel__video-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+  }
+
+  .ai-video-carousel__play-button-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: {{ block.settings.control_background }};
+    color: {{ block.settings.control_icon_color }};
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.85;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 2;
+  }
+
+  .ai-video-carousel__play-button-{{ ai_gen_id }}:hover {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+
+  .ai-video-carousel__play-button-{{ ai_gen_id }} svg {
+    width: 24px;
+    height: 24px;
+    margin-left: 3px;
+  }
+
+  .ai-video-carousel__video-wrapper-{{ ai_gen_id }}.is-playing .ai-video-carousel__play-button-{{ ai_gen_id }} {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .ai-video-carousel__mute-button-{{ ai_gen_id }} {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: {{ block.settings.control_background }};
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: {{ block.settings.control_icon_color }};
+    transition: opacity 0.3s ease;
+    z-index: 3;
+  }
+
+  .ai-video-carousel__mute-button-{{ ai_gen_id }}:hover {
+    opacity: 0.8;
+  }
+
+  .ai-video-carousel__mute-button-{{ ai_gen_id }} svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .ai-video-carousel__product-card-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background-color: {{ block.settings.product_card_background }};
+    border-radius: {{ block.settings.product_card_border_radius }}px;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+  }
+
+  .ai-video-carousel__product-card-{{ ai_gen_id }}:hover {
+    transform: translateY(-2px);
+  }
+
+  .ai-video-carousel__product-image-{{ ai_gen_id }} {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .ai-video-carousel__product-image-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-video-carousel__product-info-{{ ai_gen_id }} {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ai-video-carousel__product-title-{{ ai_gen_id }} {
+    font-size: 14px;
+    font-weight: 600;
+    color: {{ block.settings.product_text_color }};
+    margin: 0 0 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.4;
+  }
+
+  .ai-video-carousel__product-price-{{ ai_gen_id }} {
+    font-size: 14px;
+    color: {{ block.settings.product_text_color }};
+    margin: 0;
+  }
+
+  .ai-video-carousel__nav-button-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: {{ block.settings.nav_button_background }};
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: {{ block.settings.nav_button_icon_color }};
+    z-index: 4;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-video-carousel__nav-button-{{ ai_gen_id }}:hover {
+    opacity: 0.8;
+  }
+
+  .ai-video-carousel__nav-button-{{ ai_gen_id }}:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .ai-video-carousel__nav-button-{{ ai_gen_id }} svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .ai-video-carousel__nav-button--prev-{{ ai_gen_id }} {
+    left: -25px;
+  }
+
+  .ai-video-carousel__nav-button--next-{{ ai_gen_id }} {
+    right: -25px;
+  }
+
+  .ai-video-carousel__empty-state-{{ ai_gen_id }} {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+  }
+
+  .ai-video-carousel__empty-state-{{ ai_gen_id }} svg {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 16px;
+    opacity: 0.3;
+  }
+
+  @media screen and (max-width: 749px) {
+    {%- liquid
+      assign m_per_row = block.settings.mobile_videos_per_row
+      assign m_gap = block.settings.gap_mobile
+      assign m_full_gaps = m_per_row | floor
+    -%}
+    .ai-video-carousel__track-{{ ai_gen_id }} {
+      gap: {{ m_gap }}px;
+    }
+
+    {% if block.settings.mobile_layout == 'center' %}
+      /* Centered: the active video sits in the middle, smaller neighbours peek in on both sides */
+      .ai-video-carousel__item-{{ ai_gen_id }} {
+        flex: 0 0 {{ block.settings.mobile_center_width }}%;
+        gap: 8px;
+        transform: scale({{ block.settings.mobile_side_scale | divided_by: 100.0 }});
+        transform-origin: center center;
+        opacity: 0.75;
+        transition: transform 0.4s ease, opacity 0.4s ease;
+      }
+
+      .ai-video-carousel__item-{{ ai_gen_id }}.is-active {
+        transform: scale(1);
+        opacity: 1;
+      }
+    {% else %}
+      /* e.g. 2.5 per row: 2 full gaps are visible, the 3rd video is half shown */
+      .ai-video-carousel__item-{{ ai_gen_id }} {
+        flex: 0 0 calc((100% - {{ m_full_gaps }} * {{ m_gap }}px) / {{ m_per_row }});
+        gap: 8px;
+      }
+    {% endif %}
+
+    .ai-video-carousel__play-button-{{ ai_gen_id }} {
+      width: 42px;
+      height: 42px;
+    }
+
+    .ai-video-carousel__play-button-{{ ai_gen_id }} svg {
+      width: 18px;
+      height: 18px;
+      margin-left: 2px;
+    }
+
+    .ai-video-carousel__mute-button-{{ ai_gen_id }} {
+      top: 8px;
+      right: 8px;
+      width: 30px;
+      height: 30px;
+    }
+
+    .ai-video-carousel__mute-button-{{ ai_gen_id }} svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    /* Narrow cards: stack the product image above the text */
+    .ai-video-carousel__product-card-{{ ai_gen_id }} {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      padding: 6px;
+    }
+
+    .ai-video-carousel__product-image-{{ ai_gen_id }} {
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+    }
+
+    .ai-video-carousel__product-title-{{ ai_gen_id }},
+    .ai-video-carousel__product-price-{{ ai_gen_id }} {
+      font-size: 12px;
+    }
+
+    .ai-video-carousel__nav-button-{{ ai_gen_id }} {
+      width: 36px;
+      height: 36px;
+    }
+
+    .ai-video-carousel__nav-button-{{ ai_gen_id }} svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .ai-video-carousel__nav-button--prev-{{ ai_gen_id }} {
+      left: 6px;
+    }
+
+    .ai-video-carousel__nav-button--next-{{ ai_gen_id }} {
+      right: 6px;
+    }
+  }
+{% endstyle %}
+
+<video-carousel-{{ ai_gen_id }}
+  class="ai-video-carousel-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  {% assign has_videos = false %}
+  {% for i in (1..10) %}
+    {% assign video_key = 'video_' | append: i %}
+    {% if block.settings[video_key] != blank %}
+      {% assign has_videos = true %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+
+  {% if has_videos %}
+    <div class="ai-video-carousel__container-{{ ai_gen_id }}">
+      <button
+        class="ai-video-carousel__nav-button-{{ ai_gen_id }} ai-video-carousel__nav-button--prev-{{ ai_gen_id }}"
+        aria-label="Previous"
+        data-nav="prev"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <div class="ai-video-carousel__track-{{ ai_gen_id }}">
+        {% for i in (1..10) %}
+          {% liquid
+            assign video_key = 'video_' | append: i
+            assign product_key = 'product_' | append: i
+            assign video = block.settings[video_key]
+            assign product = block.settings[product_key]
+          %}
+
+          {% if video != blank %}
+            <div class="ai-video-carousel__item-{{ ai_gen_id }}" data-index="{{ forloop.index0 }}">
+              <div class="ai-video-carousel__video-wrapper-{{ ai_gen_id }}">
+                <video
+                  class="ai-video-carousel__video-{{ ai_gen_id }}"
+                  {% if video.preview_image %}
+                    poster="{{ video.preview_image | image_url: width: 720 }}"
+                  {% endif %}
+                  {% if block.settings.autoplay %}autoplay{% endif %}
+                  loop
+                  muted
+                  playsinline
+                  preload="metadata"
+                >
+                  {% for source in video.sources %}
+                    <source
+                      src="{{ source.url }}"
+                      type="{{ source.mime_type }}"
+                    >
+                  {% endfor %}
+                </video>
+
+                {% if block.settings.show_play_button %}
+                  <button
+                    class="ai-video-carousel__play-button-{{ ai_gen_id }}"
+                    aria-label="Play video"
+                    data-play-toggle
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <polygon points="6 4 20 12 6 20 6 4"></polygon>
+                    </svg>
+                  </button>
+                {% endif %}
+
+                <button
+                  class="ai-video-carousel__mute-button-{{ ai_gen_id }}"
+                  aria-label="Toggle mute"
+                  data-mute-toggle
+                >
+                  <svg
+                    class="ai-video-carousel__mute-icon-muted-{{ ai_gen_id }}"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <line x1="23" y1="9" x2="17" y2="15"></line>
+                    <line x1="17" y1="9" x2="23" y2="15"></line>
+                  </svg>
+                  <svg
+                    class="ai-video-carousel__mute-icon-unmuted-{{ ai_gen_id }}"
+                    style="display: none;"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                  </svg>
+                </button>
+              </div>
+
+              {% if product != blank %}
+                <a
+                  href="{{ product.url }}"
+                  class="ai-video-carousel__product-card-{{ ai_gen_id }}"
+                >
+                  <div class="ai-video-carousel__product-image-{{ ai_gen_id }}">
+                    {% if product.featured_image %}
+                      <img
+                        src="{{ product.featured_image | image_url: width: 120 }}"
+                        alt="{{ product.featured_image.alt | escape }}"
+                        width="120"
+                        height="120"
+                        loading="lazy"
+                      >
+                    {% endif %}
+                  </div>
+                  <div class="ai-video-carousel__product-info-{{ ai_gen_id }}">
+                    <h3 class="ai-video-carousel__product-title-{{ ai_gen_id }}">{{ product.title }}</h3>
+                    <p class="ai-video-carousel__product-price-{{ ai_gen_id }}">{{ product.price | money }}</p>
+                  </div>
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <button
+        class="ai-video-carousel__nav-button-{{ ai_gen_id }} ai-video-carousel__nav-button--next-{{ ai_gen_id }}"
+        aria-label="Next"
+        data-nav="next"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+  {% else %}
+    <div class="ai-video-carousel__empty-state-{{ ai_gen_id }}">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polygon points="23 7 16 12 23 17 23 7"></polygon>
+        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+      </svg>
+      <p>Next, add videos to your carousel</p>
+    </div>
+  {% endif %}
+</video-carousel-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class VideoCarousel{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentIndex = 0;
+        this.videosPerRow = {{ block.settings.videos_per_row }};
+        this.isMobile = window.innerWidth <= 749;
+        this.centerOnMobile = {% if block.settings.mobile_layout == 'center' %}true{% else %}false{% endif %};
+        this.autoplay = {{ block.settings.autoplay }};
+        this.mobileStart = '{{ block.settings.mobile_start }}';
+      }
+
+      get centerMode() {
+        return this.centerOnMobile && this.isMobile;
+      }
+
+      /* Centered mode can open on the middle video so there are videos on both sides */
+      getStartIndex() {
+        if (this.centerMode && this.mobileStart === 'middle') {
+          return Math.floor((this.items.length - 1) / 2);
+        }
+        return 0;
+      }
+
+      /* Jump to the start position without the slide animation */
+      jumpToStart() {
+        this.currentIndex = this.getStartIndex();
+        this.track.style.transition = 'none';
+        this.updateCarousel();
+        void this.track.offsetWidth;
+        this.track.style.transition = '';
+      }
+
+      connectedCallback() {
+        this.track = this.querySelector('.ai-video-carousel__track-{{ ai_gen_id }}');
+        this.items = Array.from(this.querySelectorAll('.ai-video-carousel__item-{{ ai_gen_id }}'));
+        this.prevButton = this.querySelector('[data-nav="prev"]');
+        this.nextButton = this.querySelector('[data-nav="next"]');
+        this.muteButtons = this.querySelectorAll('[data-mute-toggle]');
+
+        if (!this.track || this.items.length === 0) return;
+
+        this.setupNavigation();
+        this.setupSideClicks();
+        this.setupSwipe();
+        this.setupPlayback();
+        this.setupMuteButtons();
+        this.jumpToStart();
+
+        window.addEventListener('resize', () => {
+          const wasMobile = this.isMobile;
+          this.isMobile = window.innerWidth <= 749;
+          if (wasMobile !== this.isMobile) {
+            this.jumpToStart();
+          } else {
+            this.updateCarousel();
+          }
+        });
+      }
+
+      setupNavigation() {
+        if (this.prevButton) {
+          this.prevButton.addEventListener('click', () => this.navigate('prev'));
+        }
+        if (this.nextButton) {
+          this.nextButton.addEventListener('click', () => this.navigate('next'));
+        }
+      }
+
+      /* Centered mode: tapping a side video brings it to the middle
+         instead of playing it or opening its product link. */
+      setupSideClicks() {
+        this.items.forEach((item, index) => {
+          item.addEventListener(
+            'click',
+            (event) => {
+              if (!this.centerMode || index === this.currentIndex) return;
+              event.preventDefault();
+              event.stopPropagation();
+              this.currentIndex = index;
+              this.updateCarousel();
+            },
+            true
+          );
+        });
+      }
+
+      setupSwipe() {
+        const area = this.track.parentElement;
+        let startX = 0;
+        let startY = 0;
+
+        area.addEventListener('touchstart', (event) => {
+          startX = event.touches[0].clientX;
+          startY = event.touches[0].clientY;
+        }, { passive: true });
+
+        area.addEventListener('touchend', (event) => {
+          const dx = event.changedTouches[0].clientX - startX;
+          const dy = event.changedTouches[0].clientY - startY;
+          if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+            this.navigate(dx < 0 ? 'next' : 'prev');
+          }
+        }, { passive: true });
+      }
+
+      /* Play button is shown over the poster while a video is paused,
+         and hidden while it plays. Tapping the video pauses it again. */
+      setupPlayback() {
+        this.querySelectorAll('.ai-video-carousel__video-wrapper-{{ ai_gen_id }}').forEach((wrapper) => {
+          const video = wrapper.querySelector('video');
+          const playButton = wrapper.querySelector('[data-play-toggle]');
+          if (!video) return;
+
+          const sync = () => {
+            wrapper.classList.toggle('is-playing', !video.paused);
+            if (playButton) {
+              playButton.setAttribute('aria-label', video.paused ? 'Play video' : 'Pause video');
+            }
+          };
+
+          const toggle = () => {
+            if (video.paused) {
+              video.play().catch(() => {});
+            } else {
+              video.pause();
+            }
+          };
+
+          video.addEventListener('play', sync);
+          video.addEventListener('playing', sync);
+          video.addEventListener('pause', sync);
+          video.addEventListener('click', toggle);
+          if (playButton) playButton.addEventListener('click', toggle);
+          sync();
+        });
+      }
+
+      setupMuteButtons() {
+        this.muteButtons.forEach((button) => {
+          const videoWrapper = button.closest('.ai-video-carousel__video-wrapper-{{ ai_gen_id }}');
+          const video = videoWrapper.querySelector('video');
+          const mutedIcon = button.querySelector('.ai-video-carousel__mute-icon-muted-{{ ai_gen_id }}');
+          const unmutedIcon = button.querySelector('.ai-video-carousel__mute-icon-unmuted-{{ ai_gen_id }}');
+
+          button.addEventListener('click', () => {
+            if (video.muted) {
+              video.muted = false;
+              mutedIcon.style.display = 'none';
+              unmutedIcon.style.display = 'block';
+            } else {
+              video.muted = true;
+              mutedIcon.style.display = 'block';
+              unmutedIcon.style.display = 'none';
+            }
+          });
+        });
+      }
+
+      /* Measured from the real layout, so it works for any per-row value,
+         including fractions like 2.5 where the last video must slide fully in. */
+      getMetrics() {
+        const gap = parseFloat(getComputedStyle(this.track).columnGap) || 0;
+        const step = this.items[0].offsetWidth + gap;
+        const viewport = this.track.parentElement.clientWidth;
+
+        if (this.centerMode) {
+          /* Shift so the active video's centre lines up with the viewport's centre */
+          const centerShift = (viewport - this.items[0].offsetWidth) / 2;
+          return { step, centerShift, maxOffset: Infinity, maxIndex: this.items.length - 1 };
+        }
+
+        const maxOffset = Math.max(0, this.track.scrollWidth - viewport);
+        const maxIndex = step > 0 ? Math.ceil(maxOffset / step - 0.01) : 0;
+        return { step, maxOffset, maxIndex };
+      }
+
+      navigate(direction) {
+        const { maxIndex } = this.getMetrics();
+
+        if (direction === 'prev') {
+          this.currentIndex = Math.max(0, this.currentIndex - 1);
+        } else {
+          this.currentIndex = Math.min(maxIndex, this.currentIndex + 1);
+        }
+
+        this.updateCarousel();
+      }
+
+      updateCarousel() {
+        const { step, maxOffset, maxIndex, centerShift = 0 } = this.getMetrics();
+        this.currentIndex = Math.min(this.currentIndex, maxIndex);
+        const offset = Math.min(this.currentIndex * step, maxOffset) - centerShift;
+
+        this.track.style.transform = `translateX(${-offset}px)`;
+        this.updateActive();
+        this.updateButtons();
+      }
+
+      /* Centered mode: only the middle video plays, the side ones wait paused. */
+      updateActive() {
+        const leftCenterMode = this.wasCenterMode && !this.centerMode;
+        this.wasCenterMode = this.centerMode;
+
+        this.items.forEach((item, index) => {
+          const isActive = this.centerMode && index === this.currentIndex;
+          item.classList.toggle('is-active', isActive);
+
+          const video = item.querySelector('video');
+          if (!video) return;
+
+          if (this.centerMode) {
+            if (isActive && this.autoplay) {
+              video.play().catch(() => {});
+            } else if (!isActive) {
+              video.pause();
+            }
+          } else if (leftCenterMode && this.autoplay) {
+            video.play().catch(() => {});
+          }
+        });
+      }
+
+      updateButtons() {
+        const { maxIndex } = this.getMetrics();
+
+        if (this.prevButton) {
+          this.prevButton.disabled = this.currentIndex === 0;
+        }
+        if (this.nextButton) {
+          this.nextButton.disabled = this.currentIndex >= maxIndex;
+        }
+      }
+    }
+
+    customElements.define('video-carousel-{{ ai_gen_id }}', VideoCarousel{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Video carousel",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "videos_per_row",
+      "label": "Videos per row (desktop)",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap between videos",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout",
+      "label": "Mobile layout",
+      "options": [
+        { "value": "center", "label": "Centered with side previews" },
+        { "value": "row", "label": "Row" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "mobile_start",
+      "label": "Start on (mobile)",
+      "info": "Applies to the centered layout.",
+      "options": [
+        { "value": "middle", "label": "Middle video" },
+        { "value": "first", "label": "First video" }
+      ],
+      "default": "middle"
+    },
+    {
+      "type": "range",
+      "id": "mobile_center_width",
+      "label": "Centered video width (mobile)",
+      "info": "Applies to the centered layout.",
+      "min": 50,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "default": 70
+    },
+    {
+      "type": "range",
+      "id": "mobile_side_scale",
+      "label": "Side video size (mobile)",
+      "info": "Applies to the centered layout.",
+      "min": 70,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 85
+    },
+    {
+      "type": "range",
+      "id": "mobile_videos_per_row",
+      "label": "Videos per row (mobile)",
+      "info": "Applies to the row layout. Use .5 to show part of the next video as a swipe hint.",
+      "min": 1,
+      "max": 4,
+      "step": 0.5,
+      "default": 2.5
+    },
+    {
+      "type": "range",
+      "id": "gap_mobile",
+      "label": "Gap between videos (mobile)",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Video settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay videos",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_play_button",
+      "label": "Show play button",
+      "info": "Shown over the video thumbnail while the video is paused.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "video_border_radius",
+      "label": "Video border radius",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Video 1"
+    },
+    {
+      "type": "video",
+      "id": "video_1",
+      "label": "Video"
+    },
+    {
+      "type": "product",
+      "id": "product_1",
+      "label": "Product"
+    },
+    {
+      "type": "header",
+      "content": "Video 2"
+    },
+    {
+      "type": "video",
+      "id": "video_2",
+      "label": "Video"
+    },
+    {
+      "type": "product",
+      "id": "product_2",
+      "label": "Product"
+    },
+    {
+      "type": "header",
+      "content": "Video 3"
+    },
+    {
+      "type": "video",
+      "id": "video_3",
+      "label": "Video"
+    },
+    {
+      "type": "product",
+      "id": "product_3",
+      "label": "Product"
+    },
+    {
+      "type": "header",
+      "content": "Video 4"
+    },
+    {
+      "type": "video",
+      "id": "video_4",
+      "label": "Video"
+    },
+    {
+      "type": "product",
+      "id": "product_4",
+      "label": "Product"
+    },
+    {
+      "type": "header",
+      "content": "Video 5"
+    },
+    {
+      "type": "video",
+      "id": "video_5",
+      "label": "Video"
+    },
+    {
+      "type": "product",
+      "id": "product_5",
+      "label": "Product"
+    },
+    {
+      "type": "header",
+      "content": "Video 6"
+    },
+    {
+      "type": "video",
+      "id": "video_6",
+      "label": "Video"
+    },
+    {
+      "type": "product",
+      "id": "product_6",
+      "label": "Product"
+    },
+    {
+      "type": "header",
+      "content": "Video 7"
+    },
+    {
+      "type": "video",
+      "id": "video_7",
+      "label": "Video"
+    },
+    {
+      "type": "product",
+      "id": "product_7",
+      "label": "Product"
+    },
+    {
+      "type": "header",
+      "content": "Video 8"
+    },
+    {
+      "type": "video",
+      "id": "video_8",
+      "label": "Video"
+    },
+    {
+      "type": "product",
+      "id": "product_8",
+      "label": "Product"
+    },
+    {
+      "type": "header",
+      "content": "Video 9"
+    },
+    {
+      "type": "video",
+      "id": "video_9",
+      "label": "Video"
+    },
+    {
+      "type": "product",
+      "id": "product_9",
+      "label": "Product"
+    },
+    {
+      "type": "header",
+      "content": "Video 10"
+    },
+    {
+      "type": "video",
+      "id": "video_10",
+      "label": "Video"
+    },
+    {
+      "type": "product",
+      "id": "product_10",
+      "label": "Product"
+    },
+    {
+      "type": "header",
+      "content": "Controls style"
+    },
+    {
+      "type": "color",
+      "id": "control_background",
+      "label": "Control background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "control_icon_color",
+      "label": "Control icon color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "nav_button_background",
+      "label": "Navigation button background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "nav_button_icon_color",
+      "label": "Navigation button icon color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Product card style"
+    },
+    {
+      "type": "color",
+      "id": "product_card_background",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "product_text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "product_card_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 8
+    }
+  ],
+  "presets": [
+    {
+      "name": "Video carousel"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,146 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "content_width": "80ch"
+      }
+    },
+    "image_with_text_overlay_GW9hgM": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_qBafCn": {
+          "type": "heading",
+          "settings": {
+            "text": "FAQ",
+            "heading_tag": "h1"
+          }
+        }
+      },
+      "block_order": [
+        "heading_qBafCn"
+      ],
+      "name": "Image with text overlay",
+      "settings": {
+        "full_width": true,
+        "allow_transparent_header": false,
+        "enable_parallax": false,
+        "image_size": "auto",
+        "image": "shopify://shop_images/IMG_4505-2048x1152.jpg",
+        "mobile_text_position": "place-self-center text-center",
+        "desktop_text_position": "sm:place-self-center sm:text-center",
+        "text_color": "#ffffff",
+        "overlay_color": "#000000",
+        "overlay_opacity": 30
+      }
+    },
+    "faq_tEAJYz": {
+      "type": "faq",
+      "blocks": {
+        "item_3yhH6x": {
+          "type": "item",
+          "settings": {
+            "title": "What products does your online store offer?",
+            "content": "<p>  - We specialize in unisex trucker caps combined with leather wallets, and card holders we seek that our products are designed for both men and women, offering a blend of style and functionality.</p>"
+          }
+        },
+        "item_BWmfUW": {
+          "type": "item",
+          "settings": {
+            "title": "Who are the owners of the brand, and who makes up the top management team?",
+            "content": "<p>- Our Founder, Mr. Ahmed Mahmoud, is a renowned fashion and lifestyle blogger with over 3 million followers on social media. Ahmed holds an MBA in Marketing and has previously served as the head of marketing for several local and international brands also he is a famous Tiktoker and YouTuber    - Mr. Haytham Othman , is widely recognized for his robust finance background. Mr Haytham holds an MBA in Finance With experience as a CFO for various local and international companies, he brings a wealth of financial expertise to Levai and Loris.<br/><br/></p>"
+          }
+        },
+        "item_Lm6yUq": {
+          "type": "item",
+          "settings": {
+            "title": "How can I contact your customer support?",
+            "content": "<p>- You can reach our customer support team via email at Support@levaiandloris.com or by phone at 02039949444.</p>"
+          }
+        },
+        "item_CDgmYX": {
+          "type": "item",
+          "settings": {
+            "title": "Do you ship internationally?",
+            "content": "<p>- Yes, we offer international shipping. Customers outside Egypt are responsible for return shipping costs.</p>"
+          }
+        },
+        "item_9TYPap": {
+          "type": "item",
+          "settings": {
+            "title": "Where is your brand headquartered?",
+            "content": "<p>  - Our brand is headquartered in Egypt with the main office located in the United Kingdom and a second main office in the United Arab Emirates.</p>"
+          }
+        },
+        "item_NPq83r": {
+          "type": "item",
+          "settings": {
+            "title": "Are your products suitable for both men and women?",
+            "content": "<p> - Absolutely! Our unisex trucker caps, leather wallets, and card holders are designed to cater to the style preferences of both men and women.</p>"
+          }
+        },
+        "item_G4pxNJ": {
+          "type": "item",
+          "settings": {
+            "title": "Can I return or exchange a product?",
+            "content": "<p>- Yes, we accept returns and exchanges within 14 days of the delivery date Please review our Return and Exchange Policy for more details.</p>"
+          }
+        },
+        "item_wF6EmD": {
+          "type": "item",
+          "settings": {
+            "title": "Can I follow your CEO and COO on social media?",
+            "content": "<p>- Certainly! You can follow Mr. Haytham Othman and Ahmed Mahmoud you can do that on their respective social media platforms for insights and updates. For any additional inquiries or assistance, please feel free to contact us. Thank you for choosing Levai and Loris!</p>"
+          }
+        }
+      },
+      "block_order": [
+        "item_3yhH6x",
+        "item_BWmfUW",
+        "item_Lm6yUq",
+        "item_CDgmYX",
+        "item_9TYPap",
+        "item_NPq83r",
+        "item_G4pxNJ",
+        "item_wF6EmD"
+      ],
+      "name": "FAQ",
+      "settings": {
+        "full_width": true,
+        "subheading": "",
+        "title": "",
+        "content": "",
+        "team_avatar_width": 50,
+        "support_hours": "",
+        "answer_time": "",
+        "button_text": "",
+        "button_url": "",
+        "text_position": "center",
+        "background": "",
+        "background_gradient": "",
+        "text_color": "",
+        "heading_color": "",
+        "heading_gradient": "",
+        "button_background": "",
+        "button_text_color": "",
+        "accordion_background": "",
+        "accordion_text_color": ""
+      }
+    }
+  },
+  "order": [
+    "main",
+    "image_with_text_overlay_GW9hgM",
+    "faq_tEAJYz"
+  ]
+}

@@ -1,0 +1,330 @@
+{%- comment -%}
+  Tiered Discount Progress Bar for Cart Drawer (Impact Theme)
+  All tiers, texts, colors and sizes come from Theme settings > Tiered discount bar.
+{%- endcomment -%}
+
+{%- liquid
+  assign max_qty = 0
+  assign tiers_json = ''
+
+  for i in (1..3)
+    assign key_enabled = 'tpb_tier_' | append: i | append: '_enabled'
+    assign key_qty = 'tpb_tier_' | append: i | append: '_qty'
+    assign key_discount = 'tpb_tier_' | append: i | append: '_discount'
+
+    if settings[key_enabled] and settings[key_qty] > 0
+      assign q = settings[key_qty]
+      if q > max_qty
+        assign max_qty = q
+      endif
+
+      assign discount_json = settings[key_discount] | json
+      if tiers_json != ''
+        assign tiers_json = tiers_json | append: ','
+      endif
+      assign tiers_json = tiers_json | append: '{"qty":' | append: q | append: ',"discount":' | append: discount_json | append: '}'
+    endif
+  endfor
+-%}
+
+{%- if settings.tpb_enable and max_qty > 0 -%}
+<tiered-progress-bar class="tiered-progress" data-item-count="{{ cart.item_count }}">
+  <script type="application/json" data-config>
+    {
+      "maxQty": {{ max_qty }},
+      "tiers": [{{ tiers_json }}],
+      "messages": {
+        "empty": {{ settings.tpb_msg_empty | json }},
+        "progress": {{ settings.tpb_msg_progress | json }},
+        "between": {{ settings.tpb_msg_between | json }},
+        "max": {{ settings.tpb_msg_max | json }}
+      }
+    }
+  </script>
+
+  <div class="tiered-progress__header">
+    <span class="tiered-progress__message" data-message></span>
+  </div>
+
+  <div class="tiered-progress__track">
+    <div class="tiered-progress__fill" data-fill></div>
+    {%- for i in (1..3) -%}
+      {%- liquid
+        assign key_enabled = 'tpb_tier_' | append: i | append: '_enabled'
+        assign key_qty = 'tpb_tier_' | append: i | append: '_qty'
+      -%}
+      {%- if settings[key_enabled] and settings[key_qty] > 0 -%}
+        {%- assign position = settings[key_qty] | times: 100.0 | divided_by: max_qty -%}
+        <div class="tiered-progress__marker" data-tier="{{ settings[key_qty] }}" style="left: {{ position }}%;">
+          <span class="tiered-progress__marker-dot"></span>
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+
+  {%- if settings.tpb_show_labels -%}
+    <div class="tiered-progress__labels">
+      {%- for i in (1..3) -%}
+        {%- liquid
+          assign key_enabled = 'tpb_tier_' | append: i | append: '_enabled'
+          assign key_qty = 'tpb_tier_' | append: i | append: '_qty'
+          assign key_discount = 'tpb_tier_' | append: i | append: '_discount'
+          assign key_label = 'tpb_tier_' | append: i | append: '_label'
+        -%}
+        {%- if settings[key_enabled] and settings[key_qty] > 0 -%}
+          {%- liquid
+            assign qty_text = settings[key_qty] | append: ''
+            assign discount_html = settings[key_discount] | escape | prepend: '<strong>' | append: '</strong>'
+            assign label_html = settings[key_label] | escape | replace: '[qty]', qty_text | replace: '[discount]', discount_html
+          -%}
+          <span class="tiered-progress__label" data-label-tier="{{ settings[key_qty] }}">{{ label_html }}</span>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</tiered-progress-bar>
+
+<style>
+  .tiered-progress {
+    --tpb-fill-start: {{ settings.tpb_fill_start | default: '#f0c27f' }};
+    --tpb-fill-end: {{ settings.tpb_fill_end | default: '#d4a24e' }};
+    --tpb-highlight: {{ settings.tpb_highlight | default: '#b8860b' }};
+    --tpb-marker-reached: {{ settings.tpb_marker_reached | default: '#d4a24e' }};
+    --tpb-track: {% if settings.tpb_track != blank %}{{ settings.tpb_track }}{% else %}rgb(var(--text-color) / 0.1){% endif %};
+    --tpb-bar-height: {{ settings.tpb_bar_height | default: 6 }}px;
+    --tpb-dot-size: calc(var(--tpb-bar-height) + 8px);
+
+    display: block;
+    padding: 10px 0 2px;
+  }
+
+  .tiered-progress__header {
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .tiered-progress__message {
+    font-size: {{ settings.tpb_msg_size | default: 13 }}px;
+    font-weight: 600;
+    line-height: 1.3;
+    display: inline-block;
+  }
+
+  .tiered-progress__message .highlight {
+    color: var(--tpb-highlight);
+    font-weight: 700;
+  }
+
+  /* ── Track ── */
+  .tiered-progress__track {
+    position: relative;
+    height: var(--tpb-bar-height);
+    background: var(--tpb-track);
+    border-radius: 999px;
+    margin: 0 8px;
+    overflow: visible;
+  }
+
+  .tiered-progress__fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--tpb-fill-start), var(--tpb-fill-end));
+    transition: width 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+    width: 0%;
+  }
+
+  /* ── Dots only, no per-marker labels ── */
+  .tiered-progress__marker {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+  }
+
+  .tiered-progress__marker-dot {
+    width: var(--tpb-dot-size);
+    height: var(--tpb-dot-size);
+    border-radius: 50%;
+    background: rgb(var(--text-color) / 0.15);
+    border: 2px solid rgb(var(--background, 255 255 255));
+    transition: background 0.4s ease, box-shadow 0.4s ease;
+    display: block;
+  }
+
+  .tiered-progress__marker.reached .tiered-progress__marker-dot {
+    background: var(--tpb-marker-reached);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--tpb-marker-reached) 25%, transparent);
+  }
+
+  /* ── Labels row below track ── */
+  .tiered-progress__labels {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 6px 0 0;
+    padding: 0 4px;
+  }
+
+  .tiered-progress__label {
+    font-size: {{ settings.tpb_label_size | default: 11 }}px;
+    color: rgb(var(--text-color) / 0.45);
+    transition: color 0.4s ease;
+    line-height: 1.3;
+  }
+
+  .tiered-progress__label.reached {
+    color: rgb(var(--text-color) / 0.85);
+  }
+
+  .tiered-progress__label strong {
+    color: inherit;
+  }
+
+  .tiered-progress__label.reached strong {
+    color: var(--tpb-highlight);
+  }
+    .cart-tier-note { font-size: 14px; line-height: 1.5; }
+  .cart-tier-note p { margin: 0; }
+  .cart-tier-note strong { color: {{ settings.tpb_highlight | default: '#ff0000' }}; font-weight: 700; }
+</style>
+
+<script>
+  if (!window.__tieredProgressFetchPatched) {
+    window.__tieredProgressFetchPatched = true;
+    const _originalFetch = window.fetch.bind(window);
+
+    window.fetch = function(...args) {
+      const url = typeof args[0] === 'string' ? args[0] : args[0]?.url || '';
+      const result = _originalFetch(...args);
+
+      if (
+        url.includes('/cart/add') ||
+        url.includes('/cart/change') ||
+        url.includes('/cart/update') ||
+        url.includes('/cart/clear')
+      ) {
+        result
+          .then(() => _originalFetch('/cart.js'))
+          .then(r => r.json())
+          .then(cart => {
+            document.querySelectorAll('tiered-progress-bar').forEach(el => {
+              if (typeof el.update === 'function') el.update(cart.item_count);
+            });
+          })
+          .catch(() => {});
+      }
+
+      return result;
+    };
+  }
+
+  if (!customElements.get('tiered-progress-bar')) {
+    customElements.define('tiered-progress-bar', class extends HTMLElement {
+      connectedCallback() {
+        this.fillBar   = this.querySelector('[data-fill]');
+        this.messageEl = this.querySelector('[data-message]');
+        this.markerEls = this.querySelectorAll('.tiered-progress__marker');
+        this.labelEls  = this.querySelectorAll('.tiered-progress__label');
+
+        try {
+          this.config = JSON.parse(this.querySelector('[data-config]').textContent);
+        } catch (e) {
+          return;
+        }
+        this.tiers  = this.config.tiers.slice().sort((a, b) => a.qty - b.qty);
+        this.maxQty = this.config.maxQty;
+
+        const serverCount = parseInt(this.dataset.itemCount) || 0;
+        this.update(serverCount);
+        this._fetchAndUpdate();
+
+        this._onCartChange = this._handleCartChange.bind(this);
+        document.addEventListener('cart:change', this._onCartChange);
+        document.addEventListener('cart:refresh', this._onCartChange);
+        this._observeCartCount();
+      }
+
+      disconnectedCallback() {
+        document.removeEventListener('cart:change', this._onCartChange);
+        document.removeEventListener('cart:refresh', this._onCartChange);
+        if (this._observer) this._observer.disconnect();
+      }
+
+      _fetchAndUpdate() {
+        fetch('/cart.js')
+          .then(r => r.json())
+          .then(cart => this.update(cart.item_count))
+          .catch(() => {});
+      }
+
+      _observeCartCount() {
+        const cartCountEl = document.querySelector('cart-count');
+        if (!cartCountEl) return;
+        this._observer = new MutationObserver(() => {
+          const count = parseInt(cartCountEl.innerText) || 0;
+          this.update(count);
+        });
+        this._observer.observe(cartCountEl, { childList: true, characterData: true, subtree: true });
+        if (cartCountEl.shadowRoot) {
+          this._observer.observe(cartCountEl.shadowRoot, { childList: true, characterData: true, subtree: true });
+        }
+      }
+
+      _handleCartChange(event) {
+        const count = event?.detail?.cart?.item_count ?? event?.detail?.item_count;
+        if (typeof count === 'number') this.update(count);
+        else this._fetchAndUpdate();
+      }
+
+      _escape(str) {
+        const div = document.createElement('div');
+        div.textContent = str ?? '';
+        return div.innerHTML;
+      }
+
+      _render(template, values) {
+        let html = this._escape(template);
+        Object.entries(values).forEach(([key, value]) => {
+          html = html.split(`[${key}]`).join(`<span class="highlight">${this._escape(String(value))}</span>`);
+        });
+        return html;
+      }
+
+      update(itemCount) {
+        if (!this.fillBar || !this.messageEl || !this.tiers) return;
+        const count = Math.max(0, itemCount);
+
+        const fillPercent = Math.min((count / this.maxQty) * 100, 100);
+        this.fillBar.style.width = fillPercent + '%';
+
+        this.markerEls.forEach(m => {
+          m.classList.toggle('reached', count >= parseInt(m.dataset.tier));
+        });
+
+        this.labelEls.forEach(l => {
+          l.classList.toggle('reached', count >= parseInt(l.dataset.labelTier));
+        });
+
+        const current = this.tiers.filter(t => count >= t.qty).pop();
+        const next    = this.tiers.find(t => count < t.qty);
+        const msgs    = this.config.messages;
+
+        let template;
+        if (!next) template = msgs.max;
+        else if (!current) template = count === 0 ? msgs.empty : msgs.progress;
+        else template = msgs.between;
+
+        this.messageEl.innerHTML = this._render(template, {
+          remaining: next ? next.qty - count : 0,
+          discount: next ? next.discount : (current?.discount ?? ''),
+          next_discount: next ? next.discount : '',
+          current_discount: current ? current.discount : ''
+        });
+      }
+    });
+  }
+</script>
+{%- endif -%}

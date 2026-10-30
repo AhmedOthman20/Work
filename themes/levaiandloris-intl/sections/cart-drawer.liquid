@@ -1,50 +1,3 @@
-{%- style -%}
-  .cart-perks {
-    display: grid;
-    gap: 12px;
-    margin-block-start: 16px;
-  }
-
-  /* ---------- Free shipping card ---------- */
-  .cart-perk-shipping {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #ecfdf3 0%, #d1fae5 100%);
-    border: 1px solid #a7f3d0;
-    color: #065f46;
-    overflow: hidden;
-  }
-
-  .cart-perk-shipping__icon {
-    flex: none;
-    display: grid;
-    place-items: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #10b981;
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
-  }
-
-  .cart-perk-shipping__text {
-    font-size: 13px;
-    line-height: 1.45;
-  }
-
-  .cart-perk-shipping__text p { margin: 0; }
-  .cart-perk-shipping__text strong { color: #047857; font-weight: 700; }
-
-  /* ---------- Original price (before all discounts) ---------- */
-  .cart-original-total__price {
-    text-decoration: line-through;
-  }
-{%- endstyle -%}
-
 <cart-drawer {% if request.design_mode %}handle-section-events{% endif %} class="cart-drawer drawer drawer--lg" id="cart-drawer">
   {%- if cart.item_count == 0 -%}
     <button is="close-button" aria-label="{{ 'general.accessibility.close' | t | escape }}">
@@ -78,32 +31,13 @@
             {%- render 'icon' with 'close' -%}
           </button>
         </div>
+            {%- comment -%}{%- render 'tiered-progress-bar' -%}
+{%- endcomment -%}
 
-        <div class="cart-perks">
-          {%- comment -%} 1. Free shipping first {%- endcomment -%}
-          {%- if section.settings.payment_note != blank -%}
-            <div class="cart-perk-shipping">
-              <span class="cart-perk-shipping__icon" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M1 3h14v13H1z"/><path d="M15 8h4l4 4v4h-8z"/>
-                  <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
-                </svg>
-              </span>
-              <div class="cart-perk-shipping__text">{{ section.settings.payment_note }}</div>
-            </div>
-          {%- endif -%}
-
-          {%- if settings.cart_show_free_shipping_threshold -%}
-            {%- render 'free-shipping-bar' -%}
-          {%- endif -%}
-
-          {%- comment -%} 2. Then the bundle discount {%- endcomment -%}
-          {%- render 'tiered-progress-bar' -%}
-
-          {%- if settings.tpb_offer_note != blank -%}
-            <div class="cart-tier-note">{{ settings.tpb_offer_note }}</div>
-          {%- endif -%}
-        </div>
+            <!--<p>Two products with a discount of <span style="color: #ff0000;"><strong>500 EGP</strong> </span>/ Three products with a discount of <strong><span style="color: #ff0000;">900 EGP</span></strong></p>-->
+        {%- if settings.cart_show_free_shipping_threshold -%}
+          {%- render 'free-shipping-bar' -%}
+        {%- endif -%}
       </div>
 
       <div class="v-stack gap-6 sm:gap-8">
@@ -194,32 +128,13 @@
           {%- endif -%}
         </div>
       {%- endif -%}
-
-      {%- comment -%}
-        Original price before ANY discount:
-        uses the variant compare-at price (the 300 EGP product discount) when it's higher
-        than the selling price, so the bundle discount (200 EGP) and the product discount
-        are both included in the strikethrough total.
-      {%- endcomment -%}
-      {%- liquid
-        assign full_original_total = 0
-        for item in cart.items
-          assign unit_original = item.original_price
-          if item.variant.compare_at_price > item.original_price
-            assign unit_original = item.variant.compare_at_price
-          endif
-          assign line_original = unit_original | times: item.quantity
-          assign full_original_total = full_original_total | plus: line_original
-        endfor
-      -%}
-
+{%- if cart.original_total_price != cart.total_price -%}
+  <div class="h-stack gap-4 justify-between">
+    <span class="text-subdued text-sm">Price before discount</span>
+    <span class="text-subdued text-sm" style="text-decoration: line-through;">{{- cart.original_total_price | money_with_currency -}}</span>
+  </div>
+{%- endif -%}
       <div class="v-stack gap-1">
-        {%- if section.settings.show_original_total and full_original_total > cart.total_price -%}
-          <div class="h-stack gap-4 justify-between">
-            <span class="text-subdued text-sm">{{ section.settings.original_total_label | escape }}</span>
-            <span class="text-subdued text-sm cart-original-total__price">{{- full_original_total | money_with_currency -}}</span>
-          </div>
-        {%- endif -%}
 
         <div class="h-stack gap-4 justify-between">
           <span class="h5">{{ 'cart.general.total' | t }}</span>
@@ -312,13 +227,6 @@
       "default": true
     },
     {
-      "type": "richtext",
-      "id": "payment_note",
-      "label": "Free shipping note",
-      "info": "Shown at the top of the cart, above the discount offer. Leave empty to hide.",
-      "default": "<p><strong>Free shipping</strong> when you pay online by card 💳</p>"
-    },
-    {
       "type": "checkbox",
       "id": "allow_discount_application",
       "label": "Allow discount application",
@@ -335,23 +243,6 @@
       "id": "show_checkout_button",
       "label": "Show checkout button",
       "default": true
-    },
-    {
-      "type": "header",
-      "content": "Original price"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_original_total",
-      "label": "Show original price before all discounts",
-      "info": "Uses each product's compare-at price, so both product and cart discounts are included.",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "original_total_label",
-      "label": "Original price label",
-      "default": "Price before discount"
     },
     {
       "type": "header",

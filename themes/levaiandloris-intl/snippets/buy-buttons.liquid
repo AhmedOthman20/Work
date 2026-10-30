@@ -34,12 +34,20 @@ Supported variables
 
   {%- assign button_disabled = false -%}
   {%- assign button_size = button_size | default: 'xl' -%}
+  {%- assign current_variant = product.selected_or_first_available_variant -%}
 
-  {%- if product.selected_or_first_available_variant == nil -%}
+  {%- if current_variant == nil -%}
     {%- capture button_content -%}{{ 'product.general.unavailable_button' | t }}{%- endcapture -%}
     {%- assign button_disabled = true -%}
-  {%- elsif product.selected_or_first_available_variant.available -%}
+  {%- elsif current_variant.available -%}
+    {%- assign is_preorder = false -%}
     {%- if product.template_suffix contains 'pre-order' -%}
+      {%- assign is_preorder = true -%}
+    {%- elsif current_variant.inventory_management != blank and current_variant.inventory_quantity <= 0 -%}
+      {%- assign is_preorder = true -%}
+    {%- endif -%}
+
+    {%- if is_preorder -%}
       {%- capture button_content -%}{{ 'product.general.pre_order_button' | t }}{%- endcapture -%}
     {%- else -%}
       {%- capture button_content -%}{{ 'product.general.add_to_cart_button' | t }}{%- endcapture -%}

@@ -1,12 +1,3 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
     "main": {
@@ -22,7 +13,7 @@
         "full_width": true,
         "subheading": "Contact Us",
         "title": "Do you have any question?",
-        "content": "<p><strong>General Inquiries :</strong></p><p>– Email : support@LevaiandLoris.com</p><p>– Phone : 01222262535</p><p><strong>Customer Support :</strong></p><p>– Email : Support@Levaiandloris.com</p><p>– Phone : 01222262535</p><p>– Operating Hours : From 9 am to 9 pm Egypt Time or send your inquiry via Whatsapp</p><p><strong>Media and Press Inquiries :</strong></p><p>– Email: support@LevaiandLoris.com</p><p><strong>Business Partnerships :</strong></p><p>– Email: support@LevaiandLoris.com</p><p><strong>Headquarters and Main Offices :</strong></p><ul><li>Egypt Headquarter</li></ul><p>Abd El Salam Aref Street, San Stefano , Alexandria Egypt</p><ul><li>United Kingdom Main Office :</li></ul><p>London, United Kingdom<br/><a href=\"https://find-and-update.company-information.service.gov.uk/company/16482578/officers\" target=\"_blank\">71-75 Shelton Street – WC2H 9JQ, Covent Garden, London.</a></p><ul><li>United Arab Emirates Office :</li></ul><p>Sharjah, United Arab Emirates , Head Office<br/>316F Tiger 4 Building, Altaawun Road, Sharjah.</p><p>We strive to respond to all inquiries promptly. Thank you for choosing Levai & Loris .</p><p>Best regards,</p><p>Levai & Loris Team .</p>",
+        "content": "<p><strong>General Inquiries :<\/strong><\/p><p>– Email : support@LevaiandLoris.com<\/p><p>– Phone : 01222262535<\/p><p><strong>Customer Support :<\/strong><\/p><p>– Email : Support@Levaiandloris.com<\/p><p>– Phone : 01222262535<\/p><p>– Operating Hours : From 9 am to 9 pm Egypt Time or send your inquiry via Whatsapp<\/p><p><strong>Media and Press Inquiries :<\/strong><\/p><p>– Email: support@LevaiandLoris.com<\/p><p><strong>Business Partnerships :<\/strong><\/p><p>– Email: support@LevaiandLoris.com<\/p><p><strong>Headquarters and Main Offices :<\/strong><\/p><ul><li>Egypt Headquarter<\/li><\/ul><p>Abd El Salam Aref Street, San Stefano , Alexandria Egypt<\/p><ul><li>United Kingdom Main Office :<\/li><\/ul><p>London, United Kingdom<br\/><a href=\"https:\/\/find-and-update.company-information.service.gov.uk\/company\/16482578\/officers\" target=\"_blank\">71-75 Shelton Street – WC2H 9JQ, Covent Garden, London.<\/a><\/p><ul><li>United Arab Emirates Office :<\/li><\/ul><p>Sharjah, United Arab Emirates , Head Office<br\/>316F Tiger 4 Building, Altaawun Road, Sharjah.<\/p><p>We strive to respond to all inquiries promptly. Thank you for choosing Levai & Loris .<\/p><p>Best regards,<\/p><p>Levai & Loris Team .<\/p>",
         "text_position": "start",
         "contact_form_size": "large",
         "background": "",

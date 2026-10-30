@@ -1,0 +1,202 @@
+{%- comment -%}
+------------------------------------------------------------------------------------------------------------------------
+NOTE TO DEVELOPERS: welcome to Impact theme! We hope that you will enjoy editing this theme as much as we did for
+  developing it. We have put a lot of work to make this theme as developer friendly as possible by offering you
+  hooks to integrate into critical parts of the theme. You will find the complete technical documentation (including
+  all events, dependencies...) in the "documentation.txt" file, located in the Assets folder.
+------------------------------------------------------------------------------------------------------------------------
+{%- endcomment -%}
+
+<!doctype html>
+
+<html lang="{{ request.locale.iso_code }}" dir="{% render 'direction' %}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, height=device-height, minimum-scale=1.0">
+    <meta name="theme-color" content="{{ settings.header_background }}">
+    {% render 'product-card-extras-css' %}
+{%- comment -%}
+  Non-Egypt visitor redirect to global.levaiandloris.com
+  ---------------------------------------------------------
+  WHERE TO PASTE THIS:
+    Online Store > Themes > (your live theme) > Edit code > layout/theme.liquid
+    Paste this block as early as possible inside <head>, right after the
+    opening <head> tag and before other <script>/<link> tags. Placing it
+    early minimizes any visible flash of the wrong store before redirect.
+
+  WHY THIS WORKS WITHOUT A THIRD-PARTY GEO API:
+    This store already has two Shopify Markets: "Egypt" (Egypt only) and
+    "International" (236 other regions). Shopify resolves `localization.country`
+    server-side from the visitor's IP as part of that Markets setup — so we
+    reuse that instead of calling an external geolocation service.
+
+  WHAT IT DOES:
+    - If the resolved visitor country is NOT Egypt, redirect once to
+      https://global.levaiandloris.com, preserving the path/query so deep
+      links (e.g. a specific product or collection) still work.
+    - Uses sessionStorage as a one-time guard so it won't loop or re-fire
+      on every page view during the same browsing session.
+    - Skips itself if somehow already running on the global domain.
+
+  IMPORTANT CAVEATS:
+    - This only runs in the visitor's browser (client-side redirect), so
+      there's a brief moment where levaiandloris.com's HTML loads before
+      the redirect fires. That's normal for this kind of setup.
+    - IP-based geolocation isn't 100% accurate (VPNs, corporate networks,
+      some mobile carriers can resolve to the wrong country).
+    - Only paste this in the Egypt/main store's theme (levaiandloris.com).
+      Do NOT add it to the theme for global.levaiandloris.com — that would
+      create a redirect loop for Egypt-based visitors browsing that store
+      directly, though the hostname check below guards against that too.
+{%- endcomment -%}
+  <style>
+    @media (max-width:767px){
+    a.text-with-icon.group {
+    order: -1;
+}
+}
+  </style>
+<script>
+  window.__llGeo = {
+    isoCode: {{ localization.country.iso_code | json }}
+  };
+</script>
+<script>
+(function () {
+  try {
+    var iso = window.__llGeo && window.__llGeo.isoCode;
+
+    // Nothing to compare against, or already Egypt — do nothing.
+    if (!iso || iso === 'EG') return;
+
+    // Never redirect once we're already on the global store.
+    if (window.location.hostname === 'global.levaiandloris.com') return;
+
+    // Don't redirect search engine bots/crawlers/social scrapers.
+    if (/bot|crawl|spider|slurp|facebookexternalhit|whatsapp/i.test(navigator.userAgent)) return;
+
+    // Don't redirect mid-checkout, account, or cart flows.
+    if (/^\/(checkout|account|cart)/.test(window.location.pathname)) return;
+
+    // Manual override to bypass the redirect for testing/support.
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('no_geo_redirect') === '1') return;
+
+    // Only redirect once per browser tab session.
+    if (sessionStorage.getItem('llGlobalRedirected')) return;
+    sessionStorage.setItem('llGlobalRedirected', '1');
+
+    var target = 'https://global.levaiandloris.com' + window.location.pathname + window.location.search;
+    window.location.replace(target);
+  } catch (e) {
+    // Fail silently rather than breaking the page.
+  }
+})();
+</script>
+    <title>{% if page_title == blank %}{{ shop.name }}{% else %}{{ page_title }}{% if current_page != 1 %} &ndash; {{ 'general.page' | t: page: current_page }}{% endif %} | {{ shop.name }}{% endif %}</title>
+
+    {%- if page_description -%}
+      <meta name="description" content="{{ page_description | escape }}">
+    {%- elsif template.name == 'product' -%}
+      <meta name="description" content="{{ product.description | strip_html | truncate: 160 | escape }}">
+    {%- elsif template.name == 'collection' -%}
+      <meta name="description" content="{{ collection.description | strip_html | truncate: 160 | default: shop.description | escape }}">
+    {%- elsif template.name == 'article' -%}
+      <meta name="description" content="{{ article.excerpt_or_content | strip_html | truncate: 160 | escape }}">
+    {%- elsif shop.description != blank -%}
+      <meta name="description" content="{{ shop.description | escape }}">
+    {%- endif -%}
+
+    <link rel="canonical" href="{{ canonical_url }}">
+
+    {%- if settings.favicon -%}
+      <link rel="shortcut icon" href="{{ settings.favicon | image_url: width: 96 }}">
+      <link rel="apple-touch-icon" href="{{ settings.favicon | image_url: width: 180 }}">
+    {%- endif -%}
+
+    {%- comment -%}Few prefetch to increase performance on commonly used third-parties{%- endcomment -%}
+    <link rel="preconnect" href="https://cdn.shopify.com">
+    <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+    <link rel="dns-prefetch" href="https://productreviews.shopifycdn.com">
+
+    {%- unless settings.heading_font.system? -%}
+      <link rel="preload" href="{{ settings.heading_font | font_url }}" as="font" type="font/woff2" crossorigin>
+    {%- endunless -%}
+
+    {%- unless settings.text_font.system? -%}
+      <link rel="preload" href="{{ settings.text_font | font_url }}" as="font" type="font/woff2" crossorigin>
+    {%- endunless -%}
+
+    {%- render 'social-meta-tags' -%}
+    {%- render 'microdata-schema' -%}
+    {%- render 'css-variables' -%}
+    {%- render 'js-variables' -%}
+
+    <script type="importmap">
+      {%- comment -%}On Safari 16.3 and lower, a polyfill is used to load importmap{%- endcomment -%}
+      {
+        "imports": {
+          "vendor": "{{ 'vendor.min.js' | asset_url }}",
+          "theme": "{{ 'theme.js' | asset_url }}",
+          "photoswipe": "{{ 'photoswipe.min.js' | asset_url }}"
+        }
+      }
+    </script>
+ 
+    <script type="module" src="{{ 'vendor.min.js' | asset_url }}"></script>
+    <script type="module" src="{{ 'theme.js' | asset_url }}"></script>
+
+    {{ content_for_header }}
+
+    {{- 'theme.css' | asset_url | stylesheet_tag: preload: true -}}
+    <script type="text/javascript">
+(function(c, l, a, r, i, t, y){
+    c[a] = c[a] || function(){ (c[a].q = c[a].q || []).push(arguments) };
+    t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+    y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+})(window, document, "clarity", "script", "w7jjhrlclg");
+</script>
+  </head>
+
+  <body class="{% if settings.zoom_image_on_hover %}zoom-image--enabled{% endif %}">
+    {%- render 'shadow-dom-templates' -%}
+
+    <a href="#main" class="skip-to-content sr-only">{{ 'general.accessibility.skip_to_content' | t }}</a>
+
+    {%- comment -%}
+    This placeholder will be filled to screen readers for any kind of announcements
+    {%- endcomment -%}
+    <div class="sr-only" role="status" aria-live="polite" aria-atomic="true">
+      <span id="status-announcement"></span>
+    </div>
+
+    <div class="sr-only" role="alert" aria-live="assertive" aria-atomic="true">
+      <span id="error-announcement"></span>
+    </div>
+
+    {%- if request.page_type != 'password' -%}
+      {%- sections 'header-group' -%}
+      {%- sections 'overlay-group' -%}
+
+      {%- if settings.cart_type == 'popover' -%}
+        <cart-notification-drawer open-from="bottom" class="quick-buy-drawer drawer"></cart-notification-drawer>
+      {%- endif -%}
+    {%- endif -%}
+
+    {%- if request.page_type == 'customers/account' or request.page_type == 'customers/order' or request.page_type == 'customers/addresses' -%}
+      {%- section 'account-banner' -%}
+    {%- endif -%}
+
+    <main role="main" id="main" class="anchor">
+      {{ content_for_layout }}
+
+      {%- comment -%}
+      IMPLEMENTATION NOTE: due to the very complex logic of margin/padding collapsing in Impact, the footer group is
+      added into the main element to ensure that dynamic sections added into the footer group are properly laid out.
+      {%- endcomment -%}
+      {%- if request.page_type != 'password' -%}
+        {%- sections 'footer-group' -%}
+      {%- endif -%}
+    </main>
+  </body>
+</html>

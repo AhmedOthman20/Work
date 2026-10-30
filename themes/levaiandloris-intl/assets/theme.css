@@ -415,7 +415,6 @@ height-observer, visibility-progress, scroll-area, video-media, model-media, med
   padding-block-start: var(--accordion-spacing);
   padding-block-end: var(--accordion-spacing);
   display: flex;
-  text-transform:uppercase;
 }
 
 .accordion__content {
@@ -2800,7 +2799,7 @@ model-media model-viewer, model-media .shopify-model-viewer-ui {
 .buy-buttons {
   align-items: start;
   gap: var(--spacing-2);
-  display: contents;
+  display: grid;
 }
 
 .buy-buttons--compact {
@@ -3030,8 +3029,8 @@ model-media model-viewer, model-media .shopify-model-viewer-ui {
 }
 
 .price-list {
-    align-items: flex-end;
-      gap: var(--spacing-0-5) var(--spacing-2);
+  align-items: baseline;
+  gap: var(--spacing-0-5) var(--spacing-2);
   flex-wrap: wrap;
   display: flex;
 }
@@ -10199,7 +10198,4 @@ shopify-accelerated-checkout, shopify-accelerated-checkout-cart {
   -webkit-box-orient: vertical;
   display: -webkit-box;
   overflow: hidden;
-}
-a.rating.sm\:hidden {
-    display: none;
 }

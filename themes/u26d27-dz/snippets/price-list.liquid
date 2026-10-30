@@ -1,0 +1,257 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+PRODUCT PRICE
+----------------------------------------------------------------------------------------------------------------------
+
+This component generates price list for a given product. It handles the rendering of both price, compare at price,
+sale price and unit price
+
+********************************************
+Supported variables
+********************************************
+
+* product: the product from which prices are rendered
+* variant: if a variant is specified, then only the price from this variant is rendered (used in product details)
+* line_item: if a line item is specified, then the price from this line item are rendered
+* hide_unit_price: if set to true, unit pricing are hidden (this is useful for elements that are very size constrained)
+* size: can be either "sm" or "lg". If none is passed it will use the standard size
+* alignment: can be "center" to align the prices
+{%- endcomment -%}
+
+{%- liquid
+  case size
+    when 'lg'
+      assign regular_price_classes = 'text-lg'
+      assign on_sale_price_classes = 'text-lg text-on-sale'
+      assign compare_at_price_classes = 'text-subdued line-through'
+      assign unit_price_classes = 'text-subdued'
+
+    when 'sm'
+      assign regular_price_classes = 'text-subdued text-sm'
+      assign on_sale_price_classes = 'text-on-sale text-sm'
+      assign compare_at_price_classes = 'text-subdued text-sm line-through'
+      assign unit_price_classes = 'text-subdued text-sm'
+
+    else
+      assign regular_price_classes = 'text-subdued'
+      assign on_sale_price_classes = 'text-on-sale'
+      assign compare_at_price_classes = 'text-subdued line-through'
+      assign unit_price_classes = 'text-subdued text-sm'
+  endcase
+-%}
+
+<price-list class="price-list {% if size == 'lg' %}price-list--lg{% endif %} {% if text_alignment == 'center' %}justify-center{% endif %}">
+  {%- if variant != blank -%}
+    {%- comment -%}
+    --------------------------------------------------------------------------------------------------------------------
+    VARIANT CASE (used on product page, quick view...)
+    --------------------------------------------------------------------------------------------------------------------
+    {%- endcomment -%}
+    <sale-price class="{% if variant.compare_at_price > variant.price %}{{ on_sale_price_classes }}{% else %}{{ regular_price_classes }}{% endif %}">
+      <span class="sr-only">{{ 'product.price.sale_price' | t }}</span>
+
+      {%- if settings.currency_code_enabled -%}
+        {{- variant.price | money_with_currency -}}
+      {%- else -%}
+        {{- variant.price | money -}}
+      {%- endif -%}
+    </sale-price>
+
+    {%- if variant.compare_at_price > variant.price -%}
+      <compare-at-price class="{{ compare_at_price_classes }}">
+        <span class="sr-only">{{ 'product.price.regular_price' | t }}</span>
+
+        {%- if settings.currency_code_enabled -%}
+          {{- variant.compare_at_price | money_with_currency -}}
+        {%- else -%}
+          {{- variant.compare_at_price | money -}}
+        {%- endif -%}
+      </compare-at-price>
+    {%- endif -%}
+  {%- elsif line_item != blank -%}
+    {%- comment -%}
+    --------------------------------------------------------------------------------------------------------------------
+    LINE ITEM CASE (used on cart, order page...)
+
+    The compare-at price shown is the price before ANY discount:
+    the variant compare-at price (product discount) when it is higher than the selling price,
+    multiplied by the quantity. The sale price is the final line price after all discounts
+    (product discount + cart/bundle discounts).
+    --------------------------------------------------------------------------------------------------------------------
+    {%- endcomment -%}
+    {%- liquid
+      assign line_unit_original = line_item.original_price
+      if line_item.variant.compare_at_price > line_item.original_price
+        assign line_unit_original = line_item.variant.compare_at_price
+      endif
+      assign line_full_original_price = line_unit_original | times: line_item.quantity
+    -%}
+
+    <sale-price class="{% if line_full_original_price > line_item.final_line_price %}{{ on_sale_price_classes }}{% else %}{{ regular_price_classes }}{% endif %}">
+      <span class="sr-only">{{ 'product.price.sale_price' | t }}</span>
+
+      {%- if settings.currency_code_enabled -%}
+        {{- line_item.final_line_price | money_with_currency -}}
+      {%- else -%}
+        {{- line_item.final_line_price | money -}}
+      {%- endif -%}
+    </sale-price>
+
+    {%- if line_full_original_price > line_item.final_line_price -%}
+      <compare-at-price class="{{ compare_at_price_classes }}">
+        <span class="sr-only">{{ 'product.price.regular_price' | t }}</span>
+
+        {%- if settings.currency_code_enabled -%}
+          {{- line_full_original_price | money_with_currency -}}
+        {%- else -%}
+          {{- line_full_original_price | money -}}
+        {%- endif -%}
+      </compare-at-price>
+    {%- endif -%}
+
+    {%- comment -%} Bundle badges — managed in Theme settings > Cart bundle badges {%- endcomment -%}
+    {%- capture bundle_badge_style -%}
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: {{ settings.cbb_font_size | default: 12 }}px;
+      {%- if settings.cbb_bg != blank %} background: {{ settings.cbb_bg }};{% endif -%}
+      {%- if settings.cbb_text_color != blank %} color: {{ settings.cbb_text_color }};{% endif -%}
+    {%- endcapture -%}
+
+    {%- capture bundle_badge_icon -%}
+      {%- if settings.cbb_show_icon -%}
+        <svg width="{{ settings.cbb_icon_size | default: 16 }}" height="{{ settings.cbb_icon_size | default: 16 }}" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+          <path d="M18.062 15.4613C17.5263 14.9837 17.0572 14.4362 16.6675 13.8335C16.2421 13.0016 15.9871 12.0931 15.9175 11.1613V8.41688C15.9212 6.95333 15.3903 5.53881 14.4246 4.43909C13.4589 3.33937 12.1248 2.63014 10.6731 2.44466V1.72799C10.6731 1.53129 10.595 1.34265 10.4559 1.20356C10.3168 1.06447 10.1281 0.986328 9.93142 0.986328C9.73472 0.986328 9.54608 1.06447 9.40699 1.20356C9.2679 1.34265 9.18976 1.53129 9.18976 1.72799V2.45577C7.75101 2.65462 6.43307 3.36814 5.48005 4.46416C4.52703 5.56019 4.0035 6.96446 4.00642 8.41688V11.1613C3.93684 12.0931 3.68186 13.0016 3.25642 13.8335C2.87358 14.4349 2.41209 14.9823 1.8842 15.4613C1.82494 15.5134 1.77745 15.5775 1.74488 15.6493C1.71231 15.7212 1.69541 15.7991 1.69531 15.878V16.6335C1.69531 16.7809 1.75384 16.9222 1.85803 17.0264C1.96222 17.1306 2.10353 17.1891 2.25087 17.1891H17.6953C17.8427 17.1891 17.984 17.1306 18.0882 17.0264C18.1923 16.9222 18.2509 16.7809 18.2509 16.6335V15.878C18.2508 15.7991 18.2339 15.7212 18.2013 15.6493C18.1687 15.5775 18.1212 15.5134 18.062 15.4613ZM2.85087 16.078C3.36776 15.5787 3.82287 15.0191 4.20642 14.4113C4.74232 13.4066 5.055 12.298 5.12309 11.1613V8.41688C5.10106 7.76579 5.21027 7.11693 5.44423 6.50892C5.67818 5.90092 6.0321 5.34621 6.48489 4.87783C6.93769 4.40945 7.48011 4.03698 8.07986 3.78259C8.6796 3.52821 9.3244 3.39711 9.97587 3.39711C10.6273 3.39711 11.2721 3.52821 11.8719 3.78259C12.4716 4.03698 13.014 4.40945 13.4668 4.87783C13.9196 5.34621 14.2736 5.90092 14.5075 6.50892C14.7415 7.11693 14.8507 7.76579 14.8286 8.41688V11.1613C14.8967 12.298 15.2094 13.4066 15.7453 14.4113C16.1289 15.0191 16.584 15.5787 17.1009 16.078H2.85087Z" fill="currentColor"/>
+          <path d="M10.0045 19.044C10.3545 19.036 10.6903 18.9044 10.9526 18.6726C11.2149 18.4408 11.3868 18.1237 11.4378 17.7773H8.51562C8.56811 18.1331 8.74803 18.4576 9.0219 18.6906C9.29578 18.9236 9.64497 19.0492 10.0045 19.044Z" fill="currentColor"/>
+        </svg>
+      {%- endif -%}
+    {%- endcapture -%}
+
+    {%- if settings.cbb_out_enable and settings.cbb_out_text != blank and line_item.variant.compare_at_price > line_item.variant.price -%}
+      <span class="text-sm badge" style="{{ bundle_badge_style | strip_newlines }}">
+        {{- bundle_badge_icon -}}
+        {{- settings.cbb_out_text | escape -}}
+      </span>
+    {%- endif -%}
+
+    {%- liquid
+      assign line_item_has_discount = false
+
+      if line_item.original_line_price > line_item.final_line_price
+        assign line_item_has_discount = true
+      elsif line_item.line_level_discount_allocations.size > 0
+        assign line_item_has_discount = true
+      elsif line_item.variant.compare_at_price > line_item.variant.price
+        assign line_item_has_discount = true
+      endif
+
+      assign bundle_max_items = settings.cbb_max_items | default: 3
+    -%}
+
+    {%- if settings.cbb_max_enable and settings.cbb_max_text != blank and cart.item_count > bundle_max_items and line_item_has_discount == false -%}
+      <span class="text-sm badge" role="status" style="{{ bundle_badge_style | strip_newlines }}">
+        {{- bundle_badge_icon -}}
+        {{- settings.cbb_max_text | escape -}}
+      </span>
+    {%- endif -%}
+  {%- else -%}
+    {%- comment -%}
+    --------------------------------------------------------------------------------------------------------------------
+    PRODUCT CASE (used on card)
+    --------------------------------------------------------------------------------------------------------------------
+    {%- endcomment -%}
+    {%- if product.price_varies and product.compare_at_price -%}
+      {%- assign cheapest_variant = product.variants | sort: 'price' | first -%}
+
+      {%- capture price_min -%}
+        {%- if settings.currency_code_enabled -%}
+          {{- cheapest_variant.price | money_with_currency -}}
+        {%- else -%}
+          {{- cheapest_variant.price | money -}}
+        {%- endif -%}
+      {%- endcapture -%}
+
+      {%- if cheapest_variant.price < cheapest_variant.compare_at_price -%}
+        <sale-price class="{{ on_sale_price_classes }}">
+          <span class="sr-only">{{ 'product.price.sale_price' | t }}</span>
+          {{- 'product.price.from_price_html' | t: price_min: price_min -}}
+        </sale-price>
+
+        <compare-at-price class="{{ compare_at_price_classes }}">
+          <span class="sr-only">{{ 'product.price.regular_price' | t }}</span>
+
+          {%- if settings.currency_code_enabled -%}
+            {{- cheapest_variant.compare_at_price | money_with_currency -}}
+          {%- else -%}
+            {{- cheapest_variant.compare_at_price | money -}}
+          {%- endif -%}
+        </compare-at-price>
+      {%- else -%}
+        <sale-price class="{{ regular_price_classes }}">
+          <span class="sr-only">{{ 'product.price.sale_price' | t }}</span>
+          {{- 'product.price.from_price_html' | t: price_min: price_min -}}
+        </sale-price>
+      {%- endif -%}
+    {%- elsif product.price < product.compare_at_price -%}
+      <sale-price class="{{ on_sale_price_classes }}">
+        <span class="sr-only">{{ 'product.price.sale_price' | t }}</span>
+
+        {%- if settings.currency_code_enabled -%}
+          {{- product.price | money_with_currency -}}
+        {%- else -%}
+          {{- product.price | money -}}
+        {%- endif -%}
+      </sale-price>
+
+      <compare-at-price class="{{ compare_at_price_classes }}">
+        <span class="sr-only">{{ 'product.price.regular_price' | t }}</span>
+
+        {%- if settings.currency_code_enabled -%}
+          {{- product.compare_at_price | money_with_currency -}}
+        {%- else -%}
+          {{- product.compare_at_price | money -}}
+        {%- endif -%}
+      </compare-at-price>
+    {%- elsif product.price_varies -%}
+      {%- capture price_min -%}
+        {%- if settings.currency_code_enabled -%}
+          {{ product.price_min | money_with_currency }}
+        {%- else -%}
+          {{ product.price_min | money }}
+        {%- endif -%}
+      {%- endcapture -%}
+
+      {%- capture price_max -%}
+        {%- if settings.currency_code_enabled -%}
+          {{- product.price_max | money_with_currency -}}
+        {%- else -%}
+          {{- product.price_max | money -}}
+        {%- endif -%}
+      {%- endcapture -%}
+
+      <sale-price class="{{ regular_price_classes }}">
+        <span class="sr-only">{{ 'product.price.sale_price' | t }}</span>
+        {{- 'product.price.from_price_html' | t: price_min: price_min, price_max: price_max -}}
+      </sale-price>
+    {%- else -%}
+      <sale-price class="{{ regular_price_classes }}">
+        <span class="sr-only">{{ 'product.price.sale_price' | t }}</span>
+
+        {%- if settings.currency_code_enabled -%}
+          {{- product.price | money_with_currency -}}
+        {%- else -%}
+          {{- product.price | money -}}
+        {%- endif -%}
+      </sale-price>
+    {%- endif -%}
+  {%- endif -%}
+
+  {%- unless hide_unit_price -%}
+    {%- assign unit_price_item = variant | default: line_item | default: product.selected_or_first_available_variant -%}
+
+    {%- if unit_price_item.unit_price -%}
+      <unit-price class="{{ unit_price_classes }}">
+        ({{- unit_price_item.unit_price | unit_price_with_measurement: unit_price_item.unit_price_measurement -}})
+      </unit-price>
+    {%- endif -%}
+  {%- endunless -%}
+</price-list>

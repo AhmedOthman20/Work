@@ -36,8 +36,18 @@ Product card extras (Theme settings > Product card extras)
     4. theme setting "Default offer text" (if "Use default text when collection has no offer" is on)
 * Offer visibility: all products / only discounted / only non-discounted (theme setting)
 * Offer is hidden for products in the collections picked in "Hide offer badge in these collections"
-{%- endcomment -%}
 
+********************************************
+Button / trust labels and languages
+********************************************
+
+* Store's primary language: uses the Theme settings texts (editable in the theme editor)
+* Any other language (e.g. Arabic): uses the locale files, so each language gets its own text
+    - Add to cart  → product.general.add_to_cart_button
+    - Sold out     → product.general.sold_out_button
+    - Pay with card → product.product_card_extras.pay_with_card
+    - Fast shipping → product.product_card_extras.fast_shipping
+{%- endcomment -%}
 {%- assign show_rating = show_rating | default: settings.show_product_rating, allow_false: true -%}
 {%- assign show_vendor = show_vendor | default: settings.show_vendor, allow_false: true -%}
 {%- assign show_quick_buy = show_quick_buy | default: settings.show_quick_buy, allow_false: true -%}
@@ -52,10 +62,18 @@ Product card extras (Theme settings > Product card extras)
   assign pce_offer_use_default = settings.pce_offer_use_default | default: true, allow_false: true
   assign pce_offer_visibility = settings.pce_offer_visibility | default: 'all'
   assign pce_show_trust = settings.pce_show_trust | default: true, allow_false: true
-  assign pce_atc_label = settings.pce_atc_label | default: 'Add to cart'
-  assign pce_sold_out_label = settings.pce_sold_out_label | default: 'Sold out'
-  assign pce_pay_label = settings.pce_pay_label | default: 'Pay with card'
-  assign pce_shipping_label = settings.pce_shipping_label | default: 'Fast shipping'
+
+  if request.locale.primary
+    assign pce_atc_label = settings.pce_atc_label | default: 'Add to cart'
+    assign pce_sold_out_label = settings.pce_sold_out_label | default: 'Sold out'
+    assign pce_pay_label = settings.pce_pay_label | default: 'Pay with card'
+    assign pce_shipping_label = settings.pce_shipping_label | default: 'Fast shipping'
+  else
+    assign pce_atc_label = 'product.general.add_to_cart_button' | t
+    assign pce_sold_out_label = 'product.general.sold_out_button' | t
+    assign pce_pay_label = 'product.product_card_extras.pay_with_card' | t
+    assign pce_shipping_label = 'product.product_card_extras.fast_shipping' | t
+  endif
 -%}
 {%- capture pce_offer_default -%}Buy 2, save EGP 500
 Buy 3, save EGP 900{%- endcapture -%}
@@ -398,7 +416,7 @@ Buy 3, save EGP 900{%- endcapture -%}
           {%- endif -%}
         </div>
 
-        {%- if pce_offer_text != blank -%}
+         {%- if pce_offer_text != blank -%}
           <div class="pce-offer">
   {%- for line in pce_offer_lines -%}
   {%- assign clean_line = line | strip -%}

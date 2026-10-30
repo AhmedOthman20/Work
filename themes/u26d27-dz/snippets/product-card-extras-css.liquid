@@ -1,0 +1,609 @@
+{%- comment -%}
+  Styles + size popup script for the product card extras (snippets/product-card.liquid).
+  Render once in layout/theme.liquid, just before </head>:
+  {% render 'product-card-extras-css' %}
+{%- endcomment -%}
+{%- liquid
+  assign pce_border_color = settings.pce_border_color | default: '#e5e5e5'
+  assign pce_uppercase_title = settings.pce_uppercase_title | default: true, allow_false: true
+  assign pce_atc_bg = settings.pce_atc_bg | default: '#1a1a1a'
+  assign pce_atc_text = settings.pce_atc_text | default: '#ffffff'
+  assign pce_sale_color = settings.pce_sale_color | default: '#e31b23'
+  assign pce_offer_bg = settings.pce_offer_bg | default: '#e31b23'
+  assign pce_offer_text_color = settings.pce_offer_text_color | default: '#ffffff'
+  assign pce_trust_color = settings.pce_trust_color | default: '#22a03c'
+  assign pce_hide_pdp_buy_buttons = settings.pce_hide_pdp_buy_buttons | default: true, allow_false: true
+-%}
+<style>
+  .product-card.product-card--bordered {
+    border: 1px solid {{ pce_border_color }};
+  }
+
+  .product-card.product-card--extras .product-card__info {
+    padding: 12px 14px 14px;
+    /* Equal height: stretch the info area to the tallest card in the row,
+       then push the trust box to the bottom so every card lines up */
+    align-self: stretch;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .product-card.product-card--extras .product-card__info--center {
+    align-items: center;
+  }
+
+  .product-card.product-card--extras .product-card__info > .pce-atc,
+  .product-card.product-card--extras .product-card__info > .v-stack {
+    align-self: stretch;
+  }
+
+  /* Rez pre-order app injects its own button into product cards; our Add to cart already covers it */
+  .product-card .rez-preorder-collection-container,
+  .product-card .rez-preorder-collection-btn {
+    display: none !important;
+  }
+
+  .product-card.product-card--extras .product-card__info > .pce-trust {
+    margin-top: auto;
+  }
+
+  /* Keep at least 12px between the trust box and whatever sits above it */
+  .product-card.product-card--extras .product-card__info > :has(+ .pce-trust) {
+    margin-bottom: 8px;
+  }
+  /* ---------- Badge: glossy sweeping glare ---------- */
+.pce-offer {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+
+@keyframes pce-glare {
+  0%   { left: -60%; }
+  45%  { left: 130%; }  /* fast sweep */
+  100% { left: 130%; }  /* short pause before the next one */
+}
+
+/* ---------- First word: gold shimmer + pulse + glow ---------- */
+
+/* Keep the rest of the line above the glare */
+.pce-offer__line {
+  position: relative;
+  z-index: 2;
+}
+.pce-offer__line {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+/* White pill with the amount */
+.pce-offer__pill {
+  position: relative;
+  overflow: hidden;
+  flex: none;
+  display: inline-block;
+  padding: 1px 10px;
+  border-radius: 6px;
+  background: #fff;
+  color: #e31b23;
+  font-size: 1.15em;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+/* Soft shine sweeping across the pill */
+.pce-offer__pill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -70%;
+  width: 45%;
+  background: #fff;
+
+  pointer-events: none;
+}
+
+
+
+.pce-offer__rest {
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pce-offer__pill::after { display: none; }
+}
+
+  .product-card__title {
+    {%- if pce_uppercase_title %} text-transform: uppercase;{% endif %}
+    letter-spacing: .02em;
+    line-height: 1.35;
+  }
+
+  /* Add to cart (first item inside .product-card__info) */
+  .product-card .pce-atc {
+    justify-self: stretch;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .product-card .pce-atc__form {
+    margin: 0;
+  }
+
+  /* Doubled class beats the theme's [type=submit] background reset */
+  .product-card .pce-atc__button.pce-atc__button {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 0;
+    background-color: {{ pce_atc_bg }};
+    color: {{ pce_atc_text }};
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    text-align: center;
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+
+  /* Impact's custom-button wraps the label in a <div> */
+  .product-card .pce-atc__button.pce-atc__button > div {
+    width: 100%;
+    text-align: center;
+  }
+
+  .product-card .pce-atc__button.pce-atc__button:hover:not(:disabled) {
+    opacity: .85;
+  }
+
+  .product-card .pce-atc__button.pce-atc__button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+  }
+
+  .product-card .pce-atc__button.pce-atc__button:focus-visible {
+    outline: 2px solid {{ pce_atc_bg }};
+    outline-offset: 2px;
+  }
+
+  /* Price + offer */
+  .pce-price-row {
+      display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    margin-top: 6px;
+    flex-direction: column-reverse;
+  }
+
+  .pce-price {
+    display: flex;
+    line-height: 1.3;
+    font-size: 17px;
+    font-weight:700;
+        gap: 5px;
+
+  }
+
+  .pce-price__compare {
+    text-decoration-thickness: 1px;
+  }
+
+  .pce-price__final--sale {
+    color: {{ pce_sale_color }};
+  }
+/* No offer badge: compare-at and sale price side by side */
+@media (min-width: 768px) {
+  .pce-price-row:not(:has(.pce-offer)) .pce-price {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 10px;
+  }
+}
+  .pce-offer {
+    display: flex;
+    {% comment %} flex-direction: column; {% endcomment %}
+    gap: 3px;
+    padding: 5px 8px;
+    border-radius: 4px;
+    background: {{ pce_offer_bg }};
+    color: {{ pce_offer_text_color }};
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  /* Trust badges: two separate boxes, side by side */
+  .pce-trust {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 8px;
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  .pce-trust__pay,
+  .pce-trust__ship {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 6px 8px;
+    border: 1.5px solid {{ pce_trust_color }};
+    border-radius: 6px;
+    background: {{ pce_trust_color | color_modify: 'alpha', 0.06 }};
+    color: {{ pce_trust_color }};
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .pce-trust__pay svg,
+  .pce-trust__ship svg {
+    width: 20px;
+    height: 14px;
+    flex: none;
+  }
+
+  {%- if pce_hide_pdp_buy_buttons %}
+  /* Product page: the Buy buttons block only exists so the quick buy popup gets
+     its Add to cart button. On the product page itself the sticky bar replaces it. */
+  .product-info .product-info__block-item[data-block-type="buy-buttons"] {
+    display: none;
+  }
+  {%- endif %}
+
+  /* Size popup (products with options) */
+  pce-quick-add {
+    display: block;
+  }
+
+  a.pce-atc__button {
+    text-decoration: none;
+  }
+
+  .pce-qa {
+    width: min(460px, calc(100vw - 32px));
+    max-height: calc(100vh - 32px);
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: rgb(var(--background-primary, 255 255 255));
+    color: rgb(var(--text-primary, 26 26 26));
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .25);
+    overflow: auto;
+  }
+
+  .pce-qa::backdrop {
+    background: rgba(0, 0, 0, .45);
+  }
+
+  .pce-qa__inner {
+    position: relative;
+    display: grid;
+    gap: 20px;
+    padding: 24px;
+  }
+
+  .pce-qa__close {
+    position: absolute;
+    top: 12px;
+    inset-inline-end: 12px;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .pce-qa__head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-inline-end: 36px;
+  }
+
+  .pce-qa__image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    flex: none;
+  }
+
+  .pce-qa__title {
+    margin: 0 0 6px;
+    font-weight: 600;
+    line-height: 1.35;
+    {%- if pce_uppercase_title %} text-transform: uppercase;{% endif %}
+  }
+
+  .pce-qa__price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .pce-qa__price [hidden] {
+    display: none;
+  }
+
+  .pce-qa__option {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    text-align: center;
+  }
+
+  .pce-qa__legend {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 0;
+    font-size: 14px;
+  }
+
+  .pce-qa__legend-name {
+    opacity: .7;
+  }
+
+  .pce-qa__values {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .pce-qa__radio {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .pce-qa__pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 56px;
+    min-height: 42px;
+    padding: 8px 16px;
+    border: 1px solid rgba(26, 26, 26, .15);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    transition: border-color .15s;
+  }
+
+  .pce-qa__pill:hover {
+    border-color: {{ pce_atc_bg }};
+  }
+
+  .pce-qa__radio:checked + .pce-qa__pill {
+    border: 2px solid {{ pce_atc_bg }};
+    padding: 7px 15px;
+  }
+
+  .pce-qa__radio:focus-visible + .pce-qa__pill {
+    outline: 2px solid {{ pce_atc_bg }};
+    outline-offset: 2px;
+  }
+
+  .pce-qa__pill[data-unavailable] {
+    opacity: .45;
+    text-decoration: line-through;
+  }
+
+  .pce-qa__error {
+    margin: 0;
+    color: {{ pce_sale_color }};
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .pce-qa__error[hidden] {
+    display: none;
+  }
+
+  .pce-qa__form {
+    margin: 0;
+  }
+
+  @media (max-width: 699px) {
+    /* Impact only uses its shared-row subgrid from 700px up. On phones each card is its own grid:
+       image row + info row that fills the rest, so the trust boxes still line up */
+    .product-card.product-card--extras {
+      grid-template-rows: auto 1fr;
+      align-content: stretch;
+    }
+
+    .product-card.product-card--extras .product-card__info { padding: 10px 10px 12px; }
+
+    /* Price and offer badge stay on one row */
+    .pce-price-row {
+      flex-wrap: nowrap;
+      {% comment %} align-items: center; {% endcomment %}
+      gap: 6px;
+    }
+    .pce-price {
+      flex: none;
+      font-size: 13px;
+    }
+    .pce-offer {
+      flex: 0 1 auto;
+      min-width: 0;
+      padding: 3px 5px;
+      font-size: 9px;
+      letter-spacing: 0;
+      white-space: normal;
+      line-height: 1.3;
+    }
+    .product-card .pce-atc__button.pce-atc__button { min-height: 40px; font-size: 12px; }
+    .pce-trust { grid-auto-flow: row; gap: 6px; }
+    .pce-trust__pay,
+    .pce-trust__ship { min-height: 32px; padding: 5px 6px; font-size: 10px; }
+    .pce-trust__pay svg,
+    .pce-trust__ship svg { width: 18px; height: 13px; }
+
+    /* Size popup becomes a bottom sheet on phones */
+    .pce-qa {
+      width: 100%;
+      max-width: 100%;
+      margin: auto 0 0;
+      border-radius: 12px 12px 0 0;
+    }
+    .pce-qa__inner { padding: 20px 16px calc(16px + env(safe-area-inset-bottom)); }
+  }
+</style>
+
+<script>
+  (() => {
+    if (customElements.get('pce-quick-add')) return;
+
+    class PceQuickAdd extends HTMLElement {
+      connectedCallback() {
+        /* This script loads in <head>, so the element can upgrade before its children are parsed.
+           Listen on the element itself (always works) and set up lazily once the content exists. */
+        if (!this._listening) {
+          this._listening = true;
+          this.addEventListener('click', (event) => {
+            if (!event.target.closest('[data-pce-open]')) return;
+            if (this.init()) this.open();
+          });
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', () => this.init(), { once: true });
+        } else {
+          this.init();
+        }
+      }
+
+      init() {
+        if (this._ready) return true;
+        this.dialog = this.querySelector('dialog');
+        this.form = this.querySelector('form');
+        if (!this.dialog || !this.form) return false;
+        this._ready = true;
+
+        const data = this.querySelector('[data-pce-variants]');
+        this.variants = data ? JSON.parse(data.textContent) : [];
+        this.groups = Array.from(this.querySelectorAll('[data-pce-option]'));
+        this.idInput = this.form.querySelector('[name="id"]');
+        this.submit = this.form.querySelector('[data-pce-submit]');
+        this.errorEl = this.querySelector('[data-pce-error]');
+
+        this.querySelectorAll('[data-pce-close]').forEach((button) => button.addEventListener('click', () => this.dialog.close()));
+        /* Click on the dimmed backdrop closes the popup */
+        this.dialog.addEventListener('click', (event) => { if (event.target === this.dialog) this.dialog.close(); });
+        this.dialog.addEventListener('change', (event) => { if (event.target.closest('[data-pce-option]')) this.update(); });
+
+        /* Impact's product-form fires these after the add request */
+        this.form.addEventListener('variant:add', () => this.dialog.close());
+        this.form.addEventListener('cart:error', (event) => this.showError(event.detail && event.detail.error));
+
+        this.update();
+        return true;
+      }
+
+      open() {
+        this.hideError();
+        if (typeof this.dialog.showModal === 'function') this.dialog.showModal();
+        else this.dialog.setAttribute('open', '');
+      }
+
+      selected() {
+        return this.groups.map((group) => {
+          const checked = group.querySelector('input:checked');
+          return checked ? checked.value : null;
+        });
+      }
+
+      setLabel(text) {
+        if (!this.submit) return;
+        const target = this.submit.querySelector('div') || this.submit;
+        target.textContent = text;
+      }
+
+      update() {
+        const selected = this.selected();
+
+        this.groups.forEach((group, i) => {
+          const valueEl = group.querySelector('[data-pce-option-value]');
+          if (valueEl) valueEl.textContent = selected[i] || '';
+          group.querySelectorAll('input').forEach((input) => {
+            const possible = this.variants.some((v) => v.available && v.options.every((o, j) => (j === i ? o === input.value : o === selected[j])));
+            if (input.nextElementSibling) input.nextElementSibling.toggleAttribute('data-unavailable', !possible);
+          });
+        });
+
+        const variant = this.variants.find((v) => v.options.every((o, i) => o === selected[i]));
+        this.hideError();
+
+        if (variant) {
+          this.idInput.value = variant.id;
+          const price = this.querySelector('[data-pce-price]');
+          const compare = this.querySelector('[data-pce-compare]');
+          const image = this.querySelector('[data-pce-image]');
+          if (price) {
+            price.textContent = variant.price;
+            price.classList.toggle('pce-price__final--sale', !!variant.compare);
+          }
+          if (compare) {
+            compare.hidden = !variant.compare;
+            compare.textContent = variant.compare || '';
+          }
+          if (image && variant.image) image.src = variant.image;
+        }
+
+        const canBuy = !!(variant && variant.available);
+        if (this.submit) this.submit.disabled = !canBuy;
+        this.setLabel(canBuy ? this.dataset.addLabel : this.dataset.soldOutLabel);
+      }
+
+      showError(message) {
+        if (!this.errorEl || !message) return;
+        this.errorEl.textContent = message;
+        this.errorEl.hidden = false;
+      }
+
+      hideError() {
+        if (this.errorEl) this.errorEl.hidden = true;
+      }
+    }
+
+    customElements.define('pce-quick-add', PceQuickAdd);
+  })();
+</script>

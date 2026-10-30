@@ -1,0 +1,343 @@
+{% doc %}
+  @prompt
+    sticky add to cart and buy button , remove product title and price , add title and price in desktop only, i want it to be sticky all the time and without scroling , can we add product image quantity and variation if product have ?, i mobile make it 2 row first one image quantity variation second one buttons , can we add in mobile image beside quantity
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% assign current_variant = product.selected_or_first_available_variant %}
+
+{% style %}
+  .ai-sticky-buy-{{ ai_gen_id }} { display:block; position:fixed; z-index:50; left:0; right:0; bottom:0; width:100%; padding:12px 20px; background:{{ block.settings.bar_background }}; color:{{ block.settings.bar_text }}; border-top:1px solid rgba(26,26,26,.12); box-shadow:0 -4px 18px rgba(0,0,0,.12); }
+  .ai-sticky-buy-{{ ai_gen_id }}__inner { width:{{ block.settings.desktop_width_percent }}%; max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:18px; }
+  .ai-sticky-buy-{{ ai_gen_id }}__product { min-width:0; display:flex; align-items:center; gap:12px; }
+  .ai-sticky-buy-{{ ai_gen_id }}__image { width:52px; height:52px; object-fit:cover; border-radius:4px; flex:none; }
+  .ai-sticky-buy-{{ ai_gen_id }}__details { min-width:0; }
+  .ai-sticky-buy-{{ ai_gen_id }}__title { text-transform:uppercase; margin:0 0 4px; color:inherit; font-size:15px; font-weight:600; line-height:1.3; }
+  .ai-sticky-buy-{{ ai_gen_id }}__price { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px; font-size:14px; line-height:1.3; }
+  .ai-sticky-buy-{{ ai_gen_id }}__price-final { font-weight:600; }
+  .ai-sticky-buy-{{ ai_gen_id }}__price--sale .ai-sticky-buy-{{ ai_gen_id }}__price-final { color:{{ block.settings.sale_price_color }}; }
+  .ai-sticky-buy-{{ ai_gen_id }}__price-compare { font-size:13px; opacity:.6; }
+  .ai-sticky-buy-{{ ai_gen_id }}__price-badge { padding:2px 6px; border-radius:3px; background:{{ block.settings.sale_badge_background }}; color:{{ block.settings.sale_badge_text }}; font-size:11px; font-weight:600; line-height:1.3; }
+  .ai-sticky-buy-{{ ai_gen_id }}__price-compare[hidden], .ai-sticky-buy-{{ ai_gen_id }}__price-badge[hidden] { display:none; }
+  .ai-sticky-buy-{{ ai_gen_id }}__controls { display:flex; align-items:center; gap:16px; min-width:0; }
+  .ai-sticky-buy-{{ ai_gen_id }}__sr { position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+
+  /* Option groups */
+  .ai-sticky-buy-{{ ai_gen_id }}__option { min-width:0; margin:0; padding:0; border:0; }
+  .ai-sticky-buy-{{ ai_gen_id }}__legend { display:flex; align-items:baseline; gap:6px; padding:0; margin:0 0 6px; line-height:1.2; }
+  .ai-sticky-buy-{{ ai_gen_id }}__legend-name { font-size:{{ block.settings.label_size }}px; opacity:.7; }
+  .ai-sticky-buy-{{ ai_gen_id }}__legend-value { font-size:{{ block.settings.label_size | minus: 3 }}px; }
+  .ai-sticky-buy-{{ ai_gen_id }}__values { display:flex; flex-wrap:wrap; gap:8px; }
+
+  /* Button style */
+  .ai-sticky-buy-{{ ai_gen_id }}__pill { display:inline-flex; align-items:center; justify-content:center; min-width:{{ block.settings.pill_min_width }}px; min-height:34px; padding:6px 14px; border:1px solid {{ block.settings.pill_border }}; border-radius:{{ block.settings.pill_radius }}px; background:{{ block.settings.pill_background }}; color:{{ block.settings.pill_text }}; font-size:13px; line-height:1; cursor:pointer; white-space:nowrap; transition:border-color .15s; }
+  .ai-sticky-buy-{{ ai_gen_id }}__pill:hover { border-color:{{ block.settings.pill_selected_border }}; }
+  .ai-sticky-buy-{{ ai_gen_id }}__radio:checked + .ai-sticky-buy-{{ ai_gen_id }}__pill { border:2px solid {{ block.settings.pill_selected_border }}; padding:5px 13px; }
+  .ai-sticky-buy-{{ ai_gen_id }}__radio:focus-visible + .ai-sticky-buy-{{ ai_gen_id }}__pill { outline:3px solid #1a1a1a; outline-offset:2px; }
+  .ai-sticky-buy-{{ ai_gen_id }}__pill[data-unavailable] { opacity:.45; text-decoration:line-through; }
+
+  /* Dropdown style */
+  .ai-sticky-buy-{{ ai_gen_id }}__select, .ai-sticky-buy-{{ ai_gen_id }}__quantity { min-height:44px; padding:8px 12px; border:1px solid #777; border-radius:{{ block.settings.button_radius }}px; background:#fff; color:#1a1a1a; font:inherit; }
+  .ai-sticky-buy-{{ ai_gen_id }}__select { max-width:220px; }
+  .ai-sticky-buy-{{ ai_gen_id }}__quantity { width:72px; }
+
+  .ai-sticky-buy-{{ ai_gen_id }}__button { text-transform:uppercase; min-height:46px; padding:12px 22px; border:1px solid black; border-radius:{{ block.settings.button_radius }}px; background:{{ block.settings.button_background }}; color:{{ block.settings.button_text }}; font:inherit; font-size:14px; font-weight:600; cursor:pointer; text-align:center; }
+  .ai-sticky-buy-{{ ai_gen_id }}__button--secondary { background:transparent; color:{{ block.settings.bar_text }}; border-color:currentColor; }
+  .ai-sticky-buy-{{ ai_gen_id }}__button:disabled { opacity:.5; cursor:not-allowed; }
+  .ai-sticky-buy-{{ ai_gen_id }}__button[aria-busy="true"] { opacity:.6; cursor:progress; }
+  .ai-sticky-buy-{{ ai_gen_id }}__button:focus-visible, .ai-sticky-buy-{{ ai_gen_id }}__select:focus-visible, .ai-sticky-buy-{{ ai_gen_id }}__quantity:focus-visible { outline:3px solid #1a1a1a; outline-offset:2px; }
+  .ai-sticky-buy-{{ ai_gen_id }}__button:hover:not(:disabled) { opacity:.86; }
+  .ai-sticky-buy-{{ ai_gen_id }}__actions { gap:8px !important; display:flex; align-items:center; }
+  .ai-sticky-buy-{{ ai_gen_id }}__error { max-width:1200px; margin:0 auto 8px; font-size:13px; color:{{ block.settings.sale_price_color }}; }
+  .ai-sticky-buy-{{ ai_gen_id }}__error[hidden] { display:none; }
+
+  @media(max-width:749px) {
+    .ai-sticky-buy-{{ ai_gen_id }} { padding:10px 12px; }
+    .ai-sticky-buy-{{ ai_gen_id }}__inner { width:100%; display:grid; grid-template-columns:1fr; gap:8px; }
+    .ai-sticky-buy-{{ ai_gen_id }}__controls { width:100%; flex-direction:column; align-items:stretch; gap:8px; }
+    .ai-sticky-buy-{{ ai_gen_id }}__legend { margin-bottom:4px; }
+    .ai-sticky-buy-{{ ai_gen_id }}__values { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding:2px; }
+    .ai-sticky-buy-{{ ai_gen_id }}__values::-webkit-scrollbar { display:none; }
+    .ai-sticky-buy-{{ ai_gen_id }}__pill { flex:none; min-height:32px; }
+    .ai-sticky-buy-{{ ai_gen_id }}__select { width:100%; max-width:none; }
+    .ai-sticky-buy-{{ ai_gen_id }}__quantity { width:52px; flex:none; }
+    .ai-sticky-buy-{{ ai_gen_id }}__actions { display:flex; width:100%; gap:8px; align-items:center; }
+    .ai-sticky-buy-{{ ai_gen_id }}__button { flex:1; min-height:44px; padding:10px 8px; font-size:12px; }
+  }
+{% endstyle %}
+
+<sticky-buy-{{ ai_gen_id }} class="ai-sticky-buy-{{ ai_gen_id }}" data-product-id="{{ product.id }}" {{ block.shopify_attributes }}>
+  {% if product %}
+    <p class="ai-sticky-buy-{{ ai_gen_id }}__error" role="alert" data-error hidden></p>
+    <div class="ai-sticky-buy-{{ ai_gen_id }}__inner">
+      <div class="ai-sticky-buy-{{ ai_gen_id }}__product">
+        {% if current_variant.featured_image %}<img class="ai-sticky-buy-{{ ai_gen_id }}__image" src="{{ current_variant.featured_image | image_url: width: 120 }}" alt="{{ current_variant.featured_image.alt | default: product.title | escape }}" width="52" height="52" loading="lazy">{% elsif product.featured_image %}<img class="ai-sticky-buy-{{ ai_gen_id }}__image" src="{{ product.featured_image | image_url: width: 120 }}" alt="{{ product.featured_image.alt | default: product.title | escape }}" width="52" height="52" loading="lazy">{% endif %}
+        <div class="ai-sticky-buy-{{ ai_gen_id }}__details"><p class="ai-sticky-buy-{{ ai_gen_id }}__title">{{ product.title | escape }}</p>{% liquid
+  assign on_sale = false
+  if current_variant.compare_at_price > current_variant.price
+    assign on_sale = true
+    assign saving_percent = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round
+  endif
+%}<div class="ai-sticky-buy-{{ ai_gen_id }}__price{% if on_sale %} ai-sticky-buy-{{ ai_gen_id }}__price--sale{% endif %}" data-price><span class="ai-sticky-buy-{{ ai_gen_id }}__price-final" data-price-final>{{ current_variant.price | money }}</span><s class="ai-sticky-buy-{{ ai_gen_id }}__price-compare" data-price-compare {% unless on_sale %}hidden{% endunless %}>{% if on_sale %}{{ current_variant.compare_at_price | money }}{% endif %}</s>{% if block.settings.show_sale_badge %}<span class="ai-sticky-buy-{{ ai_gen_id }}__price-badge" data-price-badge {% unless on_sale %}hidden{% endunless %}>{% if on_sale %}-{{ saving_percent }}%{% endif %}</span>{% endif %}</div></div>
+      </div>
+
+      <div class="ai-sticky-buy-{{ ai_gen_id }}__controls">
+        {% unless product.has_only_default_variant %}
+          {% for option in product.options_with_values %}
+            {% assign option_index = forloop.index0 %}
+            {% assign selected_value = current_variant.options[option_index] %}
+            {% if block.settings.picker_style == 'buttons' %}
+              <fieldset class="ai-sticky-buy-{{ ai_gen_id }}__option" data-option-group="{{ option_index }}">
+                <legend class="{% if block.settings.show_variant_label %}ai-sticky-buy-{{ ai_gen_id }}__legend{% else %}ai-sticky-buy-{{ ai_gen_id }}__sr{% endif %}">
+                  <span class="ai-sticky-buy-{{ ai_gen_id }}__legend-name">{{ option.name | escape }}:</span>
+                  <span class="ai-sticky-buy-{{ ai_gen_id }}__legend-value" data-option-value>{{ selected_value | escape }}</span>
+                </legend>
+                <div class="ai-sticky-buy-{{ ai_gen_id }}__values">
+                  {% for value in option.values %}
+                    {% assign input_id = 'ai-sticky-' | append: ai_gen_id | append: '-' | append: option_index | append: '-' | append: forloop.index0 %}
+                    <input class="ai-sticky-buy-{{ ai_gen_id }}__radio ai-sticky-buy-{{ ai_gen_id }}__sr" type="radio" id="{{ input_id }}" name="ai-sticky-{{ ai_gen_id }}-option-{{ option_index }}" value="{{ value | escape }}" {% if value == selected_value %}checked{% endif %}>
+                    <label class="ai-sticky-buy-{{ ai_gen_id }}__pill" for="{{ input_id }}">{{ value | escape }}</label>
+                  {% endfor %}
+                </div>
+              </fieldset>
+            {% else %}
+              <div class="ai-sticky-buy-{{ ai_gen_id }}__option" data-option-group="{{ option_index }}">
+                <label class="{% if block.settings.show_variant_label %}ai-sticky-buy-{{ ai_gen_id }}__legend{% else %}ai-sticky-buy-{{ ai_gen_id }}__sr{% endif %}" for="ai-sticky-{{ ai_gen_id }}-select-{{ option_index }}">
+                  <span class="ai-sticky-buy-{{ ai_gen_id }}__legend-name">{{ option.name | escape }}:</span>
+                  <span class="ai-sticky-buy-{{ ai_gen_id }}__legend-value" data-option-value>{{ selected_value | escape }}</span>
+                </label>
+                <select id="ai-sticky-{{ ai_gen_id }}-select-{{ option_index }}" class="ai-sticky-buy-{{ ai_gen_id }}__select">
+                  {% for value in option.values %}<option value="{{ value | escape }}" {% if value == selected_value %}selected{% endif %}>{{ value | escape }}</option>{% endfor %}
+                </select>
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% endunless %}
+      </div>
+
+      <div class="ai-sticky-buy-{{ ai_gen_id }}__actions">
+        <label class="ai-sticky-buy-{{ ai_gen_id }}__sr" for="ai-sticky-quantity-{{ ai_gen_id }}">Quantity</label><input id="ai-sticky-quantity-{{ ai_gen_id }}" class="ai-sticky-buy-{{ ai_gen_id }}__quantity" type="number" min="1" value="1" inputmode="numeric" data-quantity>
+        <button type="button" class="ai-sticky-buy-{{ ai_gen_id }}__button ai-sticky-buy-{{ ai_gen_id }}__button--secondary" data-action="buy">{{ block.settings.buy_label | escape }}</button>
+        {% if block.settings.show_add_button %}<button type="button" class="ai-sticky-buy-{{ ai_gen_id }}__button" data-action="add">{{ block.settings.add_label | escape }}</button>{% endif %}
+      </div>
+    </div>
+
+    <script type="application/json" data-variants>
+      [{% for v in product.variants %}{"id":{{ v.id }},"price":{{ v.price }},"compare":{{ v.compare_at_price | default: 0 }},"available":{{ v.available }},"options":{{ v.options | json }},"image":{% if v.featured_image %}{{ v.featured_image | image_url: width: 120 | json }}{% elsif product.featured_image %}{{ product.featured_image | image_url: width: 120 | json }}{% else %}null{% endif %}}{% unless forloop.last %},{% endunless %}{% endfor %}]
+    </script>
+    <script type="application/json" data-config>
+      {"cartAddUrl":{{ routes.cart_add_url | append: '.js' | json }},"cartUrl":{{ routes.cart_url | json }},"checkoutUrl":"/checkout","afterAdd":{{ block.settings.after_add | json }},"errorText":{{ block.settings.error_text | json }}}
+    </script>
+  {% endif %}
+</sticky-buy-{{ ai_gen_id }}>
+
+<script>
+  (() => {
+    const tagName = 'sticky-buy-{{ ai_gen_id }}';
+    if (customElements.get(tagName)) return;
+    class StickyBuy extends HTMLElement {
+      connectedCallback() {
+        const data = this.querySelector('[data-variants]');
+        const config = this.querySelector('[data-config]');
+        this.variants = data ? JSON.parse(data.textContent) : [];
+        this.config = config ? JSON.parse(config.textContent) : {};
+        this.groups = Array.from(this.querySelectorAll('[data-option-group]'));
+        this.quantityInput = this.querySelector('[data-quantity]');
+        this.priceElement = this.querySelector('[data-price]');
+        this.errorElement = this.querySelector('[data-error]');
+        this.imageElement = this.querySelector('.ai-sticky-buy-{{ ai_gen_id }}__image');
+        this.currentVariant = this.variants.find((v) => v.id === {{ current_variant.id | default: 0 }}) || this.variants[0];
+        this.addEventListener('change', (event) => { if (event.target.closest('[data-option-group]')) this.onOptionChange(); });
+        this.addEventListener('click', (event) => this.handleAction(event));
+        this.updateAvailability();
+        this.updateButtons();
+      }
+      getSelected() {
+        return this.groups.map((group) => {
+          const checked = group.querySelector('input[type="radio"]:checked');
+          const select = group.querySelector('select');
+          return checked ? checked.value : select ? select.value : null;
+        });
+      }
+      onOptionChange() {
+        const selected = this.getSelected();
+        this.groups.forEach((group, i) => { const el = group.querySelector('[data-option-value]'); if (el) el.textContent = selected[i]; });
+        this.currentVariant = this.variants.find((v) => v.options.every((o, i) => o === selected[i])) || null;
+        this.hideError();
+        this.updateAvailability();
+        this.syncVariant();
+      }
+      updateAvailability() {
+        const selected = this.getSelected();
+        this.groups.forEach((group, i) => {
+          const isAvailable = (value) => this.variants.some((v) => v.available && v.options.every((o, j) => (j === i ? o === value : o === selected[j])));
+          group.querySelectorAll('input[type="radio"]').forEach((input) => {
+            const pill = input.nextElementSibling;
+            if (pill) pill.toggleAttribute('data-unavailable', !isAvailable(input.value));
+          });
+          group.querySelectorAll('option').forEach((option) => {
+            const base = option.dataset.label || (option.dataset.label = option.textContent);
+            option.textContent = isAvailable(option.value) ? base : base + ' — {{ block.settings.sold_out_label | escape }}';
+          });
+        });
+      }
+      syncVariant() {
+        const variant = this.currentVariant;
+        if (variant) {
+          this.renderPrice(variant);
+          if (this.imageElement && variant.image) this.imageElement.src = variant.image;
+        }
+        this.updateButtons();
+      }
+      formatMoney(cents) {
+        return new Intl.NumberFormat(document.documentElement.lang || undefined, { style: 'currency', currency: '{{ cart.currency.iso_code }}' }).format(cents / 100);
+      }
+      renderPrice(variant) {
+        if (!this.priceElement) return;
+        const onSale = variant.compare > variant.price;
+        const final = this.priceElement.querySelector('[data-price-final]');
+        const compare = this.priceElement.querySelector('[data-price-compare]');
+        const badge = this.priceElement.querySelector('[data-price-badge]');
+        this.priceElement.classList.toggle('ai-sticky-buy-{{ ai_gen_id }}__price--sale', onSale);
+        if (final) final.textContent = this.formatMoney(variant.price);
+        if (compare) { compare.hidden = !onSale; compare.textContent = onSale ? this.formatMoney(variant.compare) : ''; }
+        if (badge) { badge.hidden = !onSale; badge.textContent = onSale ? '-' + Math.round((variant.compare - variant.price) * 100 / variant.compare) + '%' : ''; }
+      }
+      updateButtons() {
+        const ok = !!(this.currentVariant && this.currentVariant.available);
+        this.querySelectorAll('[data-action]').forEach((button) => { button.disabled = !ok; });
+      }
+      getQuantity() {
+        return Math.max(1, parseInt(this.quantityInput && this.quantityInput.value, 10) || 1);
+      }
+      async ajaxAdd(extra = {}) {
+        const response = await fetch(this.config.cartAddUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(Object.assign({ items: [{ id: this.currentVariant.id, quantity: this.getQuantity() }] }, extra))
+        });
+        const json = await response.json();
+        if (!response.ok) throw new Error(json.description || json.message || this.config.errorText);
+        return json;
+      }
+      /* Dawn-family drawer: <cart-drawer> / <cart-notification> with renderContents() */
+      getDawnDrawer() {
+        const el = document.querySelector('cart-drawer, cart-notification');
+        return el && typeof el.renderContents === 'function' && typeof el.getSectionsToRender === 'function' ? el : null;
+      }
+      /* Horizon-family drawer and other custom-element drawers */
+      getDrawer() {
+        return document.querySelector('cart-drawer-component, cart-drawer, side-cart, cart-drawer-element, #CartDrawer, [data-cart-drawer]');
+      }
+      openDrawer(drawer) {
+        if (!drawer) return false;
+        if (typeof drawer.showDialog === 'function') { drawer.showDialog(); return true; }
+        if (typeof drawer.open === 'function') { drawer.open(); return true; }
+        if (typeof drawer.show === 'function') { drawer.show(); return true; }
+        const dialog = drawer.matches('dialog') ? drawer : drawer.querySelector('dialog');
+        if (dialog && typeof dialog.showModal === 'function') { if (!dialog.open) dialog.showModal(); return true; }
+        return false;
+      }
+      async addToCart() {
+        if (this.config.afterAdd === 'cart') {
+          await this.ajaxAdd();
+          window.location.href = this.config.cartUrl;
+          return;
+        }
+
+        /* Dawn-style themes: request the drawer sections with the add call and render them */
+        const dawnDrawer = this.getDawnDrawer();
+        if (dawnDrawer) {
+          const sections = dawnDrawer.getSectionsToRender().map((section) => section.id);
+          const result = await this.ajaxAdd({ sections, sections_url: window.location.pathname });
+          dawnDrawer.classList.remove('is-empty');
+          dawnDrawer.renderContents(result);
+          return;
+        }
+
+        /* Horizon-style themes: add, then fire the theme's cart update event so the drawer + cart count refresh */
+        await this.ajaxAdd();
+        const cart = await fetch(this.config.cartUrl + '.js', { headers: { Accept: 'application/json' } }).then((r) => r.json());
+        const detail = {
+          resource: cart,
+          sourceId: this.id || 'sticky-buy-{{ ai_gen_id }}',
+          data: { source: 'sticky-buy-{{ ai_gen_id }}', itemCount: cart.item_count, productId: '{{ product.id }}', variantId: String(this.currentVariant.id) }
+        };
+        ['cart:update', 'cart:refresh', 'cart:updated'].forEach((name) => {
+          this.dispatchEvent(new CustomEvent(name, { bubbles: true, detail }));
+        });
+
+        /* Open the drawer once the theme has had a moment to re-render it */
+        const drawer = this.getDrawer();
+        await new Promise((resolve) => setTimeout(resolve, 150));
+        if (!this.openDrawer(drawer)) window.location.href = this.config.cartUrl;
+      }
+      async buyNow() {
+        await this.ajaxAdd();
+        window.location.href = this.config.checkoutUrl;
+      }
+      async handleAction(event) {
+        const button = event.target.closest('[data-action]');
+        if (!button || !this.currentVariant || button.disabled) return;
+        this.hideError();
+        button.setAttribute('aria-busy', 'true');
+        try {
+          if (button.dataset.action === 'buy') await this.buyNow();
+          else await this.addToCart();
+        } catch (error) {
+          this.showError(error.message || this.config.errorText);
+        } finally {
+          button.removeAttribute('aria-busy');
+        }
+      }
+      showError(message) {
+        if (!this.errorElement) return;
+        this.errorElement.textContent = message;
+        this.errorElement.hidden = false;
+      }
+      hideError() {
+        if (this.errorElement) this.errorElement.hidden = true;
+      }
+    }
+    customElements.define(tagName, StickyBuy);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Sticky buy buttons",
+  "settings": [
+    { "type": "range", "id": "desktop_width_percent", "label": "Desktop width", "min": 50, "max": 100, "step": 5, "unit": "%", "default": 100 },
+    { "type": "header", "content": "Price" },
+    { "type": "checkbox", "id": "show_sale_badge", "label": "Show discount badge", "info": "Shows e.g. -20% when the variant has a compare-at price", "default": true },
+    { "type": "color", "id": "sale_price_color", "label": "Sale price color", "default": "#c0392b" },
+    { "type": "color", "id": "sale_badge_background", "label": "Badge background", "default": "#c0392b" },
+    { "type": "color", "id": "sale_badge_text", "label": "Badge text", "default": "#ffffff" },
+    { "type": "header", "content": "Variant picker" },
+    { "type": "select", "id": "picker_style", "label": "Style", "options": [ { "value": "buttons", "label": "Buttons" }, { "value": "dropdown", "label": "Dropdown" } ], "default": "buttons" },
+    { "type": "checkbox", "id": "show_variant_label", "label": "Show option label", "info": "Shows e.g. Size: S above the options", "default": true },
+    { "type": "range", "id": "label_size", "label": "Label size", "min": 12, "max": 22, "step": 1, "unit": "px", "default": 16 },
+    { "type": "text", "id": "sold_out_label", "label": "Sold out text (dropdown)", "default": "Sold out" },
+    { "type": "range", "id": "pill_min_width", "label": "Button min width", "min": 32, "max": 80, "step": 2, "unit": "px", "default": 44 },
+    { "type": "range", "id": "pill_radius", "label": "Button corner radius", "min": 0, "max": 30, "step": 1, "unit": "px", "default": 2 },
+    { "type": "color", "id": "pill_background", "label": "Button background", "default": "#f3f3f3" },
+    { "type": "color", "id": "pill_text", "label": "Button text", "default": "#1a1a1a" },
+    { "type": "color", "id": "pill_border", "label": "Button border", "default": "#dddddd" },
+    { "type": "color", "id": "pill_selected_border", "label": "Selected border", "default": "#1a1a1a" },
+    { "type": "header", "content": "Buy buttons" },
+    { "type": "checkbox", "id": "show_add_button", "label": "Show add to cart button", "default": true },
+    { "type": "text", "id": "add_label", "label": "Add to cart label", "default": "Add to cart" },
+    { "type": "text", "id": "buy_label", "label": "Buy now label", "default": "Buy now" },
+    { "type": "select", "id": "after_add", "label": "After add to cart", "options": [ { "value": "theme", "label": "Open side cart" }, { "value": "cart", "label": "Go to cart page" } ], "default": "theme", "info": "Buy now always goes straight to checkout" },
+    { "type": "text", "id": "error_text", "label": "Error message", "default": "Couldn't add this item. Please try again." },
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "bar_background", "label": "Bar background", "default": "#ffffff" },
+    { "type": "color", "id": "bar_text", "label": "Bar text", "default": "#1a1a1a" },
+    { "type": "color", "id": "button_background", "label": "Buy button background", "default": "#1a1a1a" },
+    { "type": "color", "id": "button_text", "label": "Buy button text", "default": "#ffffff" },
+    { "type": "range", "id": "button_radius", "label": "Buy button corner radius", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 0 }
+  ],
+  "presets": [{ "name": "Sticky buy buttons" }],
+  "tag": null,
+  "class": "sticky-buy-block"
+}
+{% endschema %}

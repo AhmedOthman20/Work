@@ -4,8 +4,8 @@
 
 | البيئة | المتجر | مجلد الثيم |
 |---|---|---|
-| `levai` | `levaiandloris-intl.myshopify.com` | `themes/levaiandloris-intl` |
-| `dz` | `u26d27-dz.myshopify.com` | `themes/u26d27-dz` |
+| `levai` | `levaiandloris-intl.myshopify.com` (global.levaiandloris.com) | `themes/levaiandloris-intl` |
+| `dz` | `u26d27-dz.myshopify.com` (levaiandloris.com) | `themes/u26d27-dz` |
 
 ## التثبيت
 

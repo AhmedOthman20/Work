@@ -1,1 +1,388 @@
-{"sections":{"hero":{"type":"image-with-text-overlay","blocks":{"subheading":{"type":"subheading","settings":{"text":"Egyptian Heritage, British Craftsmanship"}},"heading":{"type":"heading","settings":{"text":"About Levai & Loris","heading_tag":"h1"}},"richtext":{"type":"richtext","settings":{"content":"<p>Where Boldness Identity Meets Craftsmanship<\/p>"}}},"block_order":["subheading","heading","richtext"],"settings":{"full_width":true,"allow_transparent_header":true,"enable_parallax":false,"image_size":"md","image":"shopify:\/\/shop_images\/IMG_4499-1240x698.jpg","mobile_text_position":"place-self-center text-center","desktop_text_position":"sm:place-self-center sm:text-center","text_color":"#ffffff","overlay_color":"#000000","overlay_opacity":40}},"intro":{"type":"rich-text","blocks":{"heading":{"type":"heading","settings":{"text":"About Us","heading_tag":"h2","text_color":"","gradient":""}},"content":{"type":"richtext","settings":{"content":"<p>In the bustling heart of the United Kingdom, where tradition meets innovation, there exists a brand that bridges the gap between two vibrant cultures. Levai & Loris, an Egyptian-owned company, has woven the rich tapestry of Egypt's heritage into the fabric of British style, creating a harmonious fusion that's making waves in the fashion world.<\/p><p>Founded with a passion for headwear, leather products, and cosmetics, Levai & Loris showcases the artistry behind every product. Here, each item is a testament to the meticulous craftsmanship and dedication of artisans from both Egypt and the UK.<\/p>"}}},"block_order":["heading","content"],"settings":{"full_width":true,"content_width":"medium","text_position":"center","background":"#ffffff","background_gradient":"","text_color":"#1a1a1a"}},"media_section_1":{"type":"media-with-text","blocks":{"image_1":{"type":"image","settings":{"image":"shopify:\/\/shop_images\/218_e9e123a6-81af-4682-826b-e5ae82d2d192.jpg","media_width":50,"media_position":"start","text_position":"place-self-center text-center","icon":"none","icon_width":48,"subheading":"Our Philosophy","title":"Power of Headwear","content":"<p>At Levai & Loris, We believe in the power of headwear to transform an outfit and a mindset. Our collection is designed to reflect your personality and elevate your look. Each piece is not just a fashion statement but a story waiting to be told.<\/p>","link_text":"","link_url":"","background":"#1a1a1a","background_gradient":"","text_color":"#ffffff","text_gradient":"","button_background":"","button_text_color":""}}},"block_order":["image_1"],"settings":{"full_width":false,"alternate_media_position":false,"spacing":"none"}},"media_section_2":{"type":"media-with-text","blocks":{"image_2":{"type":"image","settings":{"image":"shopify:\/\/shop_images\/IMG_1443.jpg","media_width":50,"media_position":"end","text_position":"place-self-center text-center","icon":"none","icon_width":48,"subheading":"Premium Quality","title":"Leather Craftsmanship","content":"<p>Leather products at Levai & Loris are more than accessories; they are statements of quality and durability. From finely crafted bags to exquisite wallets, these pieces embody the fusion of Egyptian heritage and British precision. Each item tells a story of time-honored craftsmanship, where every stitch and cut is a testament to the brand's commitment to excellence.<\/p>","link_text":"","link_url":"","background":"#f2f2f2","background_gradient":"","text_color":"#1a1a1a","text_gradient":"","button_background":"","button_text_color":""}}},"block_order":["image_2"],"settings":{"full_width":false,"alternate_media_position":false,"spacing":"none"}},"culture_blend":{"type":"rich-text","blocks":{"heading":{"type":"heading","settings":{"text":"A Blend of Cultures","heading_tag":"h2","text_color":"","gradient":""}},"content":{"type":"richtext","settings":{"content":"<p>But what truly sets Levai & Loris apart is the seamless blend of cultures, the harmonious collaboration that brings the best of both worlds into your life. You can see a reflection of our passion for unity through fashion. It's a testament to our belief that fashion transcends borders and speaks a universal language.<\/p><p>Levai & Loris invites you to embrace a world where elegance meets innovation, where tradition and modernity coexist in perfect harmony. Our story is a testament to the beauty of collaboration, the richness of culture, and the limitless potential of fashion. With a heart in Egypt and a soul in the UK, we created a brand that speaks to the world.<\/p>"}}},"block_order":["heading","content"],"settings":{"full_width":true,"content_width":"medium","text_position":"center","background":"#1a1a1a","background_gradient":"","text_color":"#ffffff"}},"vision_mission":{"type":"multi-column","blocks":{"vision":{"type":"item","settings":{"show_controls":false,"column_size":"4","title":"Our Vision","heading_tag":"h4","content":"<p>At Levai and Loris, our vision is to empower individuals to embrace their uniqueness with confidence. We envision a world where personal style knows no limits, and our diverse range of fashion accessories and personal care products becomes the canvas for self-expression. Through innovative designs, we aspire to be a catalyst for building self-trust and encouraging everyone to boldly showcase their personality.<\/p>","link_url":"","link_text":"","link_style":"link"}},"item_jPLypC":{"type":"item","settings":{"image":"shopify:\/\/shop_images\/IMG_4501-2048x1152.jpg","show_controls":false,"column_size":"2","title":"","heading_tag":"h4","content":"","link_url":"","link_text":"","link_style":"link"}},"mission":{"type":"item","settings":{"show_controls":false,"column_size":"4","title":"Our Mission","heading_tag":"h4","content":"<p>Our mission at Levai and Loris is to curate a collection of high-quality fashion accessories and personal care items that resonate with both men and women. We aim to transcend conventional norms, offering a versatile range of products that cater to various tastes and preferences. With a commitment to exceptional design and quality, we strive to become a trusted companion in our customers' journey towards self-confidence and self-expression.<\/p>","link_url":"","link_text":"","link_style":"link"}}},"block_order":["vision","item_jPLypC","mission"],"settings":{"full_width":true,"stack_on_mobile":true,"gap":"medium","text_alignment":"start","subheading":"","title":"","content":"","background":"#ffffff","background_gradient":"","text_color":"#1a1a1a"}},"headquarters":{"type":"rich-text","blocks":{"subheading":{"type":"subheading","settings":{"text":"Global Presence"}},"heading":{"type":"heading","settings":{"text":"Headquarters","heading_tag":"h2","text_color":"","gradient":""}},"content":{"type":"richtext","settings":{"content":"<ul><li>Levai and Loris is proud to call the <strong>United Kingdom<\/strong> its main office, with the heart of our operations situated in <strong>Egypt<\/strong>. <\/li><\/ul>"}},"richtext_EdfPny":{"type":"richtext","settings":{"content":"<ul><li>As part of the Raysan Egypt family, we extend our reach across borders, with a second main office in the vibrant landscape of the <strong>United Arab Emirates<\/strong>. <\/li><\/ul>"}},"richtext_eiJwTU":{"type":"richtext","settings":{"content":"<ul><li>This strategic presence allows us to infuse our brand with the rich influences of different cultures while maintaining a global standard of excellence.<\/li><\/ul>"}}},"block_order":["subheading","heading","content","richtext_EdfPny","richtext_eiJwTU"],"settings":{"full_width":true,"content_width":"medium","text_position":"start","background":"#f2f2f2","background_gradient":"","text_color":"#1a1a1a"}},"products_section":{"type":"rich-text","blocks":{"subheading":{"type":"subheading","settings":{"text":"What We Offer"}},"heading":{"type":"heading","settings":{"text":"Our Products","heading_tag":"h2","text_color":"","gradient":""}},"content":{"type":"richtext","settings":{"content":"<p>From fashion accessories that speak volumes to personal care items that nurture individuality, Levai and Loris brings you a carefully curated selection of products that transcend traditional boundaries. We believe that everyone deserves to feel confident in their skin and express their personality through their choices.<\/p><p>Our commitment to exceptional design, quality materials, and an inclusive approach to fashion enables us to offer a diverse range of products that inspire self-trust. Levai and Loris is not just a brand; it's a lifestyle that encourages you to celebrate your uniqueness, confidently step into the world, and embrace the extraordinary.<\/p>"}},"button":{"type":"button","settings":{"style":"fill","size":"xl","text":"Explore Our Collection","url":"shopify:\/\/collections\/all","background":"#1a1a1a","text_color":"#ffffff"}}},"block_order":["subheading","heading","content","button"],"settings":{"full_width":true,"content_width":"medium","text_position":"center","background":"#ffffff","background_gradient":"","text_color":"#1a1a1a"}},"closing":{"type":"rich-text","blocks":{"heading":{"type":"heading","settings":{"text":"Welcome to Levai & Loris","heading_tag":"h2","text_color":"","gradient":""}},"content":{"type":"richtext","settings":{"content":"<p>Where Fashion and Personal Care Converge for Your Unique Journey.<\/p>"}}},"block_order":["heading","content"],"settings":{"full_width":true,"content_width":"medium","text_position":"center","background":"#1a1a1a","background_gradient":"","text_color":"#ffffff"}}},"order":["hero","intro","media_section_1","media_section_2","culture_blend","vision_mission","headquarters","products_section","closing"]}
+{
+  "sections": {
+    "hero": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "subheading": {
+          "type": "subheading",
+          "settings": {
+            "text": "Egyptian Heritage, British Craftsmanship"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "About Levai & Loris",
+            "heading_tag": "h1"
+          }
+        },
+        "richtext": {
+          "type": "richtext",
+          "settings": {
+            "content": "<p>Where Boldness Identity Meets Craftsmanship<\/p>"
+          }
+        }
+      },
+      "block_order": [
+        "subheading",
+        "heading",
+        "richtext"
+      ],
+      "settings": {
+        "full_width": true,
+        "allow_transparent_header": true,
+        "enable_parallax": false,
+        "image_size": "md",
+        "image": "shopify:\/\/shop_images\/IMG_4499-1240x698.jpg",
+        "mobile_text_position": "place-self-center text-center",
+        "desktop_text_position": "sm:place-self-center sm:text-center",
+        "text_color": "#ffffff",
+        "overlay_color": "#000000",
+        "overlay_opacity": 40
+      }
+    },
+    "intro": {
+      "type": "rich-text",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "About Us",
+            "heading_tag": "h2",
+            "text_color": "",
+            "gradient": ""
+          }
+        },
+        "content": {
+          "type": "richtext",
+          "settings": {
+            "content": "<p>In the bustling heart of the United Kingdom, where tradition meets innovation, there exists a brand that bridges the gap between two vibrant cultures. Levai & Loris, an Egyptian-owned company, has woven the rich tapestry of Egypt's heritage into the fabric of British style, creating a harmonious fusion that's making waves in the fashion world.<\/p><p>Founded with a passion for headwear, leather products, and cosmetics, Levai & Loris showcases the artistry behind every product. Here, each item is a testament to the meticulous craftsmanship and dedication of artisans from both Egypt and the UK.<\/p>"
+          }
+        }
+      },
+      "block_order": [
+        "heading",
+        "content"
+      ],
+      "settings": {
+        "full_width": true,
+        "content_width": "medium",
+        "text_position": "center",
+        "background": "#ffffff",
+        "background_gradient": "",
+        "text_color": "#1a1a1a"
+      }
+    },
+    "media_section_1": {
+      "type": "media-with-text",
+      "blocks": {
+        "image_1": {
+          "type": "image",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/218_e9e123a6-81af-4682-826b-e5ae82d2d192.jpg",
+            "media_width": 50,
+            "media_position": "start",
+            "text_position": "place-self-center text-center",
+            "icon": "none",
+            "icon_width": 48,
+            "subheading": "Our Philosophy",
+            "title": "Power of Headwear",
+            "content": "<p>At Levai & Loris, We believe in the power of headwear to transform an outfit and a mindset. Our collection is designed to reflect your personality and elevate your look. Each piece is not just a fashion statement but a story waiting to be told.<\/p>",
+            "link_text": "",
+            "link_url": "",
+            "background": "#1a1a1a",
+            "background_gradient": "",
+            "text_color": "#ffffff",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": ""
+          }
+        }
+      },
+      "block_order": [
+        "image_1"
+      ],
+      "settings": {
+        "full_width": false,
+        "alternate_media_position": false,
+        "spacing": "none"
+      }
+    },
+    "media_section_2": {
+      "type": "media-with-text",
+      "blocks": {
+        "image_2": {
+          "type": "image",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/IMG_1443.jpg",
+            "media_width": 50,
+            "media_position": "end",
+            "text_position": "place-self-center text-center",
+            "icon": "none",
+            "icon_width": 48,
+            "subheading": "Premium Quality",
+            "title": "Leather Craftsmanship",
+            "content": "<p>Leather products at Levai & Loris are more than accessories; they are statements of quality and durability. From finely crafted bags to exquisite wallets, these pieces embody the fusion of Egyptian heritage and British precision. Each item tells a story of time-honored craftsmanship, where every stitch and cut is a testament to the brand's commitment to excellence.<\/p>",
+            "link_text": "",
+            "link_url": "",
+            "background": "#f2f2f2",
+            "background_gradient": "",
+            "text_color": "#1a1a1a",
+            "text_gradient": "",
+            "button_background": "",
+            "button_text_color": ""
+          }
+        }
+      },
+      "block_order": [
+        "image_2"
+      ],
+      "settings": {
+        "full_width": false,
+        "alternate_media_position": false,
+        "spacing": "none"
+      }
+    },
+    "culture_blend": {
+      "type": "rich-text",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "A Blend of Cultures",
+            "heading_tag": "h2",
+            "text_color": "",
+            "gradient": ""
+          }
+        },
+        "content": {
+          "type": "richtext",
+          "settings": {
+            "content": "<p>But what truly sets Levai & Loris apart is the seamless blend of cultures, the harmonious collaboration that brings the best of both worlds into your life. You can see a reflection of our passion for unity through fashion. It's a testament to our belief that fashion transcends borders and speaks a universal language.<\/p><p>Levai & Loris invites you to embrace a world where elegance meets innovation, where tradition and modernity coexist in perfect harmony. Our story is a testament to the beauty of collaboration, the richness of culture, and the limitless potential of fashion. With a heart in Egypt and a soul in the UK, we created a brand that speaks to the world.<\/p>"
+          }
+        }
+      },
+      "block_order": [
+        "heading",
+        "content"
+      ],
+      "settings": {
+        "full_width": true,
+        "content_width": "medium",
+        "text_position": "center",
+        "background": "#1a1a1a",
+        "background_gradient": "",
+        "text_color": "#ffffff"
+      }
+    },
+    "vision_mission": {
+      "type": "multi-column",
+      "blocks": {
+        "vision": {
+          "type": "item",
+          "settings": {
+            "show_controls": false,
+            "column_size": "4",
+            "title": "Our Vision",
+            "heading_tag": "h4",
+            "content": "<p>At Levai and Loris, our vision is to empower individuals to embrace their uniqueness with confidence. We envision a world where personal style knows no limits, and our diverse range of fashion accessories and personal care products becomes the canvas for self-expression. Through innovative designs, we aspire to be a catalyst for building self-trust and encouraging everyone to boldly showcase their personality.<\/p>",
+            "link_url": "",
+            "link_text": "",
+            "link_style": "link"
+          }
+        },
+        "item_jPLypC": {
+          "type": "item",
+          "settings": {
+            "image": "shopify:\/\/shop_images\/IMG_4501-2048x1152.jpg",
+            "show_controls": false,
+            "column_size": "2",
+            "title": "",
+            "heading_tag": "h4",
+            "content": "",
+            "link_url": "",
+            "link_text": "",
+            "link_style": "link"
+          }
+        },
+        "mission": {
+          "type": "item",
+          "settings": {
+            "show_controls": false,
+            "column_size": "4",
+            "title": "Our Mission",
+            "heading_tag": "h4",
+            "content": "<p>Our mission at Levai and Loris is to curate a collection of high-quality fashion accessories and personal care items that resonate with both men and women. We aim to transcend conventional norms, offering a versatile range of products that cater to various tastes and preferences. With a commitment to exceptional design and quality, we strive to become a trusted companion in our customers' journey towards self-confidence and self-expression.<\/p>",
+            "link_url": "",
+            "link_text": "",
+            "link_style": "link"
+          }
+        }
+      },
+      "block_order": [
+        "vision",
+        "item_jPLypC",
+        "mission"
+      ],
+      "settings": {
+        "full_width": true,
+        "stack_on_mobile": true,
+        "gap": "medium",
+        "text_alignment": "start",
+        "subheading": "",
+        "title": "",
+        "content": "",
+        "background": "#ffffff",
+        "background_gradient": "",
+        "text_color": "#1a1a1a"
+      }
+    },
+    "headquarters": {
+      "type": "rich-text",
+      "blocks": {
+        "subheading": {
+          "type": "subheading",
+          "settings": {
+            "text": "Global Presence"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Headquarters",
+            "heading_tag": "h2",
+            "text_color": "",
+            "gradient": ""
+          }
+        },
+        "content": {
+          "type": "richtext",
+          "settings": {
+            "content": "<ul><li>Levai and Loris is proud to call the <strong>United Kingdom<\/strong> its main office, with the heart of our operations situated in <strong>Egypt<\/strong>. <\/li><\/ul>"
+          }
+        },
+        "richtext_EdfPny": {
+          "type": "richtext",
+          "settings": {
+            "content": "<ul><li>As part of the Raysan Egypt family, we extend our reach across borders, with a second main office in the vibrant landscape of the <strong>United Arab Emirates<\/strong>. <\/li><\/ul>"
+          }
+        },
+        "richtext_eiJwTU": {
+          "type": "richtext",
+          "settings": {
+            "content": "<ul><li>This strategic presence allows us to infuse our brand with the rich influences of different cultures while maintaining a global standard of excellence.<\/li><\/ul>"
+          }
+        }
+      },
+      "block_order": [
+        "subheading",
+        "heading",
+        "content",
+        "richtext_EdfPny",
+        "richtext_eiJwTU"
+      ],
+      "settings": {
+        "full_width": true,
+        "content_width": "medium",
+        "text_position": "start",
+        "background": "#f2f2f2",
+        "background_gradient": "",
+        "text_color": "#1a1a1a"
+      }
+    },
+    "products_section": {
+      "type": "rich-text",
+      "blocks": {
+        "subheading": {
+          "type": "subheading",
+          "settings": {
+            "text": "What We Offer"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Our Products",
+            "heading_tag": "h2",
+            "text_color": "",
+            "gradient": ""
+          }
+        },
+        "content": {
+          "type": "richtext",
+          "settings": {
+            "content": "<p>From fashion accessories that speak volumes to personal care items that nurture individuality, Levai and Loris brings you a carefully curated selection of products that transcend traditional boundaries. We believe that everyone deserves to feel confident in their skin and express their personality through their choices.<\/p><p>Our commitment to exceptional design, quality materials, and an inclusive approach to fashion enables us to offer a diverse range of products that inspire self-trust. Levai and Loris is not just a brand; it's a lifestyle that encourages you to celebrate your uniqueness, confidently step into the world, and embrace the extraordinary.<\/p>"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "style": "fill",
+            "size": "xl",
+            "text": "Explore Our Collection",
+            "url": "shopify:\/\/collections\/all",
+            "background": "#1a1a1a",
+            "text_color": "#ffffff"
+          }
+        }
+      },
+      "block_order": [
+        "subheading",
+        "heading",
+        "content",
+        "button"
+      ],
+      "settings": {
+        "full_width": true,
+        "content_width": "medium",
+        "text_position": "center",
+        "background": "#ffffff",
+        "background_gradient": "",
+        "text_color": "#1a1a1a"
+      }
+    },
+    "closing": {
+      "type": "rich-text",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Welcome to Levai & Loris",
+            "heading_tag": "h2",
+            "text_color": "",
+            "gradient": ""
+          }
+        },
+        "content": {
+          "type": "richtext",
+          "settings": {
+            "content": "<p>Where Fashion and Personal Care Converge for Your Unique Journey.<\/p>"
+          }
+        }
+      },
+      "block_order": [
+        "heading",
+        "content"
+      ],
+      "settings": {
+        "full_width": true,
+        "content_width": "medium",
+        "text_position": "center",
+        "background": "#1a1a1a",
+        "background_gradient": "",
+        "text_color": "#ffffff"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "intro",
+    "media_section_1",
+    "media_section_2",
+    "culture_blend",
+    "vision_mission",
+    "headquarters",
+    "products_section",
+    "closing"
+  ]
+}

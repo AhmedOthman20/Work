@@ -1,0 +1,508 @@
+{%- comment -%}
+----------------------------------------------------------------------------------------------------------------------
+PRODUCT CARD COMPONENT
+----------------------------------------------------------------------------------------------------------------------
+
+This component is used in collection and featured collection to render a single product as a card
+
+********************************************
+Supported variables
+********************************************
+
+* product: the product to render
+* show_rating: show or not the rating. If nothing is set, the theme uses the default product card setting
+* show_vendor: show or not the vendor. If nothing is set, the theme uses the default product card setting
+* show_quick_buy: show or not the quick buy. If nothing is set, the theme uses the default product card setting
+* show_secondary_image: show or not the secondary image. If nothing is set, the theme uses the default product card setting
+* show_swatches: allow to force hiding swatches. If nothing is set, it will default to the default card strategy
+* stacked: indicate if the product is in stack mode
+* position: the position of the card in the list. If specified, the theme will eagerly load the first 3 cards images
+* reveal: if set to true the item will be revealed in a stacked mode
+* background: the background to use for the product card (if none is passed then the one from the global setting is used)
+* text_color: the text color to use for the product card (if none is passed then the one from the global setting is used)
+* text_alignment: can be "center". If nothing is set, the theme uses the default product card setting
+
+********************************************
+Product card extras (Theme settings > Product card extras)
+********************************************
+
+* Full-width add to cart button under the image
+* Compare-at + sale price stacked, offer badge beside the price
+* "Pay with card / Fast shipping" trust box
+* Offer text priority (multi-line text, one offer per line):
+    1. product metafield custom.card_offer
+    2. current collection metafield custom.card_offer (collection pages only, and only if the product is in it)
+    3. first of the product's collections with custom.card_offer (home, search, related...)
+    4. theme setting "Default offer text" (if "Use default text when collection has no offer" is on)
+* Offer visibility: all products / only discounted / only non-discounted (theme setting)
+* Offer is hidden for products in the collections picked in "Hide offer badge in these collections"
+{%- endcomment -%}
+
+{%- assign show_rating = show_rating | default: settings.show_product_rating, allow_false: true -%}
+{%- assign show_vendor = show_vendor | default: settings.show_vendor, allow_false: true -%}
+{%- assign show_quick_buy = show_quick_buy | default: settings.show_quick_buy, allow_false: true -%}
+{%- assign show_secondary_image = show_secondary_image | default: settings.show_secondary_image, allow_false: true -%}
+{%- assign text_alignment = text_alignment | default: settings.product_info_alignment -%}
+
+{%- comment -%} Product card extras: fall back to defaults until the theme settings have been saved once {%- endcomment -%}
+{%- liquid
+  assign pce_show_atc = settings.pce_show_atc | default: true, allow_false: true
+  assign pce_show_border = settings.pce_show_border | default: true, allow_false: true
+  assign pce_show_offer = settings.pce_show_offer | default: true, allow_false: true
+  assign pce_offer_use_default = settings.pce_offer_use_default | default: true, allow_false: true
+  assign pce_offer_visibility = settings.pce_offer_visibility | default: 'all'
+  assign pce_show_trust = settings.pce_show_trust | default: true, allow_false: true
+  assign pce_atc_label = settings.pce_atc_label | default: 'Add to cart'
+  assign pce_sold_out_label = settings.pce_sold_out_label | default: 'Sold out'
+  assign pce_pay_label = settings.pce_pay_label | default: 'Pay with card'
+  assign pce_shipping_label = settings.pce_shipping_label | default: 'Fast shipping'
+-%}
+{%- capture pce_offer_default -%}Buy 2, save EGP 500
+Buy 3, save EGP 900{%- endcapture -%}
+
+{%- if stacked and section.settings.products_per_row_mobile == '2' -%}
+  {%- assign mobile_reduced = true -%}
+{%- endif -%}
+
+{%- assign section_background = section.settings.background_gradient | default: section.settings.background | default: settings.background -%}
+{%- assign card_background = background | default: settings.product_card_background -%}
+{%- assign card_text_color = text_color | default: settings.product_card_text_color -%}
+
+{%- if section_background != 'rgba(0,0,0,0)' and card_background != 'rgba(0,0,0,0)' and section_background != card_background -%}
+  {%- assign card_class = 'product-card ' -%}
+{%- else -%}
+  {%- assign card_class = 'product-card product-card--blends ' -%}
+{%- endif -%}
+
+{%- if show_secondary_image and product.media.size > 1 -%}
+  {%- assign card_class = card_class | append: ' product-card--show-secondary-media' -%}
+{%- endif -%}
+
+{%- assign card_class = card_class | append: ' product-card--extras' -%}
+{%- if pce_show_border -%}
+  {%- assign card_class = card_class | append: ' product-card--bordered' -%}
+{%- endif -%}
+
+{%- comment -%}
+  Offer text: product metafield → current collection metafield → any of the product's collections → theme default
+{%- endcomment -%}
+{%- liquid
+  assign pce_offer_text = ''
+  assign pce_offer_field = nil
+
+  comment
+    Only trust the page's collection when we are on a collection page AND this card's
+    product really belongs to it. On a product page opened from a collection URL
+    (/collections/x/products/y), the global `collection` is the main product's collection,
+    so "You may also like" cards must not inherit it.
+  endcomment
+  assign pce_page_collection = nil
+  if template.name == 'collection' and collection != blank
+    assign pce_card_collection_handles = product.collections | map: 'handle'
+    if pce_card_collection_handles contains collection.handle
+      assign pce_page_collection = collection
+    endif
+  endif
+
+  if pce_show_offer
+    if product.metafields.custom.card_offer != blank
+      assign pce_offer_field = product.metafields.custom.card_offer
+    elsif pce_page_collection != blank and pce_page_collection.metafields.custom.card_offer != blank
+      assign pce_offer_field = pce_page_collection.metafields.custom.card_offer
+    else
+      for pce_collection in product.collections
+        if pce_collection.metafields.custom.card_offer != blank
+          assign pce_offer_field = pce_collection.metafields.custom.card_offer
+          break
+        endif
+      endfor
+    endif
+
+    comment
+      Works with both metafield types:
+      - "List of single line text" → each list item is one offer
+      - "Multi-line text" → each line is one offer
+      Everything is normalised to lines separated by <br />
+    endcomment
+    if pce_offer_field != blank
+      if pce_offer_field.type contains 'list.'
+        assign pce_offer_text = pce_offer_field.value | join: '<br />'
+      else
+        assign pce_offer_text = pce_offer_field.value | newline_to_br
+      endif
+    elsif pce_offer_use_default
+      assign pce_offer_text = settings.pce_offer_text | default: pce_offer_default | newline_to_br
+    endif
+
+    assign pce_offer_text = pce_offer_text | strip
+  endif
+
+  comment
+    Hide the offer for products in the excluded collections (theme setting)
+  endcomment
+  if pce_offer_text != blank and settings.pce_offer_exclude_collections != blank
+    assign pce_collection_handles = product.collections | map: 'handle'
+    for pce_excluded in settings.pce_offer_exclude_collections
+      if pce_collection_handles contains pce_excluded.handle
+        assign pce_offer_text = ''
+        break
+      endif
+    endfor
+  endif
+
+  comment
+    Show on all / only discounted / only non-discounted products
+  endcomment
+  if pce_offer_text != blank and pce_offer_visibility != 'all'
+    assign pce_is_discounted = false
+    for pce_v in product.variants
+      if pce_v.compare_at_price > pce_v.price
+        assign pce_is_discounted = true
+        break
+      endif
+    endfor
+
+    if pce_offer_visibility == 'discounted' and pce_is_discounted == false
+      assign pce_offer_text = ''
+    elsif pce_offer_visibility == 'full_price' and pce_is_discounted
+      assign pce_offer_text = ''
+    endif
+  endif
+
+  assign pce_offer_lines = pce_offer_text | split: '<br />'
+-%}
+
+{%- capture quick_buy_id -%}quick-buy-{{ section.id }}-{{ product.id }}{%- endcapture -%}
+
+<product-card handle="{{ product.handle | escape }}" {% if reveal and settings.stagger_products_apparition %}reveal-js{% endif %} {% render 'surface', class: card_class, background: card_background, text_color: card_text_color %}>
+  {%- comment -%}
+  --------------------------------------------------------------------------------------------------------------------
+  PRODUCT BADGES
+  --------------------------------------------------------------------------------------------------------------------
+  {%- endcomment -%}
+
+  {%- if show_badges and product.media.size > 0 -%}
+    {%- render 'product-badges', product: product, context: 'card', class: 'product-card__badge-list' -%}
+  {%- endif -%}
+
+  {%- comment -%}
+  --------------------------------------------------------------------------------------------------------------------
+  PRODUCT MEDIA
+  --------------------------------------------------------------------------------------------------------------------
+  {%- endcomment -%}
+
+  {%- if product.media.size > 0 -%}
+    <div class="product-card__figure">
+      <a href="{{ product.url }}" data-instant>
+        {%- capture sizes -%}
+          {%- if stacked -%}
+            (max-width: 699px) calc(100vw / {{ section.settings.products_per_row_mobile }} - 40px), (max-width: 1200px) calc(100vw / {{ 3 | at_most: section.settings.products_per_row_desktop }} - 64px), calc((100vw - 96px) / {{ section.settings.products_per_row_desktop }} - (24px / {{ section.settings.products_per_row_desktop }} * {{ section.settings.products_per_row_desktop | minus: 1 }}))
+          {%- else -%}
+            (max-width: 699px) 74vw, (max-width: 999px) 38vw, calc((100vw - 96px) / {{ section.settings.products_per_row_desktop }} - (24px / {{ section.settings.products_per_row_desktop }} * {{ section.settings.products_per_row_desktop | minus: 1 }}))
+          {%- endif -%}
+        {%- endcapture -%}
+
+        {%- liquid
+          assign main_media_loading_strategy = nil
+
+          if section.index > 3 or position > 3
+            assign main_media_loading_strategy = 'lazy'
+          endif
+        -%}
+
+        {%- capture main_image_classes -%}product-card__image product-card__image--primary {% if settings.product_image_aspect_ratio contains 'crop' %}object-fill-safe{% endif %} aspect-{{ settings.product_image_aspect_ratio | split: '_' | first }}{%- endcapture -%}
+        {%- assign card_image_alt = product.featured_media.alt | default: product.title -%}
+        {{- product.featured_media | image_url: width: product.featured_media.width | image_tag: loading: main_media_loading_strategy, sizes: sizes, widths: '200,300,400,500,600,700,800,1000,1200,1400,1600,1800', class: main_image_classes, alt: card_image_alt -}}
+
+        {%- if show_secondary_image and product.media.size > 1 -%}
+          {%- assign next_media = product.media[product.featured_media.position] | default: product.media[1] -%}
+          {%- assign secondary_image_alt = next_media.alt | default: product.title -%}
+          {{- next_media | image_url: width: next_media.width | image_tag: class: 'product-card__image product-card__image--secondary object-fill', loading: 'lazy', fetchpriority: 'low', sizes: sizes, widths: '200,300,400,500,600,700,800,1000,1200,1400,1600,1800', alt: secondary_image_alt -}}
+        {%- endif -%}
+      </a>
+
+      {%- comment -%} Original hover quick buy — only used when the extras add to cart button is turned off {%- endcomment -%}
+      {%- if show_quick_buy and product.available and pce_show_atc == false -%}
+        <div class="product-card__quick-buy">
+          {%- assign quick_add_label = 'product.general.quick_add' | t -%}
+
+          {%- if product.variants.size == 1 and product.requires_selling_plan == false -%}            {%- form 'product', product, is: 'product-form' -%}
+              <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+              <div class="pointer-fine:hidden">
+                <button type="submit" is="custom-button" class="product-card__mobile-quick-buy-button" aria-label="{{ quick_add_label | escape }}">
+                  {%- render 'icon' with 'quick-buy-cart' -%}
+                </button>
+              </div>
+
+              <div class="pointer-coarse:hidden">
+                {%- render 'button', type: 'submit', content: quick_add_label -%}
+              </div>
+            {%- endform -%}
+          {%- else -%}
+            <div class="pointer-fine:hidden">
+              <button type="button" aria-controls="{{ quick_buy_id }}" aria-expanded="false" aria-label="{{ quick_add_label | escape }}" is="custom-button" class="product-card__mobile-quick-buy-button">
+                {%- render 'icon' with 'quick-buy-cart' -%}
+              </button>
+            </div>
+
+            <div class="pointer-coarse:hidden">
+              {%- render 'button', content: quick_add_label, aria_controls: quick_buy_id -%}
+            </div>
+
+            <quick-buy-drawer id="{{ quick_buy_id }}" header-bordered open-from="bottom" handle="{{ product.handle }}?variant={{ product.selected_or_first_available_variant.id }}" role="region" aria-live="polite" class="quick-buy-drawer drawer">
+              {%- comment -%}Quick buy content is filled on demand for performance reasons {%- endcomment -%}
+            </quick-buy-drawer>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- comment -%}
+  --------------------------------------------------------------------------------------------------------------------
+  PRODUCT INFO
+  --------------------------------------------------------------------------------------------------------------------
+  {%- endcomment -%}
+
+  <div class="product-card__info {% if text_alignment == 'center' %}product-card__info--center{% endif %}">
+    {%- comment -%}
+    --------------------------------------------------------------------------------------------------------------------
+    ADD TO CART (full width, under the image)
+    Rendered inside .product-card__info because Impact lays the card on a fixed 3-row subgrid
+    --------------------------------------------------------------------------------------------------------------------
+    {%- endcomment -%}
+
+    {%- if pce_show_atc -%}
+      <div class="pce-atc">
+        {%- if product.available -%}
+          {%- if product.variants.size == 1 and product.requires_selling_plan == false -%}            {%- form 'product', product, is: 'product-form', class: 'pce-atc__form' -%}
+              <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+              <button type="submit" is="custom-button" class="pce-atc__button">{{ pce_atc_label | escape }}</button>
+            {%- endform -%}
+          {%- elsif product.requires_selling_plan -%}
+            {%- comment -%} Subscription-only products need the full product page to pick a plan {%- endcomment -%}
+            <a href="{{ product.url }}" class="pce-atc__button" data-instant>{{ pce_atc_label | escape }}</a>
+          {%- else -%}
+            {%- comment -%}
+              Products with options: our own size popup (does not depend on the product template).
+              It submits through Impact's product-form, so the cart drawer / popup / cart page behave natively.
+            {%- endcomment -%}
+            {%- assign pce_variant = product.selected_or_first_available_variant -%}
+            {%- assign pce_uid = section.id | append: '-' | append: product.id -%}
+            <pce-quick-add data-sold-out-label="{{ pce_sold_out_label | escape }}" data-add-label="{{ pce_atc_label | escape }}">
+              <button type="button" class="pce-atc__button" data-pce-open aria-haspopup="dialog">{{ pce_atc_label | escape }}</button>
+
+              <dialog class="pce-qa" aria-labelledby="pce-qa-title-{{ pce_uid }}">
+                <div class="pce-qa__inner">
+                  <button type="button" class="pce-qa__close" data-pce-close aria-label="{{ 'general.accessibility.close' | t | escape }}">
+                    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
+                  </button>
+
+                  <div class="pce-qa__head">
+                    {%- assign pce_qa_image = pce_variant.featured_image | default: product.featured_image -%}
+                    {%- if pce_qa_image -%}
+                      <img class="pce-qa__image" data-pce-image src="{{ pce_qa_image | image_url: width: 200 }}" alt="{{ product.title | escape }}" width="80" height="80" loading="lazy">
+                    {%- endif -%}
+                    <div class="pce-qa__meta">
+                      <p class="pce-qa__title" id="pce-qa-title-{{ pce_uid }}">{{ product.title | escape }}</p>
+                      <div class="pce-qa__price">
+                        <span class="pce-price__final{% if pce_variant.compare_at_price > pce_variant.price %} pce-price__final--sale{% endif %}" data-pce-price>{{ pce_variant.price | money }}</span>
+                        <s class="pce-price__compare" data-pce-compare {% unless pce_variant.compare_at_price > pce_variant.price %}hidden{% endunless %}>{% if pce_variant.compare_at_price > pce_variant.price %}{{ pce_variant.compare_at_price | money }}{% endif %}</s>
+                      </div>
+                    </div>
+                  </div>
+
+                  {%- for option in product.options_with_values -%}
+                    {%- assign option_index = forloop.index0 -%}
+                    {%- assign pce_selected_value = pce_variant.options[option_index] -%}
+                    <fieldset class="pce-qa__option" data-pce-option>
+                      <legend class="pce-qa__legend">
+                        <span class="pce-qa__legend-name">{{ option.name | escape }}:</span>
+                        <span class="pce-qa__legend-value" data-pce-option-value>{{ pce_selected_value | escape }}</span>
+                      </legend>
+                      <div class="pce-qa__values">
+                        {%- for value in option.values -%}
+                          {%- capture pce_input_id -%}pce-{{ pce_uid }}-{{ option_index }}-{{ forloop.index0 }}{%- endcapture -%}
+                          <input class="pce-qa__radio" type="radio" id="{{ pce_input_id }}" name="pce-{{ pce_uid }}-{{ option_index }}" value="{{ value | escape }}" {% if value == pce_selected_value %}checked{% endif %}>
+                          <label class="pce-qa__pill" for="{{ pce_input_id }}">{{ value | escape }}</label>
+                        {%- endfor -%}
+                      </div>
+                    </fieldset>
+                  {%- endfor -%}
+
+                  <p class="pce-qa__error" role="alert" data-pce-error hidden></p>
+
+                  {%- form 'product', product, is: 'product-form', class: 'pce-qa__form' -%}
+                    <input type="hidden" name="id" value="{{ pce_variant.id }}">
+                    <button type="submit" is="custom-button" class="pce-atc__button" data-pce-submit>{{ pce_atc_label | escape }}</button>
+                  {%- endform -%}
+                </div>
+
+                <script type="application/json" data-pce-variants>
+                  [{%- for v in product.variants -%}{"id":{{ v.id }},"available":{{ v.available }},"options":{{ v.options | json }},"price":{{ v.price | money | json }},"compare":{% if v.compare_at_price > v.price %}{{ v.compare_at_price | money | json }}{% else %}null{% endif %},"image":{% if v.featured_image %}{{ v.featured_image | image_url: width: 200 | json }}{% else %}null{% endif %}}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]
+                </script>
+              </dialog>
+            </pce-quick-add>
+          {%- endif -%}
+        {%- else -%}
+          <button type="button" class="pce-atc__button" disabled>{{ pce_sold_out_label | escape }}</button>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if show_vendor and product.vendor != blank -%}
+      {%- if show_rating and text_alignment != 'center' -%}
+        <div class="rating-with-text w-full">
+          {%- render 'vendor' with product.vendor, class: 'text-xs' -%}
+
+          {%- capture rating_class -%}{% if mobile_reduced %}hidden sm:flex{% endif %}{%- endcapture -%}
+          {%- render 'product-rating', product: product, class: rating_class, display_mode: settings.product_rating_mode -%}
+        </div>
+      {%- else -%}
+        {%- render 'vendor' with product.vendor, class: 'text-xs' -%}
+      {%- endif -%}
+    {%- endif -%}
+
+    <div class="v-stack gap-0.5 w-full {% if text_alignment == 'center' %}justify-items-center{% endif %}">
+      {%- if show_rating and show_vendor == false or product.vendor == blank -%}
+        <div class="rating-with-text">
+          <span class="product-card__title"><a href="{{ product.url }}" class="bold" data-instant>{{ product.title }}</a></span>
+
+          {% comment %} {%- if text_alignment != 'center' -%}
+            {%- capture rating_class -%}{% if mobile_reduced %}hidden sm:flex{% endif %}{%- endcapture -%}
+            {%- render 'product-rating', product: product, class: rating_class, display_mode: settings.product_rating_mode -%}
+          {%- endif -%} {% endcomment %}
+        </div>
+      {%- else -%}
+        <span class="product-card__title"><a href="{{ product.url }}" class="bold" data-instant>{{ product.title }}</a></span>
+      {%- endif -%}
+
+      {%- comment -%} Price + offer badge {%- endcomment -%}
+      <div class="pce-price-row">
+        <div class="pce-price">
+          {%- liquid
+            if settings.currency_code_enabled
+              assign pce_price = product.price | money_with_currency
+              assign pce_compare = product.compare_at_price | money_with_currency
+            else
+              assign pce_price = product.price | money
+              assign pce_compare = product.compare_at_price | money
+            endif
+          -%}
+          {%- if product.compare_at_price > product.price -%}
+            <s class="pce-price__compare">{{ pce_compare }}</s>
+            <span class="pce-price__final pce-price__final--sale">{{ pce_price }}</span>
+          {%- else -%}
+            <span class="pce-price__final">{{ pce_price }}</span>
+          {%- endif -%}
+        </div>
+
+        {%- if pce_offer_text != blank -%}
+          <div class="pce-offer">
+  {%- for line in pce_offer_lines -%}
+  {%- assign clean_line = line | strip -%}
+  {%- if clean_line != blank -%}
+    {%- liquid
+      assign pce_words = clean_line | split: ' '
+      assign pce_pill = pce_words.first
+
+      comment
+        Keep the currency with the amount: "1099 LE ..." → pill "1099 LE"
+      endcomment
+      assign pce_second = pce_words[1] | upcase
+      if pce_second == 'LE' or pce_second == 'EGP' or pce_second == 'L.E'
+        assign pce_pill = pce_pill | append: ' ' | append: pce_words[1]
+      endif
+
+      assign pce_rest = clean_line | remove_first: pce_pill | strip
+    -%}
+    <span class="pce-offer__line"><span class="pce-offer__pill">{{ pce_pill | escape }}</span>{% if pce_rest != blank %}<span class="pce-offer__rest">{{ pce_rest | escape }}</span>{% endif %}</span>
+  {%- endif -%}
+{%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if show_rating and mobile_reduced or text_alignment == 'center' -%}
+      {%- capture rating_class -%}{% unless text_alignment == 'center' %}sm:hidden{% endunless %}{%- endcapture -%}
+      {%- render 'product-rating', product: product, class: rating_class, display_mode: settings.product_rating_mode -%}
+    {%- endif -%}
+
+    {%- if settings.product_color_display != 'hide' and show_swatches != false -%}
+      {%- assign color_label_list = 'general.label.color' | t | replace: ', ', ',' | downcase | split: ',' -%}
+
+      {%- for color_label in color_label_list -%}
+        {%- if product.options_by_name[color_label] != blank -%}
+          {%- assign product_option = product.options_by_name[color_label] -%}
+
+          <div class="product-card__aside">
+            {%- case settings.product_color_display -%}
+              {%- when 'count' -%}
+                <p class="product-card__color-count text-sm text-subdued">{{- 'product.general.available_colors_count' | t: count: product_option.values.size -}}</p>
+
+              {%- when 'swatch' -%}
+                <fieldset class="product-card__swatch-list h-stack {% if settings.color_swatch_style == 'rectangle' %}gap-2.5{% else %}gap-0.5{% endif %}" data-option-position="{{ product_option.position }}">
+                  <legend class="sr-only">{{ product_option.name }}</legend>
+
+                  {%- capture param_name -%}swatch-{{ quick_buy_context }}-{{ section.id }}-{{ product.id }}-{{ product_option.position }}{%- endcapture -%}
+
+                  {%- liquid
+                    for option_value in product_option.values limit: 4
+                      render 'option-value', type: 'swatch', option_value: option_value, param_name: param_name, option_position: product_option.position, output_variant_media: true, size: 'sm'
+                    endfor
+                  -%}
+
+                  {% if product_option.values.size > 4 %}
+                    <a href="{{ product.url }}" data-instant class="color-swatch__view-more {% if settings.color_swatch_style == 'round' %}rounded-full{% endif %} text-xxs text-subdued">+{{ product_option.values.size | minus: 4 }}</a>
+                  {% endif %}
+                </fieldset>
+
+              {%- when 'variant' -%}
+                <fieldset class="product-card__variant-list" data-option-position="{{ product_option.position }}">
+                  <legend class="sr-only">{{ product_option.name }}</legend>
+
+                  {%- capture param_name -%}swatch-{{ quick_buy_context }}-{{ section.id }}-{{ product.id }}-{{ product_option.position }}{%- endcapture -%}
+
+                  {%- for option_value in product_option.values limit: 4 -%}
+                    {%- if forloop.first or option_value.variant.matched and option_value == product_option.selected_value -%}
+                      {%- assign selected = true -%}
+                    {%- else -%}
+                      {%- assign selected = false -%}
+                    {%- endif -%}
+
+                    {%- render 'option-value', type: 'thumbnail', image: option_value.variant.featured_media, option_value: option_value, param_name: param_name, size: 'sm', output_variant_media: true, selected: selected -%}
+                  {%- endfor -%}
+
+                  {%- if product_option.values.size > 4 -%}
+                    <a href="{{ product.url }}" data-instant class="thumbnail-swatch__view-more text-xs text-subdued">+{{ product_option.values.size | minus: 4 }}</a>
+                  {%- endif -%}
+                </fieldset>
+              {%- endcase -%}
+          </div>
+
+          {%- break -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+
+    {%- comment -%} Trust box {%- endcomment -%}
+    {%- if pce_show_trust -%}
+      <div class="pce-trust">
+        {%- if pce_pay_label != blank -%}
+          <span class="pce-trust__pay">
+            <svg viewBox="0 0 28 20" fill="none" aria-hidden="true" focusable="false"><rect x="1" y="1" width="26" height="18" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M1 6.5h26" stroke="currentColor" stroke-width="1.6"/></svg>
+            {{ pce_pay_label | escape }}
+          </span>
+        {%- endif -%}
+        {%- if pce_shipping_label != blank -%}
+          <span class="pce-trust__ship">
+            <svg viewBox="0 0 28 20" fill="none" aria-hidden="true" focusable="false"><path d="M1 3h16v11H1zM17 7h5l4 4v3h-9z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="6" cy="16" r="2.2" stroke="currentColor" stroke-width="1.6"/><circle cx="21" cy="16" r="2.2" stroke="currentColor" stroke-width="1.6"/></svg>
+            {{ pce_shipping_label | escape }}
+          </span>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</product-card>

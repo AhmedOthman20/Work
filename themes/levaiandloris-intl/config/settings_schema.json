@@ -1313,22 +1313,11 @@
         "unit": "px",
         "default": 6
       },
-          {
+      {
         "type": "checkbox",
         "id": "tpb_show_labels",
         "label": "Show labels under bar",
         "default": true
-      },
-      {
-        "type": "header",
-        "content": "Offer text"
-      },
-      {
-        "type": "richtext",
-        "id": "tpb_offer_note",
-        "label": "Offer text under the bar",
-        "info": "Bold text uses the \"Highlighted text\" color above. Leave empty to hide.",
-        "default": "<p>Two products with a discount of <strong>500 EGP</strong> / Three products with a discount of <strong>900 EGP</strong></p>"
       }
     ]
   },  {
