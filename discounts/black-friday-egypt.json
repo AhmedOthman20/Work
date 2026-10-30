@@ -1,0 +1,298 @@
+{
+  "source": "u26d27-dz (levaiandloris.com) SMART Functions, read 2026-10-30",
+  "currency": "EGP",
+  "discounts": [
+    {
+      "title": "Black Friday offer",
+      "method": "automatic",
+      "inputType": "standard",
+      "eligibility": "all customers",
+      "combinesWith": {
+        "product": true,
+        "order": true,
+        "shipping": true
+      },
+      "oneTimePurchase": true,
+      "subscription": true,
+      "recurringCycleLimit": 1,
+      "startsAt": "2026-10-18T07:58:08Z",
+      "endsAt": "2026-10-29T11:21:59Z",
+      "productsIncluded": {
+        "all": true
+      },
+      "rules": [
+        {
+          "name": "",
+          "when": "products included quantity >= 2",
+          "label": "Black Friday offer",
+          "type": "fixed",
+          "value": 200,
+          "applyTo": "ALL",
+          "applyToFirst": null,
+          "order": "HIGHEST"
+        }
+      ]
+    },
+    {
+      "title": "Caps Offer - Black Friday",
+      "method": "automatic",
+      "inputType": "standard",
+      "eligibility": "all customers",
+      "combinesWith": {
+        "product": true,
+        "order": true,
+        "shipping": true
+      },
+      "oneTimePurchase": true,
+      "subscription": true,
+      "recurringCycleLimit": 1,
+      "startsAt": "2026-10-18T07:58:08Z",
+      "endsAt": "2026-10-19T04:54:29Z",
+      "productsIncluded": {
+        "collections": [
+          "basic-colors",
+          "collaborations",
+          "loud-colors",
+          "trucker-caps-rubber-edition"
+        ]
+      },
+      "rules": [
+        {
+          "name": "500 discount off - Cap Offer ",
+          "when": "always",
+          "label": "500 discount off - Cap Offer ",
+          "type": "fixed",
+          "value": 200,
+          "applyTo": "products included",
+          "applyToFirst": 2,
+          "order": "CART"
+        }
+      ]
+    },
+    {
+      "title": "T-Shirt Offer - Black Friday",
+      "method": "automatic",
+      "inputType": "standard",
+      "eligibility": "all customers",
+      "combinesWith": {
+        "product": true,
+        "order": true,
+        "shipping": true
+      },
+      "oneTimePurchase": true,
+      "subscription": true,
+      "recurringCycleLimit": 1,
+      "startsAt": "2026-10-18T07:58:08Z",
+      "endsAt": "2026-10-19T04:54:15Z",
+      "productsIncluded": {
+        "collections": [
+          "cooling-fabric-t-shirts",
+          "t-shirts-1",
+          "t-shirts",
+          "washed-stressed-t-shirts"
+        ]
+      },
+      "rules": [
+        {
+          "name": "",
+          "when": "products included quantity IS 1",
+          "label": "400 discount off - T-Shirt Offer ",
+          "type": "fixed",
+          "value": 400,
+          "applyTo": "products included",
+          "applyToFirst": 1,
+          "order": "CART"
+        },
+        {
+          "name": "600 discount off - T-Shirt Offer ",
+          "when": "always",
+          "label": "600 discount off - T-Shirt Offer ",
+          "type": "fixed",
+          "value": 600,
+          "applyTo": "products included",
+          "applyToFirst": 2,
+          "order": "CART"
+        }
+      ]
+    },
+    {
+      "title": "Bags Offer - Black Friday",
+      "method": "automatic",
+      "inputType": "standard",
+      "eligibility": "all customers",
+      "combinesWith": {
+        "product": true,
+        "order": true,
+        "shipping": true
+      },
+      "oneTimePurchase": true,
+      "subscription": true,
+      "recurringCycleLimit": 1,
+      "startsAt": "2026-10-18T07:58:08Z",
+      "endsAt": "2026-10-19T04:54:03Z",
+      "productsIncluded": {
+        "collections": [
+          "premium-caps-bag"
+        ]
+      },
+      "rules": [
+        {
+          "name": "",
+          "when": "products included quantity IS 1",
+          "label": "400 discount off - Bags Offer ",
+          "type": "fixed",
+          "value": 400,
+          "applyTo": "products included",
+          "applyToFirst": 1,
+          "order": "CART"
+        },
+        {
+          "name": "600 discount off - Bags Offer ",
+          "when": "always",
+          "label": "600 discount off - Bags Offer ",
+          "type": "fixed",
+          "value": 600,
+          "applyTo": "products included",
+          "applyToFirst": 2,
+          "order": "CART"
+        }
+      ]
+    },
+    {
+      "title": "Wallets Offer - Black Friday",
+      "method": "automatic",
+      "inputType": "standard",
+      "eligibility": "all customers",
+      "combinesWith": {
+        "product": true,
+        "order": true,
+        "shipping": true
+      },
+      "oneTimePurchase": true,
+      "subscription": true,
+      "recurringCycleLimit": 1,
+      "startsAt": "2026-10-18T07:58:08Z",
+      "endsAt": "2026-10-20T14:42:07Z",
+      "productsIncluded": {
+        "collections": [
+          "leather-wallets"
+        ],
+        "products": [
+          "chancellor-passport-wallet-beige",
+          "chancellor-passport-wallet-dark-brown",
+          "lord-bifold-wallet-beige",
+          "lord-bifold-wallet-black",
+          "lord-bifold-wallet-dark-brown",
+          "marquess-passport-wallet-black",
+          "marquess-passport-wallet-dark-brown",
+          "trifold-baron-wallet-black",
+          "trifold-baron-wallet-cinnamon-brown",
+          "trifold-baron-wallet-dark-brown"
+        ]
+      },
+      "rules": [
+        {
+          "name": "",
+          "when": "products included quantity IS 1",
+          "label": "400 Discount off - Wallets Offer ",
+          "type": "fixed",
+          "value": 200,
+          "applyTo": "products included",
+          "applyToFirst": 1,
+          "order": "CART"
+        },
+        {
+          "name": "400 discount off - Wallets Offer ",
+          "when": "always",
+          "label": "400 discount off - Wallets Offer ",
+          "type": "fixed",
+          "value": 400,
+          "applyTo": "products included",
+          "applyToFirst": 2,
+          "order": "CART"
+        }
+      ]
+    },
+    {
+      "title": "Card Holder Offer - Black Friday",
+      "method": "automatic",
+      "inputType": "standard",
+      "eligibility": "all customers",
+      "combinesWith": {
+        "product": true,
+        "order": true,
+        "shipping": true
+      },
+      "oneTimePurchase": true,
+      "subscription": true,
+      "recurringCycleLimit": 1,
+      "startsAt": "2026-10-18T07:58:08Z",
+      "endsAt": "2026-10-20T14:41:53Z",
+      "productsIncluded": {
+        "collections": [
+          "leather-wallets"
+        ],
+        "products": [
+          "duke-card-holder-dark-brown",
+          "duke-card-holder-cinnamon-brown",
+          "duke-card-holder-black"
+        ]
+      },
+      "rules": [
+        {
+          "name": "300 discount off - Card Holder Offer ",
+          "when": "always",
+          "label": "300 discount off - Card Holder Offer ",
+          "type": "fixed",
+          "value": 200,
+          "applyTo": "products included",
+          "applyToFirst": 2,
+          "order": "CART"
+        }
+      ]
+    },
+    {
+      "title": "Bucket Hats Offer - Black Friday",
+      "method": "automatic",
+      "inputType": "standard",
+      "eligibility": "all customers",
+      "combinesWith": {
+        "product": true,
+        "order": true,
+        "shipping": true
+      },
+      "oneTimePurchase": true,
+      "subscription": true,
+      "recurringCycleLimit": 1,
+      "startsAt": "2026-10-18T07:58:08Z",
+      "endsAt": "2026-10-19T04:53:21Z",
+      "productsIncluded": {
+        "collections": [
+          "bucket-hats"
+        ]
+      },
+      "rules": [
+        {
+          "name": "",
+          "when": "products included quantity IS 1",
+          "label": "300 Discount off - Bucket Hats Offer ",
+          "type": "fixed",
+          "value": 100,
+          "applyTo": "products included",
+          "applyToFirst": 1,
+          "order": "CART"
+        },
+        {
+          "name": "300 discount off - Bucket Hats Offer ",
+          "when": "always",
+          "label": "300 discount off - Bucket Hats Offer ",
+          "type": "fixed",
+          "value": 300,
+          "applyTo": "products included",
+          "applyToFirst": 2,
+          "order": "CART"
+        }
+      ]
+    }
+  ]
+}
