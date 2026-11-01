@@ -1,0 +1,78 @@
+{%- comment -%}
+  Section contract.
+  Mazal About introduction (Figma: About Us 1:1854 desktop, 6:3495 mobile).
+  One large centered statement in grey; words set in bold in the editor show in black.
+  @example
+  <!-- templates/page.about.json, under the hero -->
+{%- endcomment -%}
+<div class="section-background"></div>
+<div class="section mazal-ai">
+  {%- if section.settings.text != blank -%}
+    <div class="mazal-ai__text">{{ section.settings.text }}</div>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .mazal-ai {
+    display: flex;
+    justify-content: center;
+    padding: 128px 120px;
+  }
+
+  .mazal-ai__text {
+    max-width: 1272px;
+    color: #a1a1a1;
+    font-family: var(--font-body--family);
+    font-size: 48px;
+    line-height: 1.45;
+    text-align: center;
+  }
+
+  .mazal-ai__text p {
+    margin: 0;
+  }
+
+  .mazal-ai__text strong,
+  .mazal-ai__text b {
+    color: #000;
+    font-weight: inherit;
+  }
+
+  @media screen and (max-width: 989px) {
+    .mazal-ai {
+      padding: 96px 48px;
+    }
+
+    .mazal-ai__text {
+      font-size: 32px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .mazal-ai {
+      padding: 32px 16px;
+    }
+
+    .mazal-ai__text {
+      font-size: 18px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Mazal about intro",
+  "tag": "section",
+  "class": "section-wrapper",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "info": "Bold words show in black, the rest in grey.",
+      "default": "<p><strong>Rooted</strong> in a love for <strong>timeless craftsmanship, Mazal</strong> brings together enduring patterns, <strong>thoughtful fabrics,</strong> and the comfort of home, creating essentials <strong>to be cherished for generations.</strong></p>"
+    }
+  ],
+  "presets": [{ "name": "Mazal about intro" }]
+}
+{% endschema %}

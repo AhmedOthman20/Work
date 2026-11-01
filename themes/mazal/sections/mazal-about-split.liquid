@@ -1,0 +1,175 @@
+{%- comment -%}
+  Section contract.
+  Mazal About "Style of living" (Figma: About Us 1:1881 desktop, 6:3522 mobile).
+  Text bottom-left, image right; a large Cormorant title starts left of the image and runs over it in
+  difference blend. On phones the image sits right and the text goes underneath.
+  @example
+  <!-- templates/page.about.json, after the values -->
+{%- endcomment -%}
+{%- liquid
+  assign overlay_font = settings.type_heading_font | font_modify: 'weight', '600'
+  if overlay_font == blank
+    assign overlay_font = settings.type_heading_font
+  endif
+-%}
+<style>
+  {{ overlay_font | font_face: font_display: 'swap' }}
+</style>
+<div class="section-background"></div>
+<div class="section mazal-as" style="--mazal-as-font: {{ overlay_font.family }}, {{ overlay_font.fallback_families }};">
+  <div class="mazal-as__text">
+    {%- if section.settings.title != blank -%}
+      <h2 class="mazal-as__title">{{ section.settings.title | newline_to_br }}</h2>
+    {%- endif -%}
+    {%- if section.settings.text != blank -%}
+      <div class="mazal-as__body">{{ section.settings.text }}</div>
+    {%- endif -%}
+  </div>
+  <div class="mazal-as__media">
+    {%- if section.settings.image -%}
+      {{
+        section.settings.image
+        | image_url: width: 1600
+        | image_tag:
+          widths: '430, 800, 1100, 1400, 1600',
+          sizes: '(min-width: 750px) 45vw, 70vw',
+          loading: 'lazy',
+          class: 'mazal-as__image'
+      }}
+    {%- else -%}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'mazal-as__image' }}
+    {%- endif -%}
+    {%- if section.settings.overlay_title != blank -%}
+      <p class="mazal-as__overlay" aria-hidden="true">{{ section.settings.overlay_title | newline_to_br }}</p>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .mazal-as {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 64px;
+    padding: 64px;
+    isolation: isolate;
+    background: var(--color-background, #fff);
+    font-family: var(--font-body--family);
+  }
+
+  .mazal-as__text {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 428px;
+  }
+
+  .mazal-as__title {
+    margin: 0;
+    color: #000;
+    font-family: var(--font-body--family);
+    font-weight: var(--font-body--weight);
+    font-size: 24px;
+    line-height: 1.45;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  .mazal-as__body {
+    color: #a1a1a1;
+    font-size: 12px;
+    line-height: 20px;
+  }
+
+  .mazal-as__body p {
+    margin: 0;
+  }
+
+  .mazal-as__media {
+    position: relative;
+    flex: 0 0 auto;
+    width: 49.13%;
+    aspect-ratio: 680 / 624;
+    background: #f7f7f7;
+  }
+
+  .mazal-as__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Figma: starts 134px left of the image, 24px from its top. */
+  .mazal-as__overlay {
+    position: absolute;
+    inset-inline-start: -134px;
+    top: 24px;
+    margin: 0;
+    color: #fff;
+    font-family: var(--mazal-as-font);
+    font-weight: 600;
+    font-size: 92px;
+    line-height: 1.21;
+    text-transform: uppercase;
+    white-space: nowrap;
+    mix-blend-mode: difference;
+    pointer-events: none;
+  }
+
+  @media screen and (max-width: 989px) {
+    .mazal-as__overlay {
+      font-size: 64px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .mazal-as {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 32px;
+      padding: 32px 16px;
+    }
+
+    .mazal-as__media {
+      order: -1;
+      align-self: flex-end;
+      width: 73.9%;
+      aspect-ratio: 294 / 224;
+    }
+
+    .mazal-as__overlay {
+      inset-inline-start: -105px;
+      top: calc(50% - 58px);
+      font-size: 48px;
+    }
+
+    .mazal-as__text {
+      max-width: none;
+    }
+
+    .mazal-as__title {
+      font-size: 14px;
+    }
+
+    .mazal-as__body {
+      font-size: 10px;
+      line-height: 16px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Mazal about split",
+  "tag": "section",
+  "class": "section-wrapper",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "textarea", "id": "overlay_title", "label": "Title over the image", "default": "STYLE OF\nLIVING" },
+    { "type": "textarea", "id": "title", "label": "Heading", "default": "Elegant pieces that bring\na lasting sense of style to any living space." },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Leave behind the notion of seasonal, trend-driven collections to focus on forever pieces.</p>" }
+  ],
+  "presets": [{ "name": "Mazal about split" }]
+}
+{% endschema %}

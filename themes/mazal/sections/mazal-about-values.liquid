@@ -1,0 +1,186 @@
+{%- comment -%}
+  Section contract.
+  Mazal About "Our values" (Figma: About Us 1:1868 desktop, 6:3509 mobile).
+  Wide image with a large Cormorant title that sits on the image's bottom edge in difference blend
+  (light over the photo, black over the page), then a centered list of value blocks.
+  @example
+  <!-- templates/page.about.json, after the cards -->
+{%- endcomment -%}
+{%- liquid
+  assign overlay_font = settings.type_heading_font | font_modify: 'weight', '600'
+  if overlay_font == blank
+    assign overlay_font = settings.type_heading_font
+  endif
+-%}
+<style>
+  {{ overlay_font | font_face: font_display: 'swap' }}
+</style>
+<div class="section-background"></div>
+<div class="section mazal-av" style="--mazal-av-font: {{ overlay_font.family }}, {{ overlay_font.fallback_families }};">
+  <div class="mazal-av__media">
+    {%- if section.settings.image -%}
+      {{
+        section.settings.image
+        | image_url: width: 2800
+        | image_tag:
+          widths: '430, 800, 1400, 2000, 2800',
+          sizes: '100vw',
+          loading: 'lazy',
+          class: 'mazal-av__image'
+      }}
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'mazal-av__image' }}
+    {%- endif -%}
+    {%- if section.settings.overlay_title != blank -%}
+      <h2 class="mazal-av__overlay">{{ section.settings.overlay_title | newline_to_br }}</h2>
+    {%- endif -%}
+  </div>
+
+  <div class="mazal-av__list">
+    {%- for block in section.blocks -%}
+      <div class="mazal-av__item" {{ block.shopify_attributes }}>
+        {%- if block.settings.title != blank -%}
+          <h3 class="mazal-av__title">{{ block.settings.title }}</h3>
+        {%- endif -%}
+        {%- if block.settings.text != blank -%}
+          <div class="mazal-av__text">{{ block.settings.text }}</div>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .mazal-av {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 135px;
+    padding: 64px;
+    isolation: isolate;
+    background: var(--color-background, #fff);
+  }
+
+  .mazal-av__media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1384 / 624;
+    background: #f7f7f7;
+  }
+
+  .mazal-av__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Two lines of 1.21em: the first sits inside the image, the second hangs below it (Figma top: 513 of 624). */
+  .mazal-av__overlay {
+    position: absolute;
+    inset-inline-start: 50%;
+    top: calc(100% - 1.21em);
+    margin: 0;
+    color: #fff;
+    font-family: var(--mazal-av-font);
+    font-weight: 600;
+    font-size: 92px;
+    line-height: 1.21;
+    letter-spacing: normal;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+    mix-blend-mode: difference;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .mazal-av__list {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    width: 100%;
+    max-width: 680px;
+    font-family: var(--font-body--family);
+  }
+
+  .mazal-av__item {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .mazal-av__title {
+    margin: 0;
+    color: #000;
+    font-family: var(--font-body--family);
+    font-weight: var(--font-body--weight);
+    font-size: 16px;
+    line-height: 1.45;
+    letter-spacing: normal;
+    text-transform: uppercase;
+  }
+
+  .mazal-av__text {
+    color: #a1a1a1;
+    font-size: 12px;
+    line-height: 20px;
+  }
+
+  .mazal-av__text p {
+    margin: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .mazal-av {
+      gap: 74px;
+      padding: 32px 16px;
+    }
+
+    .mazal-av__media {
+      aspect-ratio: 398 / 224;
+    }
+
+    .mazal-av__overlay {
+      font-size: 48px;
+    }
+
+    .mazal-av__list {
+      gap: 24px;
+    }
+
+    .mazal-av__title {
+      font-size: 12px;
+    }
+
+    .mazal-av__text {
+      font-size: 10px;
+      line-height: 16px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Mazal about values",
+  "tag": "section",
+  "class": "section-wrapper",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "textarea", "id": "overlay_title", "label": "Title on the image", "default": "OUR\nVALUES", "info": "Two lines: the second line hangs below the image." }
+  ],
+  "blocks": [
+    {
+      "type": "value",
+      "name": "Value",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "THE BRAND SPIRIT" },
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Rooted in heritage and guided by a timeless perspective.</p>" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Mazal about values", "blocks": [{ "type": "value" }, { "type": "value" }, { "type": "value" }] }
+  ]
+}
+{% endschema %}

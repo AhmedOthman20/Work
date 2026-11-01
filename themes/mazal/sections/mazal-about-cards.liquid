@@ -1,0 +1,152 @@
+{%- comment -%}
+  Section contract.
+  Mazal About mission / vision cards (Figma: About Us 1:1856 desktop, 6:3497 mobile).
+  Two columns of image + title + paragraph; stacked on phones.
+  @example
+  <!-- templates/page.about.json, under the introduction -->
+{%- endcomment -%}
+<div class="section-background"></div>
+<div class="section mazal-acards">
+  <div class="mazal-acards__grid">
+    {%- for block in section.blocks -%}
+      <div class="mazal-acards__card" {{ block.shopify_attributes }}>
+        <div class="mazal-acards__media">
+          {%- if block.settings.image -%}
+            {{
+              block.settings.image
+              | image_url: width: 1600
+              | image_tag:
+                widths: '430, 800, 1100, 1400, 1600',
+                sizes: '(min-width: 750px) 50vw, 100vw',
+                loading: 'lazy',
+                class: 'mazal-acards__image'
+            }}
+          {%- else -%}
+            {{ 'lifestyle-2' | placeholder_svg_tag: 'mazal-acards__image' }}
+          {%- endif -%}
+        </div>
+        <div class="mazal-acards__text">
+          {%- if block.settings.title != blank -%}
+            <h2 class="mazal-acards__title">{{ block.settings.title }}</h2>
+          {%- endif -%}
+          {%- if block.settings.text != blank -%}
+            <div class="mazal-acards__body">{{ block.settings.text }}</div>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .mazal-acards {
+    padding: 0 64px 64px;
+  }
+
+  .mazal-acards__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+
+  .mazal-acards__card {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0;
+  }
+
+  .mazal-acards__media {
+    aspect-ratio: 680 / 624;
+    overflow: hidden;
+    background: #f7f7f7;
+  }
+
+  .mazal-acards__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .mazal-acards__text {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    color: #000;
+    font-family: var(--font-body--family);
+  }
+
+  .mazal-acards__title {
+    margin: 0;
+    font-family: var(--font-body--family);
+    font-weight: var(--font-body--weight);
+    font-size: 24px;
+    line-height: 1.45;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  .mazal-acards__body {
+    font-size: 14px;
+    line-height: 24px;
+  }
+
+  .mazal-acards__body p {
+    margin: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .mazal-acards {
+      padding: 32px 16px;
+    }
+
+    .mazal-acards__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .mazal-acards__card {
+      gap: 16px;
+    }
+
+    .mazal-acards__media {
+      aspect-ratio: 398 / 224;
+    }
+
+    .mazal-acards__text {
+      gap: 8px;
+    }
+
+    .mazal-acards__title {
+      font-size: 14px;
+    }
+
+    .mazal-acards__body {
+      font-size: 10px;
+      line-height: 16px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Mazal about cards",
+  "tag": "section",
+  "class": "section-wrapper",
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Card",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Bringing Comfort Into Everyday Living." },
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>At Mazal, our mission is to elevate the everyday through thoughtfully designed home essentials.</p>" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Mazal about cards", "blocks": [{ "type": "card" }, { "type": "card" }] }
+  ]
+}
+{% endschema %}

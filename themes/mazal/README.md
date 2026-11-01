@@ -24,3 +24,9 @@ The `Color` option of every Mazal product is linked to Shopify's **Color** categ
 an image for stripes and checks. `snippets/mazal-swatch.liquid` reads that swatch first; the
 "Swatch colors" section setting and `swatch-<name>.png` files are only fallbacks.
 To show a different photo for a color, set the image on that variant in the product admin.
+
+## About page
+
+`templates/page.about.json` (page **About Us**, handle `about-us`), Figma desktop 1:1849 / mobile 6:2738-6:3490:
+`mazal-about-hero` → `mazal-about-intro` (bold words show black) → `mazal-about-cards` → `mazal-about-values`
+→ `mazal-about-split` → `mazal-follow-us`. Images are in Content > Files as `mazal-about-*.png/jpg`.

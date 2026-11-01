@@ -1,0 +1,121 @@
+{
+  "sections": {
+    "hero": {
+      "type": "mazal-about-hero",
+      "settings": {
+        "image": "shopify://shop_images/mazal-about-hero.png",
+        "overlay_opacity": 0,
+        "title": "MADE FOR THE WAY YOU LIVE.",
+        "text": "At Mazal, we believe everyday essentials deserve thoughtful design. From carefully chosen fabrics to timeless patterns, we create pieces that bring comfort, character, and a little more beauty into your everyday rituals.",
+        "height": 724,
+        "height_mobile": 424
+      }
+    },
+    "intro": {
+      "type": "mazal-about-intro",
+      "settings": {
+        "text": "<p><strong>Rooted</strong> in a love for <strong>timeless craftsmanship, Mazal</strong> brings together enduring patterns, <strong>thoughtful fabrics,</strong> and the comfort of home, creating essentials <strong>to be cherished for generations.</strong></p>"
+      }
+    },
+    "cards": {
+      "type": "mazal-about-cards",
+      "blocks": {
+        "mission": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/mazal-about-mission.png",
+            "title": "Bringing Comfort Into Everyday Living.",
+            "text": "<p>At Mazal, our mission is to elevate the everyday through thoughtfully designed home essentials that unite enduring patterns, considered craftsmanship, and exceptional comfort. We strive to create pieces that feel personal, stand the test of time, and bring a lasting sense of beauty to the spaces we call home.</p>"
+          }
+        },
+        "vision": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/mazal-about-vision.jpg",
+            "title": "A Legacy of Beauty, Made to Be Lived In.",
+            "text": "<p>We envision a world where timeless design and everyday luxury exist in harmony. Through a deep appreciation for heritage, quality, and the art of living well, Mazal aspires to become a lasting part of homes and traditions, creating pieces that are cherished today and passed on through generations.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "mission",
+        "vision"
+      ],
+      "settings": {}
+    },
+    "values": {
+      "type": "mazal-about-values",
+      "blocks": {
+        "spirit": {
+          "type": "value",
+          "settings": {
+            "title": "THE BRAND SPIRIT",
+            "text": "<p>Rooted in heritage and guided by a timeless perspective, Mazal celebrates the beauty of familiar traditions through a refined, contemporary lens. Every collection reflects an appreciation for meaningful details, enduring aesthetics, and the little things that make a house feel like home.</p>"
+          }
+        },
+        "quality": {
+          "type": "value",
+          "settings": {
+            "title": "DESIGN & QUALITY",
+            "text": "<p>Every detail is considered, from the selection of fabrics to the balance of colors, textures, and patterns. By bringing together thoughtful design and a commitment to lasting quality, Mazal creates home essentials that feel exceptional, look effortlessly elegant, and remain relevant beyond passing trends.</p>"
+          }
+        },
+        "feeling": {
+          "type": "value",
+          "settings": {
+            "title": "THE FEELING WE DELIVER",
+            "text": "<p>We believe the true luxury of home lies in how it makes you feel. Through inviting textures, timeless designs, and pieces made for everyday living, Mazal brings a sense of warmth, ease, and quiet sophistication to familiar spaces, turning ordinary routines into moments worth cherishing.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "spirit",
+        "quality",
+        "feeling"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/mazal-about-values.png",
+        "overlay_title": "OUR\nVALUES"
+      }
+    },
+    "style": {
+      "type": "mazal-about-split",
+      "settings": {
+        "image": "shopify://shop_images/mazal-about-style.png",
+        "overlay_title": "STYLE OF\nLIVING",
+        "title": "Elegant pieces that bring\na lasting sense of style to any living space.",
+        "text": "<p>Leave behind the notion of seasonal, trend-driven collections to focus on forever pieces. Revel in the endless possibilities of a truly considered palette. Each arresting design, texture and hue is designed to work in perfect harmony.</p>"
+      }
+    },
+    "follow": {
+      "type": "mazal-follow-us",
+      "settings": {
+        "eyebrow": "ELEVATE YOUR EVERYDAY",
+        "title": "FOLLOW US",
+        "title_size": 48,
+        "handle": "@mazal.eg",
+        "handle_size": 32,
+        "button_label": "FOLLOW US",
+        "link": "https://www.instagram.com/mazal.eg/",
+        "open_in_new_tab": true,
+        "button_color": "#bb955a",
+        "image_1": "shopify://shop_images/mazal-follow-1.jpg",
+        "image_2": "shopify://shop_images/mazal-follow-2.jpg",
+        "image_3": "shopify://shop_images/mazal-follow-3.png",
+        "image_4": "shopify://shop_images/mazal-follow-4.png",
+        "animate": true,
+        "animation_speed": 4,
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "intro",
+    "cards",
+    "values",
+    "style",
+    "follow"
+  ]
+}
