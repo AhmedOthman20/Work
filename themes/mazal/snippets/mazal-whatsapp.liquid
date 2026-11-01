@@ -1,0 +1,67 @@
+{%- doc -%}
+  Floating WhatsApp chat button, bottom-right on every page (Figma: "Variable Chat Logos" 1:1845).
+  Rendered once from layout/theme.liquid. Change the number below (international format, digits only).
+
+  @example
+  {% render 'mazal-whatsapp' %}
+{%- enddoc -%}
+{%- liquid
+  assign wa_number = '201221915572'
+  assign wa_message = 'Hello Mazal, I have a question.'
+-%}
+<a
+  class="mazal-wa"
+  href="https://wa.me/{{ wa_number }}?text={{ wa_message | url_encode }}"
+  target="_blank"
+  rel="noopener"
+  aria-label="WhatsApp"
+>
+  {{- 'mazal-icon-whatsapp.svg' | inline_asset_content -}}
+</a>
+
+{% stylesheet %}
+  .mazal-wa {
+    position: fixed;
+    inset-inline-end: 64px;
+    inset-block-end: 64px;
+    z-index: 9;
+    display: block;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    box-shadow: 0 4px 16px rgb(0 0 0 / 0.15);
+    transition: transform 0.2s ease, inset-block-end 0.3s ease;
+  }
+
+  .mazal-wa:hover {
+    transform: scale(1.06);
+  }
+
+  .mazal-wa svg {
+    display: block;
+    width: 48px;
+    height: 48px;
+  }
+
+  /* Sit above the product page's add to cart bar while it is showing. */
+  body:has(.mazal-pdp__sticky.is-visible) .mazal-wa {
+    inset-block-end: 140px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .mazal-wa {
+      inset-inline-end: 16px;
+      inset-block-end: 16px;
+    }
+
+    body:has(.mazal-pdp__sticky.is-visible) .mazal-wa {
+      inset-block-end: 96px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mazal-wa {
+      transition: none;
+    }
+  }
+{% endstylesheet %}

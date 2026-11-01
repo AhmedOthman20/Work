@@ -1,0 +1,33 @@
+{
+  "sections": {
+    "main": {
+      "type": "mazal-contact",
+      "settings": {
+        "image": "shopify://shop_images/mazal-contact-hero.jpg",
+        "hero_title": "CUSTOMER CARE",
+        "title": "GOT A QUESTION?",
+        "text": "We're here to help with anything you need, from product questions to order support. Reach out, and we'll be happy to assist.",
+        "hours_title": "WORKING HOURS",
+        "hours": "Monday - Friday : 09:00 AM | 03:00 PM",
+        "phone": "(+20) 122 191 5572",
+        "phone_link": "+201221915572",
+        "whatsapp": "+201221915572",
+        "whatsapp_label": "Text Us",
+        "email": "support@mazalegypt.com",
+        "name_label": "Full Name",
+        "name_placeholder": "Enter your full name",
+        "email_label": "Email Address",
+        "email_placeholder": "Your email address",
+        "type_label": "Inquiry Type",
+        "type_placeholder": "How can we help?",
+        "inquiry_types": "Order support\nProduct question\nReturns & exchanges\nWholesale\nOther",
+        "message_label": "Your Message",
+        "message_placeholder": "Tell us how we can support you...",
+        "submit_label": "SUBMIT"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
