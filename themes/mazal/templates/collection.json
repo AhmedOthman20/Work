@@ -5,26 +5,47 @@
       "blocks": {
         "cat_bedding": {
           "type": "category",
-          "settings": { "collection": "all-bedding", "label": "BEDDING" }
+          "settings": {
+            "collection": "all-bedding",
+            "label": "BEDDING"
+          }
         },
         "cat_towels": {
           "type": "category",
-          "settings": { "collection": "all-bedding-copy", "label": "TOWELS" }
+          "settings": {
+            "collection": "all-bedding-copy",
+            "label": "TOWELS"
+          }
         },
         "cat_bathrobes": {
           "type": "category",
-          "settings": { "collection": "towels-copy", "label": "BATHROBES" }
+          "settings": {
+            "collection": "towels-copy",
+            "label": "BATHROBES"
+          }
         },
         "cat_pillows": {
           "type": "category",
-          "settings": { "collection": "bathrobes-copy", "label": "PILLOWS" }
+          "settings": {
+            "collection": "bathrobes-copy",
+            "label": "PILLOWS"
+          }
         },
         "cat_table_top": {
           "type": "category",
-          "settings": { "collection": "pillows-copy", "label": "TABLE TOP" }
+          "settings": {
+            "collection": "pillows-copy",
+            "label": "TABLE TOP"
+          }
         }
       },
-      "block_order": ["cat_bedding", "cat_towels", "cat_bathrobes", "cat_pillows", "cat_table_top"],
+      "block_order": [
+        "cat_bedding",
+        "cat_towels",
+        "cat_bathrobes",
+        "cat_pillows",
+        "cat_table_top"
+      ],
       "settings": {
         "all_title": "All Products",
         "subtitle": "Timeless designs of uncompromising quality, made for home comfort",
@@ -32,11 +53,11 @@
         "enable_filters": true,
         "enable_sorting": true,
         "filters_label": "FILTERS",
-        "sort_label": "Sort by",
+        "sort_label": "SORT BY",
         "from_label": "From",
         "to_label": "To",
-        "clear_label": "Clear all",
-        "apply_label": "Apply",
+        "clear_label": "CLEAR ALL FILTERS",
+        "apply_label": "APPLY FILTERS",
         "per_page": 16,
         "count_text": "SHOWING [shown] OF [total] PRODUCTS",
         "loading_text": "LOADING MORE PRODUCTS...",
@@ -46,9 +67,14 @@
         "add_label": "ADD TO CART",
         "color_option_name": "Color",
         "more_label": "[count]+ More",
-        "swatch_colors": "Pink: #f6c9d1\nGrey: #dbdada\nPeach: #f6ddc9\nMint: #c9f6e0"
+        "swatch_colors": "Pink: #f6c9d1\nGrey: #dbdada\nPeach: #f6ddc9\nMint: #c9f6e0",
+        "price_label": "PRICE RANGE",
+        "search_placeholder": "Search...",
+        "close_label": "CLOSE"
       }
     }
   },
-  "order": ["main"]
+  "order": [
+    "main"
+  ]
 }

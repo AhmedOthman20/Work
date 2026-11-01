@@ -36,5 +36,5 @@ To show a different photo for a color, set the image on that variant in the prod
 `templates/collection.json` → `sections/mazal-collection.liquid` (Figma desktop 1:1312 / mobile 6:2514). The menu's **Shop** link
 (`/collections/all`) and every collection use it. Title is the collection title (setting "All Products" for `/collections/all`),
 subtitle is the collection description or the section setting. Category links are blocks (collection + label); the current
-collection is underlined. **FILTERS** opens a drawer with sorting and the filters set in the Search & Discovery app.
+collection is underlined. **FILTERS** opens a panel under the bar on desktop (a popup with search on phones) with sorting, a price slider and the filters set in the Search & Discovery app.
 16 products per load; the next page loads by itself when "Showing X of N products" scrolls into view.

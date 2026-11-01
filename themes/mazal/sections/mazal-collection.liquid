@@ -1,8 +1,8 @@
 {%- comment -%}
   Section contract.
   Mazal shop / collection page (Figma: Shop 1:1312 desktop, 6:2514 mobile).
-  Title + subtitle, category links (blocks) with a FILTERS button that opens a drawer of Shopify
-  filters and sorting, a 4-column (2 on phones) grid of product cards, then "Showing X of N products"
+  Title + subtitle, category links (blocks) with a FILTERS button that opens the sorting and Shopify
+  filters (inline panel on desktop, popup on phones), a 4-column (2 on phones) grid of product cards, then "Showing X of N products"
   with a progress bar. The next page loads by itself when the bar scrolls into view.
   @example
   <!-- templates/collection.json -->
@@ -39,6 +39,7 @@
     {%- endif -%}
   </div>
 
+  <div class="mazal-col__top">
   <div class="mazal-col__bar">
     <nav class="mazal-col__cats" aria-label="{{ section.settings.categories_label | escape }}">
       {%- for block in section.blocks -%}
@@ -63,12 +64,139 @@
     </nav>
 
     {%- if section.settings.enable_filters -%}
-      <button type="button" class="mazal-col__filters-btn" data-filters-open aria-haspopup="dialog">
+      <button
+        type="button"
+        class="mazal-col__filters-btn"
+        aria-expanded="false"
+        aria-controls="MazalFilters-{{ section.id }}"
+        data-filters-toggle
+      >
         <svg class="mazal-col__plus" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M12 19.5V4.5M4.5 12h15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
+        <svg class="mazal-col__x" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
         <span>{{ section.settings.filters_label | escape }}{% if active_filter_count > 0 %} ({{ active_filter_count }}){% endif %}</span>
       </button>
+    {%- endif -%}
+  </div>
+
+    {%- if section.settings.enable_filters -%}
+      <div class="mazal-col__panel" id="MazalFilters-{{ section.id }}" data-filters>
+        <div class="mazal-col__panel-clip">
+          <form
+            class="mazal-col__panel-box"
+            action="{{ collection.url }}"
+            method="get"
+            aria-label="{{ section.settings.filters_label | escape }}"
+          >
+            <div class="mazal-col__panel-head">
+              <p class="mazal-col__panel-title">{{ section.settings.filters_label | escape }}</p>
+              <button type="button" class="mazal-col__close" data-filters-close>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span>{{ section.settings.close_label | escape }}</span>
+              </button>
+            </div>
+
+            <div class="mazal-col__search">
+              <input
+                type="search"
+                placeholder="{{ section.settings.search_placeholder | escape }}"
+                aria-label="{{ section.settings.search_placeholder | escape }}"
+                data-filter-search
+              >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+
+            <div class="mazal-col__groups">
+              {%- if section.settings.enable_sorting -%}
+                <div class="mazal-col__group mazal-col__group--sort" role="group" aria-labelledby="MazalSort-{{ section.id }}" data-filter-group>
+                  <p class="mazal-col__group-title" id="MazalSort-{{ section.id }}">{{ section.settings.sort_label | escape }}</p>
+                  <div class="mazal-col__options">
+                    {%- for option in collection.sort_options -%}
+                      <label class="mazal-col__check" data-filter-option>
+                        <input type="radio" name="sort_by" value="{{ option.value | escape }}" {% if option.value == sort_by %}checked{% endif %}>
+                        <span class="mazal-col__box" aria-hidden="true"></span>
+                        <span class="mazal-col__label">{{ option.name | escape }}</span>
+                      </label>
+                    {%- endfor -%}
+                  </div>
+                </div>
+              {%- endif -%}
+
+              {%- for filter in collection.filters -%}
+                {%- liquid
+                  assign filter_key = filter.label | downcase
+                  assign group_class = ''
+                  if filter_key contains 'color' or filter_key contains 'colour'
+                    assign group_class = ' mazal-col__group--color'
+                  endif
+                -%}
+                {%- if filter.type == 'price_range' -%}
+                  {%- liquid
+                    assign range_max = filter.range_max | money_without_currency | remove: ',' | ceil
+                    assign current_min = 0
+                    assign current_max = range_max
+                    if filter.min_value.value != null
+                      assign current_min = filter.min_value.value | money_without_currency | remove: ',' | floor
+                    endif
+                    if filter.max_value.value != null
+                      assign current_max = filter.max_value.value | money_without_currency | remove: ',' | ceil
+                    endif
+                  -%}
+                  <div class="mazal-col__group mazal-col__group--price" role="group" aria-labelledby="MazalFilter-{{ section.id }}-{{ forloop.index }}">
+                    <p class="mazal-col__group-title" id="MazalFilter-{{ section.id }}-{{ forloop.index }}">{{ section.settings.price_label | default: filter.label | escape }}</p>
+                    <div class="mazal-col__range" data-range data-max="{{ range_max }}" data-currency="{{ cart.currency.iso_code }}">
+                      <div class="mazal-col__range-slider">
+                        <span class="mazal-col__range-track" aria-hidden="true"><span class="mazal-col__range-fill" data-range-fill></span></span>
+                        <input type="range" min="0" max="{{ range_max }}" step="1" value="{{ current_min }}" aria-label="{{ section.settings.from_label | escape }}" data-range-min>
+                        <input type="range" min="0" max="{{ range_max }}" step="1" value="{{ current_max }}" aria-label="{{ section.settings.to_label | escape }}" data-range-max>
+                      </div>
+                      <div class="mazal-col__range-values">
+                        <span class="mazal-col__range-value" data-range-min-label>{{ cart.currency.iso_code }} {{ current_min }}</span>
+                        <span class="mazal-col__range-sep" aria-hidden="true"></span>
+                        <span class="mazal-col__range-value" data-range-max-label>{{ cart.currency.iso_code }} {{ current_max }}</span>
+                      </div>
+                      <input type="hidden" name="{{ filter.min_value.param_name }}" value="{{ current_min }}" data-range-min-input {% if filter.min_value.value == null %}disabled{% endif %}>
+                      <input type="hidden" name="{{ filter.max_value.param_name }}" value="{{ current_max }}" data-range-max-input {% if filter.max_value.value == null %}disabled{% endif %}>
+                    </div>
+                  </div>
+                {%- else -%}
+                  <div class="mazal-col__group{{ group_class }}" role="group" aria-labelledby="MazalFilter-{{ section.id }}-{{ forloop.index }}" data-filter-group>
+                    <p class="mazal-col__group-title" id="MazalFilter-{{ section.id }}-{{ forloop.index }}">{{ filter.label | escape }}</p>
+                    <div class="mazal-col__options">
+                      {%- for value in filter.values -%}
+                        <label class="mazal-col__check{% if value.count == 0 and value.active == false %} is-disabled{% endif %}" data-filter-option>
+                          <input
+                            type="checkbox"
+                            name="{{ value.param_name }}"
+                            value="{{ value.value | escape }}"
+                            {% if value.active %}checked{% endif %}
+                            {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                          >
+                          <span class="mazal-col__box" aria-hidden="true"></span>
+                          <span class="mazal-col__label">{{ value.label | escape }}</span>
+                        </label>
+                      {%- endfor -%}
+                    </div>
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+
+            <div class="mazal-col__actions">
+              <button type="submit" class="mazal-col__apply">{{ section.settings.apply_label | escape }}</button>
+              <a class="mazal-col__clear" href="{{ collection.url }}?sort_by={{ sort_by }}">{{ section.settings.clear_label | escape }}</a>
+            </div>
+          </form>
+        </div>
+      </div>
     {%- endif -%}
   </div>
 
@@ -197,96 +325,6 @@
     {%- endif -%}
   {%- endpaginate -%}
 
-  {%- if section.settings.enable_filters -%}
-    <dialog class="mazal-col__drawer" data-filters aria-label="{{ section.settings.filters_label | escape }}">
-      <form class="mazal-col__drawer-form" action="{{ collection.url }}" method="get">
-        <div class="mazal-col__drawer-head">
-          <p class="mazal-col__drawer-title">{{ section.settings.filters_label | escape }}</p>
-          <button type="button" class="mazal-col__drawer-close" data-filters-close aria-label="Close">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-          </button>
-        </div>
-
-        <div class="mazal-col__drawer-body">
-          {%- if section.settings.enable_sorting -%}
-            <details class="mazal-col__group" open>
-              <summary class="mazal-col__group-title">{{ section.settings.sort_label | escape }}</summary>
-              <div class="mazal-col__options">
-                {%- for option in collection.sort_options -%}
-                  <label class="mazal-col__check">
-                    <input type="radio" name="sort_by" value="{{ option.value | escape }}" {% if option.value == sort_by %}checked{% endif %}>
-                    <span class="mazal-col__box mazal-col__box--round" aria-hidden="true"></span>
-                    <span>{{ option.name | escape }}</span>
-                  </label>
-                {%- endfor -%}
-              </div>
-            </details>
-          {%- endif -%}
-
-          {%- for filter in collection.filters -%}
-            <details class="mazal-col__group" {% if filter.active_values.size > 0 or forloop.index <= 2 %}open{% endif %}>
-              <summary class="mazal-col__group-title">{{ filter.label | escape }}</summary>
-              {%- case filter.type -%}
-                {%- when 'price_range' -%}
-                  <div class="mazal-col__price-range">
-                    <label class="mazal-col__price-field">
-                      <span>{{ section.settings.from_label | escape }}</span>
-                      <input
-                        type="number"
-                        inputmode="decimal"
-                        min="0"
-                        name="{{ filter.min_value.param_name }}"
-                        {% if filter.min_value.value != null %}value="{{ filter.min_value.value | money_without_currency | remove: ',' }}"{% endif %}
-                        placeholder="0"
-                      >
-                    </label>
-                    <label class="mazal-col__price-field">
-                      <span>{{ section.settings.to_label | escape }}</span>
-                      <input
-                        type="number"
-                        inputmode="decimal"
-                        min="0"
-                        name="{{ filter.max_value.param_name }}"
-                        {% if filter.max_value.value != null %}value="{{ filter.max_value.value | money_without_currency | remove: ',' }}"{% endif %}
-                        placeholder="{{ filter.range_max | money_without_currency | remove: ',' }}"
-                      >
-                    </label>
-                  </div>
-                {%- else -%}
-                  <div class="mazal-col__options">
-                    {%- for value in filter.values -%}
-                      <label class="mazal-col__check{% if value.count == 0 and value.active == false %} is-disabled{% endif %}">
-                        <input
-                          type="checkbox"
-                          name="{{ value.param_name }}"
-                          value="{{ value.value | escape }}"
-                          {% if value.active %}checked{% endif %}
-                          {% if value.count == 0 and value.active == false %}disabled{% endif %}
-                        >
-                        {%- if value.swatch.color or value.swatch.image -%}
-                          {%- render 'mazal-swatch', value: value, class: 'mazal-col__box mazal-col__box--swatch' -%}
-                        {%- else -%}
-                          <span class="mazal-col__box" aria-hidden="true"></span>
-                        {%- endif -%}
-                        <span>{{ value.label | escape }}</span>
-                        <span class="mazal-col__option-count">({{ value.count }})</span>
-                      </label>
-                    {%- endfor -%}
-                  </div>
-              {%- endcase -%}
-            </details>
-          {%- endfor -%}
-        </div>
-
-        <div class="mazal-col__drawer-foot">
-          <a class="mazal-col__clear" href="{{ collection.url }}?sort_by={{ sort_by }}">{{ section.settings.clear_label | escape }}</a>
-          <button type="submit" class="mazal-col__apply">{{ section.settings.apply_label | escape }}</button>
-        </div>
-      </form>
-    </dialog>
-  {%- endif -%}
 </mazal-collection>
 
 {% stylesheet %}
@@ -326,14 +364,17 @@
   }
 
   /* Categories + filters (Figma 1:1317), then a grey rule */
+  .mazal-col__top {
+    padding-block-end: 32px;
+    margin-block-end: 32px;
+    border-block-end: 1px solid var(--mazal-grey);
+  }
+
   .mazal-col__bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 24px;
-    padding-block-end: 32px;
-    margin-block-end: 32px;
-    border-block-end: 1px solid var(--mazal-grey);
   }
 
   .mazal-col__cats {
@@ -388,10 +429,20 @@
     cursor: pointer;
   }
 
-  .mazal-col__plus {
+  .mazal-col__plus,
+  .mazal-col__x {
     display: block;
     width: 24px;
     height: 24px;
+  }
+
+  .mazal-col__x,
+  .mazal-col.is-filters-open .mazal-col__plus {
+    display: none;
+  }
+
+  .mazal-col.is-filters-open .mazal-col__x {
+    display: block;
   }
 
   /* Product grid (Figma 1:1319): 4 x 328px cards, 24px columns, 32px rows */
@@ -609,138 +660,112 @@
     }
   }
 
-  /* Filters drawer */
-  .mazal-col__drawer {
-    position: fixed;
-    inset: 0 0 0 auto;
-    width: min(420px, 100vw);
-    max-width: 100vw;
-    height: 100%;
-    max-height: 100%;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: #fff;
-    color: #000;
-    font-family: var(--font-body--family);
+  /* Filters panel: opens under the bar on desktop (screenshot "filters open"), a popup on phones. */
+  .mazal-col__panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s ease;
   }
 
-  .mazal-col__drawer::backdrop {
-    background: rgb(0 0 0 / 0.4);
+  .mazal-col.is-filters-open .mazal-col__panel {
+    grid-template-rows: 1fr;
   }
 
-  .mazal-col__drawer[open] {
-    animation: mazal-col-slide 0.3s ease;
+  .mazal-col__panel-clip {
+    min-height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    transition: visibility 0s linear 0.35s;
   }
 
-  @keyframes mazal-col-slide {
-    from {
-      transform: translateX(100%);
-    }
+  .mazal-col.is-filters-open .mazal-col__panel-clip {
+    visibility: visible;
+    transition: none;
   }
 
-  .mazal-col__drawer-form {
+  .mazal-col__panel-box {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    gap: 40px;
+    padding-block-start: 40px;
   }
 
-  .mazal-col__drawer-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 24px 32px;
-    border-block-end: 1px solid #f7f7f7;
-  }
-
-  .mazal-col__drawer-title {
-    margin: 0;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 1.45;
-    text-transform: uppercase;
-  }
-
-  .mazal-col__drawer-close {
-    display: inline-flex;
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    border: 0;
-    background: none;
-    color: #000;
-    cursor: pointer;
-  }
-
-  .mazal-col__drawer-close svg {
-    width: 24px;
-    height: 24px;
-  }
-
-  .mazal-col__drawer-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px 32px 24px;
-  }
-
-  .mazal-col__group {
-    border-block-end: 1px solid #f7f7f7;
-  }
-
-  .mazal-col__group-title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-block: 20px;
-    font-size: 14px;
-    line-height: 1.45;
-    text-transform: uppercase;
-    list-style: none;
-    cursor: pointer;
-  }
-
-  .mazal-col__group-title::-webkit-details-marker {
+  .mazal-col__panel-head,
+  .mazal-col__search {
     display: none;
   }
 
-  .mazal-col__group-title::after {
-    content: '+';
-    font-size: 18px;
-    line-height: 1;
+  .mazal-col__groups {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 40px 64px;
   }
 
-  .mazal-col__group[open] > .mazal-col__group-title::after {
-    content: '\2212';
+  .mazal-col__group {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .mazal-col__group[hidden] {
+    display: none;
+  }
+
+  .mazal-col__group-title {
+    margin: 0;
+    color: #000;
+    font-size: 14px;
+    line-height: 1.45;
+    text-transform: uppercase;
   }
 
   .mazal-col__options {
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    padding-block-end: 20px;
+    gap: 16px;
+  }
+
+  .mazal-col__group--color .mazal-col__options {
+    display: grid;
+    grid-template-columns: repeat(4, max-content);
+    gap: 16px 20px;
   }
 
   .mazal-col__check {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 14px;
+    gap: 8px;
+    color: var(--mazal-grey);
+    font-size: 12px;
     line-height: 1.45;
+    white-space: nowrap;
     cursor: pointer;
   }
 
+  .mazal-col__check[hidden] {
+    display: none;
+  }
+
   .mazal-col__check.is-disabled {
-    color: var(--mazal-grey);
+    opacity: 0.5;
     cursor: default;
+  }
+
+  .mazal-col__check:hover,
+  .mazal-col__check:has(input:checked) {
+    color: #000;
   }
 
   .mazal-col__check input {
     position: absolute;
-    opacity: 0;
+    inset-inline-start: 0;
     width: 16px;
     height: 16px;
     margin: 0;
+    opacity: 0;
   }
 
   .mazal-col__box {
@@ -750,22 +775,13 @@
     height: 16px;
     border: 1px solid var(--mazal-grey);
     border-radius: 4px;
-    background-position: center;
-    background-size: cover;
-  }
-
-  .mazal-col__box--round {
-    border-radius: 50%;
+    background: #fff;
   }
 
   .mazal-col__check input:checked + .mazal-col__box {
     border-color: #000;
+    background: #000;
     box-shadow: inset 0 0 0 3px #fff;
-    background-color: #000;
-  }
-
-  .mazal-col__check input:checked + .mazal-col__box--swatch {
-    box-shadow: 0 0 0 1px #fff, 0 0 0 2px #000;
   }
 
   .mazal-col__check input:focus-visible + .mazal-col__box {
@@ -773,66 +789,151 @@
     outline-offset: 2px;
   }
 
-  .mazal-col__option-count {
-    color: var(--mazal-grey);
+  /* Sort by on desktop is a plain text list. */
+  .mazal-col__group--sort .mazal-col__box {
+    display: none;
   }
 
-  .mazal-col__price-range {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    padding-block-end: 20px;
+  .mazal-col__group--sort .mazal-col__check:has(input:focus-visible) {
+    outline: 2px solid var(--mazal-gold);
+    outline-offset: 2px;
   }
 
-  .mazal-col__price-field {
+  .mazal-col__group--price {
+    width: 327px;
+    max-width: 100%;
+  }
+
+  .mazal-col__range {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    font-size: 12px;
-    text-transform: uppercase;
+    gap: 12px;
   }
 
-  .mazal-col__price-field input {
+  .mazal-col__range-slider {
+    position: relative;
+    height: 10px;
+  }
+
+  .mazal-col__range-track {
+    position: absolute;
+    inset-inline: 5px;
+    top: 4px;
+    height: 2px;
+    background: #e3e3e3;
+  }
+
+  .mazal-col__range-fill {
+    position: absolute;
+    inset-block: 0;
+    background: #000;
+  }
+
+  .mazal-col__range-slider input[type='range'] {
+    position: absolute;
+    inset: 0;
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--mazal-grey);
-    border-radius: 0;
-    background: #fff;
-    font-family: inherit;
-    font-size: 14px;
+    height: 10px;
+    margin: 0;
+    background: none;
+    pointer-events: none;
+    -webkit-appearance: none;
+    appearance: none;
   }
 
-  .mazal-col__drawer-foot {
+  .mazal-col__range-slider input[type='range']::-webkit-slider-runnable-track {
+    height: 10px;
+    background: none;
+  }
+
+  .mazal-col__range-slider input[type='range']::-moz-range-track {
+    height: 10px;
+    background: none;
+  }
+
+  .mazal-col__range-slider input[type='range']::-webkit-slider-thumb {
+    width: 10px;
+    height: 10px;
+    border: 0;
+    border-radius: 50%;
+    background: #000;
+    pointer-events: auto;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .mazal-col__range-slider input[type='range']::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    border: 0;
+    border-radius: 50%;
+    background: #000;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  .mazal-col__range-slider input[type='range']:focus-visible::-webkit-slider-thumb {
+    outline: 2px solid var(--mazal-gold);
+    outline-offset: 2px;
+  }
+
+  .mazal-col__range-values {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    padding: 20px 32px;
-    border-block-start: 1px solid #f7f7f7;
+    gap: 8px;
   }
 
-  .mazal-col__clear,
-  .mazal-col__apply {
+  .mazal-col__range-value {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 12px 16px;
+    height: 30px;
+    padding-inline: 8px;
+    border: 1px dashed #000;
+    border-radius: 999px;
+    background: #f7f7f7;
+    color: #000;
+    font-size: 10px;
+    line-height: 1.45;
+    white-space: nowrap;
+  }
+
+  .mazal-col__range-sep {
+    display: none;
+  }
+
+  .mazal-col__actions {
+    display: flex;
+    gap: 16px;
+  }
+
+  .mazal-col__apply,
+  .mazal-col__clear {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 252px;
+    min-height: 38px;
+    padding: 8px 16px;
     font-family: var(--font-body--family);
-    font-size: 14px;
+    font-size: 12px;
     line-height: 1.45;
     text-decoration: none;
     text-transform: uppercase;
     cursor: pointer;
   }
 
-  .mazal-col__clear {
-    border: 1px solid #000;
-    color: #000;
-  }
-
   .mazal-col__apply {
-    border: 0;
+    border: 1px solid var(--mazal-gold);
     background: var(--mazal-gold);
     color: #fff;
+  }
+
+  .mazal-col__clear {
+    border: 1px solid var(--mazal-gold);
+    background: #fff;
+    color: var(--mazal-gold);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -841,7 +942,11 @@
       transition: none;
     }
 
-    .mazal-col__drawer[open],
+    .mazal-col__panel,
+    .mazal-col__panel-clip {
+      transition: none;
+    }
+
     .mazal-col__count.is-loading .mazal-col__more-link {
       animation: none;
     }
@@ -865,10 +970,13 @@
       font-size: 10px;
     }
 
-    .mazal-col__bar {
-      gap: 12px;
+    .mazal-col__top {
       padding-block-end: 0;
       border-block-end: 0;
+    }
+
+    .mazal-col__bar {
+      gap: 12px;
     }
 
     .mazal-col__cats {
@@ -890,6 +998,15 @@
     .mazal-col__plus {
       width: 14px;
       height: 14px;
+    }
+
+    /* The popup has its own close button, so the bar keeps the plus. */
+    .mazal-col.is-filters-open .mazal-col__plus {
+      display: block;
+    }
+
+    .mazal-col.is-filters-open .mazal-col__x {
+      display: none;
     }
 
     .mazal-col__grid {
@@ -951,13 +1068,168 @@
       font-size: 10px;
     }
 
-    .mazal-col__drawer-head,
-    .mazal-col__drawer-foot {
-      padding-inline: 16px;
+    /* Filters popup (phone screenshot) */
+    .mazal-col__panel {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgb(0 0 0 / 0.5);
+      transition: none;
     }
 
-    .mazal-col__drawer-body {
-      padding-inline: 16px;
+    .mazal-col.is-filters-open .mazal-col__panel {
+      display: flex;
+    }
+
+    .mazal-col__panel-clip {
+      width: 100%;
+      max-width: 398px;
+      max-height: 100%;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      transition: none;
+    }
+
+    .mazal-col__panel-box {
+      gap: 16px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .mazal-col__panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mazal-col__panel-title {
+      margin: 0;
+      font-size: 10px;
+      line-height: 1.45;
+      text-transform: uppercase;
+    }
+
+    .mazal-col__close {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 8px;
+      border: 0;
+      background: #f7f7f7;
+      color: #000;
+      font-family: var(--font-body--family);
+      font-size: 10px;
+      line-height: 1.45;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .mazal-col__close svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .mazal-col__search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 32px;
+      padding-inline: 12px;
+      background: #f7f7f7;
+    }
+
+    .mazal-col__search input {
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: #000;
+      font-family: var(--font-body--family);
+      font-size: 12px;
+      outline: none;
+    }
+
+    .mazal-col__search svg {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+    }
+
+    .mazal-col__groups {
+      flex-direction: column;
+      flex-wrap: nowrap;
+      gap: 16px;
+    }
+
+    .mazal-col__group {
+      gap: 12px;
+      width: 100%;
+    }
+
+    .mazal-col__group-title {
+      font-size: 12px;
+    }
+
+    .mazal-col__options,
+    .mazal-col__group--color .mazal-col__options {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 12px 16px;
+    }
+
+    .mazal-col__group--sort .mazal-col__options {
+      display: grid;
+      grid-template-columns: repeat(2, max-content);
+      gap: 12px 16px;
+    }
+
+    .mazal-col__group--sort .mazal-col__box {
+      display: block;
+    }
+
+    .mazal-col__check {
+      gap: 6px;
+      font-size: 10px;
+    }
+
+    .mazal-col__group--price {
+      width: 100%;
+    }
+
+    .mazal-col__range-values {
+      grid-template-columns: 1fr 1px 1fr;
+      gap: 6px;
+    }
+
+    .mazal-col__range-sep {
+      display: block;
+      background: #000;
+    }
+
+    .mazal-col__range-value {
+      height: 32px;
+      border: 0;
+      border-radius: 0;
+    }
+
+    .mazal-col__actions {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mazal-col__apply,
+    .mazal-col__clear {
+      width: 100%;
+      min-height: 32px;
+      padding: 6px 16px;
+      font-size: 10px;
     }
   }
 {% endstylesheet %}
@@ -968,16 +1240,33 @@
       this.controller = new AbortController();
       const { signal } = this.controller;
 
-      this.drawer = this.querySelector('[data-filters]');
-      this.querySelector('[data-filters-open]')?.addEventListener('click', () => this.drawer?.showModal(), { signal });
-      this.querySelector('[data-filters-close]')?.addEventListener('click', () => this.drawer?.close(), { signal });
-      this.drawer?.addEventListener(
+      this.panel = this.querySelector('[data-filters]');
+      this.toggleButton = this.querySelector('[data-filters-toggle]');
+      this.mobileQuery = window.matchMedia('(max-width: 749px)');
+      this.toggleButton?.addEventListener('click', () => this.setFiltersOpen(!this.classList.contains('is-filters-open')), { signal });
+      this.querySelector('[data-filters-close]')?.addEventListener('click', () => this.setFiltersOpen(false), { signal });
+      /* Phones: tapping the dimmed area outside the popup closes it. */
+      this.panel?.addEventListener(
         'click',
         (event) => {
-          if (event.target === this.drawer) this.drawer.close();
+          if (event.target === this.panel) this.setFiltersOpen(false);
         },
         { signal }
       );
+      document.addEventListener(
+        'keydown',
+        (event) => {
+          if (event.key === 'Escape' && this.classList.contains('is-filters-open')) {
+            this.setFiltersOpen(false);
+            this.toggleButton?.focus();
+          }
+        },
+        { signal }
+      );
+      this.mobileQuery.addEventListener('change', () => this.lockScroll(), { signal });
+
+      this.querySelector('[data-filter-search]')?.addEventListener('input', (event) => this.searchFilters(event.target.value), { signal });
+      this.querySelectorAll('[data-range]').forEach((range) => this.setupRange(range, signal));
 
       this.addEventListener('submit', (event) => this.onSubmit(event), { signal });
       this.setupInfiniteLoad();
@@ -986,6 +1275,83 @@
     disconnectedCallback() {
       this.controller?.abort();
       this.observer?.disconnect();
+      document.documentElement.style.removeProperty('overflow');
+    }
+
+    setFiltersOpen(open) {
+      this.classList.toggle('is-filters-open', open);
+      this.toggleButton?.setAttribute('aria-expanded', String(open));
+      this.lockScroll();
+      if (open && this.mobileQuery.matches) {
+        this.querySelector('[data-filters-close]')?.focus({ preventScroll: true });
+      }
+    }
+
+    /* The phone popup keeps the page behind it still. */
+    lockScroll() {
+      const lock = this.classList.contains('is-filters-open') && this.mobileQuery.matches;
+      document.documentElement.style.overflow = lock ? 'hidden' : '';
+    }
+
+    /* Search box in the phone popup: hides options (and empty groups) that don't match. */
+    searchFilters(query) {
+      const term = query.trim().toLowerCase();
+      this.querySelectorAll('[data-filter-group]').forEach((group) => {
+        let visible = 0;
+        group.querySelectorAll('[data-filter-option]').forEach((option) => {
+          const match = !term || option.textContent.toLowerCase().includes(term);
+          option.hidden = !match;
+          if (match) visible += 1;
+        });
+        group.hidden = visible === 0;
+      });
+    }
+
+    /* Two-thumb price slider. The hidden inputs are only sent when the range is narrowed. */
+    setupRange(range, signal) {
+      const max = Number(range.dataset.max) || 0;
+      const currency = range.dataset.currency || '';
+      const minSlider = range.querySelector('[data-range-min]');
+      const maxSlider = range.querySelector('[data-range-max]');
+      const minInput = range.querySelector('[data-range-min-input]');
+      const maxInput = range.querySelector('[data-range-max-input]');
+      const fill = range.querySelector('[data-range-fill]');
+      const minLabel = range.querySelector('[data-range-min-label]');
+      const maxLabel = range.querySelector('[data-range-max-label]');
+      if (!minSlider || !maxSlider) return;
+      const format = (value) =>
+        `${currency} ${Number(value).toLocaleString('en-US', { maximumFractionDigits: 2 })}`.trim();
+
+      const update = (changed) => {
+        let low = Number(minSlider.value);
+        let high = Number(maxSlider.value);
+        if (low > high) {
+          if (changed === minSlider) low = high;
+          else high = low;
+          minSlider.value = String(low);
+          maxSlider.value = String(high);
+        }
+        if (fill && max > 0) {
+          fill.style.insetInlineStart = `${(low / max) * 100}%`;
+          fill.style.insetInlineEnd = `${100 - (high / max) * 100}%`;
+        }
+        if (minLabel) minLabel.textContent = format(low);
+        if (maxLabel) maxLabel.textContent = format(high);
+        if (minInput) {
+          minInput.value = String(low);
+          minInput.disabled = low <= 0;
+        }
+        if (maxInput) {
+          maxInput.value = String(high);
+          maxInput.disabled = high >= max;
+        }
+        /* Keep the thumb that was moved on top so it can be dragged back. */
+        minSlider.style.zIndex = low >= max - 1 ? '2' : '';
+      };
+
+      minSlider.addEventListener('input', () => update(minSlider), { signal });
+      maxSlider.addEventListener('input', () => update(maxSlider), { signal });
+      update();
     }
 
     /* Loads the next page when the count / progress bar comes into view. The link stays as a fallback. */
@@ -1138,11 +1504,14 @@
     { "type": "checkbox", "id": "enable_filters", "label": "Show filters", "default": true, "info": "Choose filters in the Search & Discovery app." },
     { "type": "checkbox", "id": "enable_sorting", "label": "Show sorting in filters", "default": true },
     { "type": "text", "id": "filters_label", "label": "Filters button", "default": "FILTERS" },
-    { "type": "text", "id": "sort_label", "label": "Sort title", "default": "Sort by" },
+    { "type": "text", "id": "sort_label", "label": "Sort title", "default": "SORT BY" },
+    { "type": "text", "id": "price_label", "label": "Price title", "default": "PRICE RANGE", "info": "Empty uses the filter name." },
+    { "type": "text", "id": "search_placeholder", "label": "Search placeholder (phones)", "default": "Search..." },
+    { "type": "text", "id": "close_label", "label": "Close button (phones)", "default": "CLOSE" },
     { "type": "text", "id": "from_label", "label": "Price from", "default": "From" },
     { "type": "text", "id": "to_label", "label": "Price to", "default": "To" },
-    { "type": "text", "id": "clear_label", "label": "Clear button", "default": "Clear all" },
-    { "type": "text", "id": "apply_label", "label": "Apply button", "default": "Apply" },
+    { "type": "text", "id": "clear_label", "label": "Clear button", "default": "CLEAR ALL FILTERS" },
+    { "type": "text", "id": "apply_label", "label": "Apply button", "default": "APPLY FILTERS" },
     { "type": "header", "content": "Products" },
     { "type": "range", "id": "per_page", "label": "Products per load", "min": 8, "max": 48, "step": 4, "default": 16 },
     { "type": "text", "id": "count_text", "label": "Count text", "default": "SHOWING [shown] OF [total] PRODUCTS", "info": "[shown] is the number on the page, [total] is the total." },
