@@ -29,4 +29,4 @@ To show a different photo for a color, set the image on that variant in the prod
 
 `templates/page.about.json` (page **About Us**, handle `about-us`), Figma desktop 1:1849 / mobile 6:2738-6:3490:
 `mazal-about-hero` → `mazal-about-intro` (bold words show black) → `mazal-about-cards` → `mazal-about-values`
-→ `mazal-about-split` → `mazal-follow-us`. Images are in Content > Files as `mazal-about-*.png/jpg`.
+→ `mazal-about-split` → `mazal-follow-us`. `sections/header.liquid` (Horizon) has one added condition so this page gets the home page's transparent header over the hero. Images are in Content > Files as `mazal-about-*.png/jpg`.
