@@ -70,7 +70,8 @@
         "swatch_colors": "Pink: #f6c9d1\nGrey: #dbdada\nPeach: #f6ddc9\nMint: #c9f6e0",
         "price_label": "PRICE RANGE",
         "search_placeholder": "Search...",
-        "close_label": "CLOSE"
+        "close_label": "CLOSE",
+        "sort_names": "Latest Arrivals\nPrice (Low - High)\nPrice (High - Low)\nBest Sellers"
       }
     }
   },

@@ -119,11 +119,17 @@
                 <div class="mazal-col__group mazal-col__group--sort" role="group" aria-labelledby="MazalSort-{{ section.id }}" data-filter-group>
                   <p class="mazal-col__group-title" id="MazalSort-{{ section.id }}">{{ section.settings.sort_label | escape }}</p>
                   <div class="mazal-col__options">
-                    {%- for option in collection.sort_options -%}
+                    {%- liquid
+                      assign sort_values = 'created-descending,price-ascending,price-descending,best-selling' | split: ','
+                      assign sort_names = section.settings.sort_names | newline_to_br | split: '<br />'
+                    -%}
+                    {%- for sort_value in sort_values -%}
+                      {%- assign sort_index = forloop.index0 -%}
+                      {%- assign sort_name = sort_names[sort_index] | strip -%}
                       <label class="mazal-col__check" data-filter-option>
-                        <input type="radio" name="sort_by" value="{{ option.value | escape }}" {% if option.value == sort_by %}checked{% endif %}>
+                        <input type="radio" name="sort_by" value="{{ sort_value }}" {% if sort_value == sort_by %}checked{% endif %}>
                         <span class="mazal-col__box" aria-hidden="true"></span>
-                        <span class="mazal-col__label">{{ option.name | escape }}</span>
+                        <span class="mazal-col__label">{{ sort_name | default: sort_value | escape }}</span>
                       </label>
                     {%- endfor -%}
                   </div>
@@ -1505,6 +1511,7 @@
     { "type": "checkbox", "id": "enable_sorting", "label": "Show sorting in filters", "default": true },
     { "type": "text", "id": "filters_label", "label": "Filters button", "default": "FILTERS" },
     { "type": "text", "id": "sort_label", "label": "Sort title", "default": "SORT BY" },
+    { "type": "textarea", "id": "sort_names", "label": "Sort names", "default": "Latest Arrivals\nPrice (Low - High)\nPrice (High - Low)\nBest Sellers", "info": "One per line: newest, price low to high, price high to low, best selling." },
     { "type": "text", "id": "price_label", "label": "Price title", "default": "PRICE RANGE", "info": "Empty uses the filter name." },
     { "type": "text", "id": "search_placeholder", "label": "Search placeholder (phones)", "default": "Search..." },
     { "type": "text", "id": "close_label", "label": "Close button (phones)", "default": "CLOSE" },
