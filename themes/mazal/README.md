@@ -16,3 +16,11 @@ Files added to the **copy 29/10** theme (Horizon) on `mazal-cpmhc506.myshopify.c
 
 Product metafields used: `custom.related_products` (list of products), `custom.care_instructions` (rich text: paragraphs + bullet lists).
 Judge.me fills `reviews.rating` / `reviews.rating_count`.
+
+## Colors
+
+The `Color` option of every Mazal product is linked to Shopify's **Color** category metafield
+(`shopify.color-pattern`). Each color is an entry in Content > Metaobjects > Color: a hex color, plus
+an image for stripes and checks. `snippets/mazal-swatch.liquid` reads that swatch first; the
+"Swatch colors" section setting and `swatch-<name>.png` files are only fallbacks.
+To show a different photo for a color, set the image on that variant in the product admin.
