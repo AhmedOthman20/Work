@@ -65,10 +65,14 @@
     position: relative;
     width: 100%;
     aspect-ratio: 1384 / 624;
+    min-height: 0;
     background: #f7f7f7;
   }
 
+  /* Absolute so the photo's own size never changes the box's aspect ratio. */
   .mazal-av__image {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
