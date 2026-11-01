@@ -287,6 +287,7 @@
   }
 
   .mazal-ct__form {
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 32px;
@@ -310,8 +311,13 @@
     line-height: 1.45;
   }
 
-  .mazal-ct__input {
+  .mazal-ct .mazal-ct__form .mazal-ct__input {
+    display: block;
+    box-sizing: border-box;
     width: 100%;
+    max-width: none;
+    margin: 0;
+    box-shadow: none;
     min-height: 44px;
     padding: 12px 16px;
     border: 1px solid transparent;
@@ -324,12 +330,12 @@
     outline: none;
   }
 
-  .mazal-ct__input::placeholder {
+  .mazal-ct .mazal-ct__form .mazal-ct__input::placeholder {
     color: #a1a1a1;
     opacity: 1;
   }
 
-  .mazal-ct__input:focus-visible {
+  .mazal-ct .mazal-ct__form .mazal-ct__input:focus-visible {
     border-color: var(--mazal-gold);
   }
 
@@ -337,7 +343,7 @@
     position: relative;
   }
 
-  .mazal-ct__select {
+  .mazal-ct .mazal-ct__form .mazal-ct__select {
     padding-inline-end: 48px;
     appearance: none;
     cursor: pointer;
@@ -357,7 +363,7 @@
     pointer-events: none;
   }
 
-  .mazal-ct__textarea {
+  .mazal-ct .mazal-ct__form .mazal-ct__textarea {
     height: 224px;
     padding-block: 16px;
     resize: vertical;
@@ -410,6 +416,7 @@
     .mazal-ct__body {
       display: flex;
       flex-direction: column;
+      align-items: stretch;
       gap: 32px;
       padding: 32px 16px;
     }
@@ -439,8 +446,8 @@
     }
 
     .mazal-ct__text {
-      font-size: 12px;
-      text-align: start;
+      font-size: 10px;
+      text-align: center;
     }
 
     .mazal-ct__hours {
@@ -475,10 +482,14 @@
       gap: 16px;
     }
 
-    .mazal-ct__input {
+    .mazal-ct .mazal-ct__form .mazal-ct__input {
       min-height: 32px;
       padding: 8px 16px;
-      font-size: 12px;
+      font-size: 10px;
+    }
+
+    .mazal-ct .mazal-ct__form .mazal-ct__select {
+      padding-inline-end: 40px;
     }
 
     .mazal-ct__chevron svg {
@@ -486,8 +497,9 @@
       height: 16px;
     }
 
-    .mazal-ct__textarea {
+    .mazal-ct .mazal-ct__form .mazal-ct__textarea {
       height: 94px;
+      padding-block: 16px;
     }
 
     .mazal-ct__submit {
