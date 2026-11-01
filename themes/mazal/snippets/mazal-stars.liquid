@@ -1,0 +1,48 @@
+{%- doc -%}
+  Renders the Mazal five-star rating (Figma "Full Rating Stars"), filled up to the given rating.
+  The star shape comes from assets/mazal-icon-stars.svg, used as a CSS mask so partial ratings
+  fill part of a star.
+
+  @param {number} rating - Rating out of 5, e.g. 4.83
+  @param {string} [class] - Extra class for sizing
+
+  @example
+  {% render 'mazal-stars', rating: product.metafields.reviews.rating.value.rating, class: 'mazal-pdp__stars' %}
+{%- enddoc -%}
+{%- liquid
+  assign stars_rating = rating | default: 0 | times: 1.0
+  if stars_rating > 5
+    assign stars_rating = 5
+  endif
+  assign stars_percent = stars_rating | divided_by: 5.0 | times: 100 | round: 2
+-%}
+<span
+  class="mazal-stars{% if class != blank %} {{ class }}{% endif %}"
+  style="--mazal-stars-fill: {{ stars_percent }}%; --mazal-stars-mask: url('{{ 'mazal-icon-stars.svg' | asset_url }}');"
+  role="img"
+  aria-label="{{ stars_rating | round: 1 }} / 5"
+></span>
+
+{% stylesheet %}
+  .mazal-stars {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 88px;
+    height: 16px;
+    background: linear-gradient(
+      to right,
+      #f4d257 var(--mazal-stars-fill),
+      #f7f7f7 var(--mazal-stars-fill)
+    );
+    -webkit-mask: var(--mazal-stars-mask) center / 100% 100% no-repeat;
+    mask: var(--mazal-stars-mask) center / 100% 100% no-repeat;
+  }
+
+  [dir='rtl'] .mazal-stars {
+    background: linear-gradient(
+      to left,
+      #f4d257 var(--mazal-stars-fill),
+      #f7f7f7 var(--mazal-stars-fill)
+    );
+  }
+{% endstylesheet %}

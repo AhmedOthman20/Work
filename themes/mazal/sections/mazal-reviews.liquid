@@ -1,0 +1,593 @@
+{%- comment -%}
+  Section contract.
+  Mazal customer reviews (Figma: Product Page 1:1549 desktop, 6:2946 mobile).
+  Holds the Judge.me "Review widget" app block and restyles it to the Mazal design: centered heading,
+  summary | rating bars | Write a review in one row, then reviews with a gold initial avatar, Verified
+  pill, rating on the right, title with the date, body, and the helpful votes.
+  The styling targets Judge.me's widget classes (jdgm-*), so it follows the reviews Judge.me renders.
+  @example
+  <!-- Product template, after "You might also like"; add the Judge.me Review widget block inside it -->
+{%- endcomment -%}
+<div class="section-background"></div>
+<mazal-reviews
+  id="{{ section.settings.anchor | default: 'mazal-reviews' | handleize }}"
+  class="section section--page-width mazal-rv"
+  data-out-of="{{ section.settings.out_of_label | escape }}"
+  style="
+    --mazal-rv-pt: {{ section.settings.padding_top }}px;
+    --mazal-rv-pb: {{ section.settings.padding_bottom }}px;
+    --mazal-rv-heading-size: {{ section.settings.heading_size }}px;
+    --mazal-rv-seal: url('{{ 'mazal-icon-seal-check.svg' | asset_url }}');
+  "
+>
+  <div class="mazal-rv__inner">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="h2 mazal-rv__heading">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+    <div class="mazal-rv__widget">
+      {%- for block in section.blocks -%}
+        {%- render block -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</mazal-reviews>
+
+{% stylesheet %}
+  .mazal-rv {
+    --mazal-gold: #bb955a;
+    --mazal-ink: #1c191a;
+    --jdgm-star-color: #f4d257;
+    --jdgm-primary-color: #bb955a;
+    --jdgm-secondary-color: rgb(187 149 90 / 0.1);
+    --jdgm-write-review-text-color: #fff;
+    --jdgm-write-review-bg-color: #bb955a;
+    --jdgm-paginate-color: #bb955a;
+    --jdgm-reviewer-name-color: #1c191a;
+    --jdgm-border-radius: 0;
+    padding-block: var(--mazal-rv-pt) var(--mazal-rv-pb);
+    color: var(--mazal-ink);
+  }
+
+  .mazal-rv__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    min-width: 0;
+  }
+
+  .mazal-rv__heading.h2 {
+    margin: 0;
+    color: #160a0d;
+    font-size: var(--mazal-rv-heading-size);
+    line-height: 1.21;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .mazal-rv__widget {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .mazal-rv .jdgm-widget,
+  .mazal-rv .jdgm-rev-widg {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-family: var(--font-body--family);
+    color: var(--mazal-ink);
+  }
+
+  .mazal-rv .jdgm-rev-widg__title,
+  .mazal-rv .jdgm-histogram__percentage,
+  .mazal-rv .jdgm-histogram__clear-filter,
+  .mazal-rv .jdgm-rev__br,
+  .mazal-rv .jdgm-rev__location,
+  .mazal-rv .jdgm-rev__transparency-badge-wrapper {
+    display: none !important;
+  }
+
+  /* ---------- Summary row: average | rating bars | write a review ---------- */
+  .mazal-rv .jdgm-rev-widg__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin: 0 0 64px;
+    padding: 0;
+    border: 0;
+    text-align: start;
+  }
+
+  .mazal-rv .jdgm-rev-widg__summary {
+    order: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0;
+    padding-inline-end: 32px;
+  }
+
+  .mazal-rv .jdgm-rev-widg__summary-stars {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+  }
+
+  .mazal-rv .jdgm-rev-widg__summary-stars .jdgm-star {
+    font-size: 24px;
+    padding: 0 1px;
+  }
+
+  .mazal-rv .mazal-rv__avg,
+  .mazal-rv .jdgm-rev-widg__summary-text {
+    visibility: visible;
+    margin: 0;
+    color: #000;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .mazal-rv .jdgm-histogram {
+    order: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: auto;
+    margin: 0;
+    padding: 4px 32px;
+    border: 0;
+    border-inline: 1px solid #e6e6e6;
+  }
+
+  .mazal-rv .jdgm-histogram__row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .mazal-rv .jdgm-histogram__star {
+    display: inline-flex;
+    width: auto;
+    margin: 0;
+  }
+
+  .mazal-rv .jdgm-histogram__star .jdgm-star {
+    font-size: 16px;
+    padding: 0 1px;
+  }
+
+  .mazal-rv .jdgm-histogram__bar {
+    width: 164px;
+    height: 8px;
+    margin: 0;
+    padding: 0;
+    border-radius: 24px;
+    background: #f7f7f7;
+    overflow: hidden;
+  }
+
+  .mazal-rv .jdgm-histogram__bar-content.jdgm-histogram__bar-content {
+    height: 100%;
+    border-radius: 24px;
+    background-color: #f4d257;
+  }
+
+  .mazal-rv .jdgm-histogram__frequency {
+    width: auto;
+    min-width: 24px;
+    margin: 0;
+    color: #a1a1a1;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .mazal-rv .jdgm-write-rev-link {
+    order: 3;
+    margin-inline-start: 32px;
+    padding: 12px 64px;
+    border: 0;
+    border-radius: 0;
+    background: var(--mazal-gold);
+    color: #fff;
+    font-family: var(--font-body--family);
+    font-size: 14px;
+    line-height: 1.45;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .mazal-rv .jdgm-write-rev-link:hover {
+    opacity: 0.9;
+  }
+
+  .mazal-rv .jdgm-rev-widg__sort-wrapper {
+    order: 4;
+    flex-basis: 100%;
+  }
+
+  .mazal-rv .jdgm-form-wrapper {
+    margin-block: 0 48px;
+  }
+
+  /* ---------- Reviews ---------- */
+  .mazal-rv .jdgm-rev-widg__body,
+  .mazal-rv .jdgm-rev-widg__reviews {
+    margin: 0;
+    padding: 0;
+  }
+
+  .mazal-rv .jdgm-rev-widg__reviews {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .mazal-rv .jdgm-rev {
+    display: grid;
+    grid-template-columns: 40px auto auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'icon author badge . rating'
+      'title title title title time'
+      'body body body body body'
+      'media media media media media'
+      'actions actions actions actions actions'
+      'reply reply reply reply reply';
+    align-items: center;
+    column-gap: 8px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .mazal-rv .jdgm-rev__header,
+  .mazal-rv .jdgm-rev__content,
+  .mazal-rv .jdgm-rev__author-wrapper,
+  .mazal-rv .jdgm-rev__buyer-badge-wrapper {
+    display: contents;
+  }
+
+  .mazal-rv .jdgm-rev__icon {
+    grid-area: icon;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin: 0;
+    border-radius: 50%;
+    background: var(--mazal-gold);
+    color: #fff;
+    font-family: var(--font-body--family);
+    font-size: 24px;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .mazal-rv .jdgm-rev .jdgm-rev__icon.jdgm-rev__icon::after {
+    display: none;
+  }
+
+  .mazal-rv .jdgm-rev__author {
+    grid-area: author;
+    color: var(--mazal-ink);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.45;
+  }
+
+  .mazal-rv .jdgm-rev__buyer-badge.jdgm-rev__buyer-badge {
+    grid-area: badge;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    justify-self: start;
+    margin: 0;
+    padding: 4px 8px;
+    border: 0;
+    border-radius: 24px;
+    background: #f7f7f7;
+    color: #000;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .mazal-rv .jdgm-rev__buyer-badge.jdgm-rev__buyer-badge::after {
+    content: '';
+    width: 14px;
+    height: 14px;
+    background: var(--mazal-rv-seal) center / contain no-repeat;
+  }
+
+  .mazal-rv .jdgm-rev__rating {
+    grid-area: rating;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    justify-self: end;
+    margin: 0;
+  }
+
+  .mazal-rv .jdgm-rev__rating::before {
+    content: attr(data-score) '.0';
+    color: var(--mazal-ink);
+    font-family: var(--font-accent--family);
+    font-weight: var(--font-accent--weight);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .mazal-rv .jdgm-rev__rating .jdgm-star {
+    font-size: 16px;
+    padding: 0 1px;
+  }
+
+  .mazal-rv .jdgm-rev__timestamp {
+    grid-area: time;
+    justify-self: end;
+    align-self: center;
+    margin: 32px 0 0;
+    color: var(--mazal-ink);
+    font-size: 14px;
+    line-height: 1.45;
+    white-space: nowrap;
+  }
+
+  .mazal-rv .jdgm-rev__title {
+    grid-area: title;
+    display: block;
+    margin: 32px 0 0;
+    color: var(--mazal-ink);
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.45;
+  }
+
+  .mazal-rv .jdgm-rev__body {
+    grid-area: body;
+    margin: 8px 0 0;
+    color: var(--mazal-ink);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .mazal-rv .jdgm-rev__body p {
+    margin: 0;
+  }
+
+  .mazal-rv .jdgm-rev__custom-form,
+  .mazal-rv .jdgm-rev__pics,
+  .mazal-rv .jdgm-rev__vids {
+    grid-column: 1 / -1;
+  }
+
+  .mazal-rv .jdgm-rev__pics:not(:empty) {
+    grid-area: media;
+    margin-block-start: 16px;
+  }
+
+  .mazal-rv .jdgm-rev__actions {
+    grid-area: actions;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    margin: 32px 0 0;
+    font-size: 12px;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  .mazal-rv .jdgm-rev__votes {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 0;
+    color: var(--mazal-ink);
+  }
+
+  .mazal-rv .jdgm-rev__reply:not(:empty) {
+    grid-area: reply;
+    margin-block-start: 16px;
+  }
+
+  .mazal-rv .jdgm-paginate {
+    margin-block-start: 32px;
+    text-align: center;
+  }
+
+  /* ---------- Phones (Figma 6:2946) ---------- */
+  @media screen and (max-width: 749px) {
+    .section.mazal-rv {
+      padding-block: 32px;
+    }
+
+    .mazal-rv__inner {
+      gap: 16px;
+    }
+
+    .mazal-rv__heading.h2 {
+      font-size: 24px;
+    }
+
+    .mazal-rv .jdgm-rev-widg__header {
+      flex-direction: column;
+      gap: 16px;
+      margin-block-end: 32px;
+    }
+
+    .mazal-rv .jdgm-rev-widg__summary {
+      align-items: center;
+      gap: 8px;
+      padding: 0;
+    }
+
+    .mazal-rv .jdgm-rev-widg__summary-stars .jdgm-star {
+      font-size: 12px;
+    }
+
+    .mazal-rv .mazal-rv__avg,
+    .mazal-rv .jdgm-rev-widg__summary-text {
+      font-size: 12px;
+    }
+
+    .mazal-rv .jdgm-rev-widg__summary-text {
+      font-size: 10px;
+    }
+
+    /* The vertical rules become 64px horizontal rules above and below the bars. */
+    .mazal-rv .jdgm-histogram {
+      position: relative;
+      padding: 16px 0;
+      border: 0;
+    }
+
+    .mazal-rv .jdgm-histogram::before,
+    .mazal-rv .jdgm-histogram::after {
+      content: '';
+      position: absolute;
+      inset-inline-start: 50%;
+      width: 64px;
+      height: 1px;
+      background: #e6e6e6;
+      transform: translateX(-50%);
+    }
+
+    .mazal-rv .jdgm-histogram::before {
+      inset-block-start: 0;
+    }
+
+    .mazal-rv .jdgm-histogram::after {
+      inset-block-end: 0;
+    }
+
+    .mazal-rv .jdgm-histogram__star .jdgm-star {
+      font-size: 14px;
+    }
+
+    .mazal-rv .jdgm-histogram__frequency {
+      font-size: 12px;
+    }
+
+    .mazal-rv .jdgm-write-rev-link {
+      margin: 0;
+      padding: 9px 16px;
+      font-size: 10px;
+    }
+
+    .mazal-rv .jdgm-rev-widg__reviews {
+      gap: 16px;
+    }
+
+    .mazal-rv .jdgm-rev {
+      grid-template-columns: 32px auto auto minmax(0, 1fr) auto;
+    }
+
+    .mazal-rv .jdgm-rev__icon {
+      width: 32px;
+      height: 32px;
+      font-size: 18px;
+    }
+
+    .mazal-rv .jdgm-rev__author,
+    .mazal-rv .jdgm-rev__title,
+    .mazal-rv .jdgm-rev__rating::before {
+      font-size: 12px;
+    }
+
+    .mazal-rv .jdgm-rev__title {
+      font-size: 14px;
+      margin-block-start: 16px;
+    }
+
+    .mazal-rv .jdgm-rev__timestamp {
+      margin-block-start: 16px;
+      font-size: 10px;
+    }
+
+    .mazal-rv .jdgm-rev__buyer-badge.jdgm-rev__buyer-badge {
+      gap: 4px;
+      padding: 4px 6px;
+      font-size: 8px;
+    }
+
+    .mazal-rv .jdgm-rev__buyer-badge.jdgm-rev__buyer-badge::after {
+      width: 12px;
+      height: 12px;
+    }
+
+    .mazal-rv .jdgm-rev__rating .jdgm-star {
+      font-size: 14px;
+    }
+
+    .mazal-rv .jdgm-rev__body {
+      font-size: 12px;
+    }
+
+    .mazal-rv .jdgm-rev__actions {
+      margin-block-start: 16px;
+      font-size: 10px;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  /* Judge.me's summary shows stars and "Based on N reviews"; the design adds "4.83 out of 5" next to
+     the stars. Judge.me renders and re-renders its widget after load, so watch for it. */
+  class MazalReviews extends HTMLElement {
+    connectedCallback() {
+      this.decorate();
+      this.observer = new MutationObserver(() => this.decorate());
+      this.observer.observe(this, { childList: true, subtree: true });
+    }
+
+    disconnectedCallback() {
+      this.observer?.disconnect();
+    }
+
+    decorate() {
+      const widget = this.querySelector('.jdgm-rev-widg');
+      const stars = this.querySelector('.jdgm-rev-widg__summary-stars');
+      if (!widget || !stars || stars.querySelector('.mazal-rv__avg')) return;
+      const average = parseFloat(widget.dataset.averageRating || '0');
+      if (!average) return;
+      const label = document.createElement('span');
+      label.className = 'mazal-rv__avg';
+      label.textContent = `${Number(average.toFixed(2))} ${this.dataset.outOf || 'out of 5'}`;
+      stars.append(label);
+    }
+  }
+
+  if (!customElements.get('mazal-reviews')) {
+    customElements.define('mazal-reviews', MazalReviews);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Mazal reviews",
+  "tag": "section",
+  "class": "section-wrapper",
+  "blocks": [{ "type": "@app" }],
+  "settings": [
+    { "type": "inline_richtext", "id": "heading", "label": "Heading", "default": "CUSTOMER REVIEWS" },
+    { "type": "range", "id": "heading_size", "label": "Heading size (desktop)", "min": 24, "max": 72, "step": 2, "unit": "px", "default": 48 },
+    { "type": "text", "id": "out_of_label", "label": "Average rating text", "default": "out of 5", "info": "Shown after the average, e.g. 4.83 out of 5." },
+    { "type": "text", "id": "anchor", "label": "Anchor id", "default": "mazal-reviews", "info": "The product rating links here." },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "presets": [
+    { "name": "Mazal reviews" }
+  ]
+}
+{% endschema %}

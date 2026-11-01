@@ -1,0 +1,50 @@
+{%- doc -%}
+  Renders the fill of a Mazal color swatch (Figma "Option" / "Rectangle 2").
+  Lookup order: the option value's own Shopify swatch (image, then color), then the
+  "Name: #hex" list passed in `colors`, then a file in Content > Files named
+  swatch-<value handle>.png (used for stripes and checks), and finally the value name as a CSS color.
+
+  @param {object} value - A product_option_value (or a plain string value name)
+  @param {string} [colors] - Lines of "Name: #hex", e.g. "Pink: #f6c9d1"
+  @param {string} [class] - Class for the swatch element
+
+  @example
+  {% render 'mazal-swatch', value: value, colors: section.settings.swatch_colors, class: 'mazal-pdp__swatch-fill' %}
+{%- enddoc -%}
+{%- liquid
+  assign swatch_name = value.name | default: value
+  assign swatch_key = swatch_name | downcase | strip
+  assign swatch_style = ''
+
+  if value.swatch.image
+    assign swatch_url = value.swatch.image | image_url: width: 96
+    assign swatch_style = 'background-image: url(' | append: swatch_url | append: ');'
+  elsif value.swatch.color
+    assign swatch_style = 'background-color: ' | append: value.swatch.color | append: ';'
+  endif
+
+  if swatch_style == blank and colors != blank
+    assign swatch_lines = colors | newline_to_br | split: '<br />'
+    for line in swatch_lines
+      assign line_parts = line | split: ':'
+      assign line_name = line_parts.first | downcase | strip
+      if line_name == swatch_key and line_parts.size > 1
+        assign line_color = line_parts.last | strip
+        assign swatch_style = 'background-color: ' | append: line_color | append: ';'
+        break
+      endif
+    endfor
+  endif
+
+  if swatch_style == blank
+    if swatch_key contains 'stripe' or swatch_key contains 'check' or swatch_key contains 'pattern'
+      assign swatch_file = 'swatch-' | append: swatch_name | handleize | append: '.png'
+      assign swatch_url = swatch_file | file_img_url: '96x'
+      assign swatch_style = 'background-image: url(' | append: swatch_url | append: ');'
+    else
+      assign swatch_css = swatch_key | remove: ' '
+      assign swatch_style = 'background-color: ' | append: swatch_css | append: ';'
+    endif
+  endif
+-%}
+<span class="{{ class | default: 'mazal-swatch' }}" style="{{ swatch_style | escape }}" aria-hidden="true"></span>

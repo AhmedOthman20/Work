@@ -1,0 +1,103 @@
+{
+  "sections": {
+    "main": {
+      "type": "mazal-product",
+      "settings": {
+        "reviews_label": "reviews",
+        "reviews_anchor": "mazal-reviews",
+        "shipping_text": "Fast Shipping",
+        "size_option_name": "size",
+        "size_guide_url": "",
+        "size_guide_label": "Size Guide",
+        "color_option_name": "Color",
+        "color_label": "COLOR",
+        "stripe_keyword": "stripe",
+        "stripe_label": "STRIPES",
+        "check_keyword": "check",
+        "check_label": "CHECKS",
+        "swatch_colors": "Pink: #f6c9d1\nGrey: #dbdada\nPeach: #f6ddc9\nMint: #c9f6e0",
+        "details_label": "PRODUCT DETAILS",
+        "care_label": "CARE INSTRUCTIONS",
+        "buy_now_label": "BUY NOW",
+        "add_to_cart_label": "ADD TO CART",
+        "sold_out_label": "SOLD OUT",
+        "show_wishlist": true,
+        "wishlist_label": "Add to wishlist",
+        "related_heading": "RELATED PRODUCTS",
+        "related_limit": 2,
+        "save_label": "Save [percent]%",
+        "related_cta": "SELECT SIZE",
+        "show_share": true,
+        "share_label": "SHARE :",
+        "copy_link_label": "Copy link",
+        "instagram_url": "https://www.instagram.com/mazal.eg/",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "mazal_recommendations": {
+      "type": "mazal-recommendations",
+      "settings": {
+        "heading": "YOU MIGHT ALSO LIKE",
+        "heading_size": 48,
+        "subtitle": "Discover more pieces designed to bring comfort, style, and effortless elegance to your everyday essentials.",
+        "intent": "related",
+        "fallback_collection": "all-bedding",
+        "products_limit": 4,
+        "badge_text": "NEW ARRIVAL",
+        "add_label": "ADD TO CART",
+        "color_option_name": "Color",
+        "more_label": "[count]+ More",
+        "swatch_colors": "Pink: #f6c9d1\nGrey: #dbdada\nPeach: #f6ddc9\nMint: #c9f6e0",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "mazal_reviews": {
+      "type": "mazal-reviews",
+      "blocks": {
+        "judge_me_reviews_review_widget_eEh6qY": {
+          "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {
+            "review_data": "sample_data",
+            "max_width": 1200,
+            "show_shop_reviews": false,
+            "empty_state": "empty_widget"
+          }
+        }
+      },
+      "block_order": ["judge_me_reviews_review_widget_eEh6qY"],
+      "settings": {
+        "heading": "CUSTOMER REVIEWS",
+        "heading_size": 48,
+        "out_of_label": "out of 5",
+        "anchor": "mazal-reviews",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    },
+    "mazal_follow_us": {
+      "type": "mazal-follow-us",
+      "settings": {
+        "eyebrow": "ELEVATE YOUR EVERYDAY",
+        "title": "FOLLOW US",
+        "title_size": 48,
+        "handle": "@mazal.eg",
+        "handle_size": 32,
+        "button_label": "FOLLOW US",
+        "link": "https://www.instagram.com/mazal.eg/",
+        "open_in_new_tab": true,
+        "button_color": "#bb955a",
+        "image_1": "shopify://shop_images/mazal-follow-1.jpg",
+        "image_2": "shopify://shop_images/mazal-follow-2.jpg",
+        "image_3": "shopify://shop_images/mazal-follow-3.png",
+        "image_4": "shopify://shop_images/mazal-follow-4.png",
+        "animate": true,
+        "animation_speed": 4,
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    }
+  },
+  "order": ["main", "mazal_recommendations", "mazal_reviews", "mazal_follow_us"]
+}

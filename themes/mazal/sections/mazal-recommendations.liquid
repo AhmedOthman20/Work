@@ -1,0 +1,530 @@
+{%- comment -%}
+  Section contract.
+  Mazal "You might also like" (Figma: Product Page 1:1540 desktop, 6:2865 mobile).
+  Heading + subtitle, then product cards (Figma "Full Card"): image on a soft grey panel with a label,
+  an Add to cart bar that slides up on hover, title + price, and the first color swatches.
+  Products come from Shopify's product recommendations for the current product, loaded after the
+  page renders. Until they arrive (or if there are none) the section shows other products from the
+  fallback collection, or the product's first collection.
+  @example
+  <!-- Product template, under the main product section -->
+{%- endcomment -%}
+{%- liquid
+  assign limit = section.settings.products_limit
+  assign color_keyword = section.settings.color_option_name | downcase | strip
+  assign source_products = null
+  if recommendations.performed and recommendations.products_count > 0
+    assign source_products = recommendations.products
+  else
+    assign fallback = section.settings.fallback_collection | default: product.collections.first
+    assign source_products = fallback.products
+  endif
+-%}
+
+<div class="section-background"></div>
+<mazal-recommendations
+  class="section section--page-width mazal-rec"
+  data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ limit }}&intent={{ section.settings.intent }}"
+  {% if recommendations.performed %}data-loaded{% endif %}
+  style="
+    --mazal-rec-pt: {{ section.settings.padding_top }}px;
+    --mazal-rec-pb: {{ section.settings.padding_bottom }}px;
+    --mazal-rec-heading-size: {{ section.settings.heading_size }}px;
+  "
+>
+  <div class="mazal-rec__inner">
+    {%- if section.settings.heading != blank or section.settings.subtitle != blank -%}
+      <div class="mazal-rec__header">
+        {%- if section.settings.heading != blank -%}
+          <h2 class="h2 mazal-rec__heading">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+        {%- if section.settings.subtitle != blank -%}
+          <p class="mazal-rec__subtitle">{{ section.settings.subtitle }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <ul class="mazal-rec__grid" role="list" data-grid>
+      {%- assign shown = 0 -%}
+      {%- for item in source_products -%}
+        {%- if item.id == product.id -%}{%- continue -%}{%- endif -%}
+        {%- if shown >= limit -%}{%- break -%}{%- endif -%}
+        {%- assign shown = shown | plus: 1 -%}
+        {%- liquid
+          assign item_variant = item.selected_or_first_available_variant
+          assign color_option = null
+          for option in item.options_with_values
+            assign option_key = option.name | downcase | strip
+            if option_key == color_keyword or option_key == 'color' or option_key == 'colour'
+              assign color_option = option
+              break
+            endif
+          endfor
+        -%}
+        <li class="mazal-rec__item">
+          <div class="mazal-rec__card">
+            <div class="mazal-rec__media">
+              <a class="mazal-rec__media-link" href="{{ item.url }}" tabindex="-1" aria-hidden="true">
+                {%- if item.featured_image -%}
+                  {{
+                    item.featured_image
+                    | image_url: width: 900
+                    | image_tag:
+                      widths: '200, 380, 500, 660, 900',
+                      sizes: '(min-width: 750px) 25vw, 183px',
+                      loading: 'lazy',
+                      alt: item.title,
+                      class: 'mazal-rec__image'
+                  }}
+                {%- else -%}
+                  {{ 'product-apparel-1' | placeholder_svg_tag: 'mazal-rec__image' }}
+                {%- endif -%}
+              </a>
+              {%- if section.settings.badge_text != blank -%}
+                <span class="mazal-rec__badge">{{ section.settings.badge_text | escape }}</span>
+              {%- endif -%}
+              {%- if item.has_only_default_variant and item_variant.available -%}
+                {%- form 'product', item, class: 'mazal-rec__add-form', data-rec-add: '' -%}
+                  <input type="hidden" name="id" value="{{ item_variant.id }}">
+                  <input type="hidden" name="quantity" value="1">
+                  <button type="submit" class="mazal-rec__add" aria-label="{{ section.settings.add_label | escape }}: {{ item.title | escape }}">
+                    <span class="mazal-rec__add-icon" aria-hidden="true">{{ 'mazal-icon-bag-white.svg' | inline_asset_content }}</span>
+                    <span class="mazal-rec__add-text">{{ section.settings.add_label | escape }}</span>
+                  </button>
+                {%- endform -%}
+              {%- else -%}
+                <a class="mazal-rec__add" href="{{ item.url }}" aria-label="{{ section.settings.add_label | escape }}: {{ item.title | escape }}">
+                  <span class="mazal-rec__add-icon" aria-hidden="true">{{ 'mazal-icon-bag-white.svg' | inline_asset_content }}</span>
+                  <span class="mazal-rec__add-text">{{ section.settings.add_label | escape }}</span>
+                </a>
+              {%- endif -%}
+            </div>
+
+            <div class="mazal-rec__info">
+              <a class="mazal-rec__name-row" href="{{ item.url }}">
+                <span class="mazal-rec__title">{{ item.title | escape }}</span>
+                <span class="mazal-rec__price">{{ item_variant.price | money }}</span>
+              </a>
+              {%- if color_option and color_option.values.size > 1 -%}
+                <div class="mazal-rec__colors">
+                  <span class="mazal-rec__dots">
+                    {%- for value in color_option.values limit: 3 -%}
+                      {%- render 'mazal-swatch', value: value, colors: section.settings.swatch_colors, class: 'mazal-rec__dot' -%}
+                    {%- endfor -%}
+                  </span>
+                  {%- assign more = color_option.values.size | minus: 3 -%}
+                  {%- if more > 0 and section.settings.more_label != blank -%}
+                    <span class="mazal-rec__more">{{ section.settings.more_label | replace: '[count]', more }}</span>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            </div>
+          </div>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</mazal-recommendations>
+
+{% stylesheet %}
+  .mazal-rec {
+    --mazal-gold: #bb955a;
+    padding-block: var(--mazal-rec-pt) var(--mazal-rec-pb);
+  }
+
+  @media screen and (max-width: 749px) {
+    .section.mazal-rec {
+      padding-block: 32px;
+    }
+  }
+
+  .mazal-rec:has(.mazal-rec__grid:empty) {
+    display: none;
+  }
+
+  .mazal-rec__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+    min-width: 0;
+  }
+
+  .mazal-rec__header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mazal-rec__heading.h2 {
+    margin: 0;
+    font-size: var(--mazal-rec-heading-size);
+    line-height: 1.21;
+    text-transform: uppercase;
+  }
+
+  .mazal-rec__subtitle {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .mazal-rec__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .mazal-rec__card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .mazal-rec__media {
+    position: relative;
+    aspect-ratio: 328 / 424;
+    padding: 8px;
+    overflow: hidden;
+    background: #f7f7f7;
+  }
+
+  .mazal-rec__media-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .mazal-rec__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .mazal-rec__badge {
+    position: absolute;
+    inset-block-start: 16px;
+    inset-inline-start: 16px;
+    padding: 8px 16px;
+    background: #fff;
+    color: #000;
+    font-size: 12px;
+    line-height: 1;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+  .mazal-rec__add-form {
+    display: contents;
+  }
+
+  .mazal-rec__add {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 7.5px 16px;
+    border: 0;
+    background: var(--mazal-gold);
+    color: #fff;
+    font-family: var(--font-body--family);
+    font-size: 12px;
+    line-height: 1.45;
+    text-decoration: none;
+    text-transform: uppercase;
+    cursor: pointer;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .mazal-rec__media:hover .mazal-rec__add,
+  .mazal-rec__add:focus-visible {
+    transform: translateY(0);
+  }
+
+  .mazal-rec__add[aria-busy='true'] {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .mazal-rec__add-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+  }
+
+  .mazal-rec__info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mazal-rec__name-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    color: #000;
+    font-family: var(--font-accent--family);
+    font-weight: var(--font-accent--weight);
+    font-size: 14px;
+    line-height: 1.45;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .mazal-rec__price {
+    flex-shrink: 0;
+  }
+
+  .mazal-rec__colors {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mazal-rec__dots {
+    display: flex;
+    gap: 4px;
+  }
+
+  .mazal-rec__dot {
+    display: block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-position: center;
+    background-size: cover;
+    box-shadow: inset 0 0 0 0.5px rgb(0 0 0 / 0.1);
+  }
+
+  .mazal-rec__more {
+    font-size: 12px;
+    line-height: 1.2;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mazal-rec__add {
+      transition: none;
+    }
+  }
+
+  /* Phones (Figma 6:2865): scrolling row of 191px cards, the cart button is a small square. */
+  @media screen and (max-width: 749px) {
+    .mazal-rec__inner {
+      gap: 32px;
+    }
+
+    .mazal-rec__heading.h2 {
+      font-size: 24px;
+    }
+
+    .mazal-rec__subtitle {
+      font-size: 12px;
+    }
+
+    .mazal-rec__grid {
+      display: flex;
+      gap: 16px;
+      margin-inline-end: calc(-1 * var(--page-margin, 16px));
+      padding-inline-end: var(--page-margin, 16px);
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+
+    .mazal-rec__grid::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mazal-rec__item {
+      flex: 0 0 191px;
+      scroll-snap-align: start;
+    }
+
+    .mazal-rec__card {
+      gap: 8px;
+    }
+
+    .mazal-rec__media {
+      aspect-ratio: 191 / 224;
+      padding: 4px;
+    }
+
+    .mazal-rec__badge {
+      inset-block-start: 8px;
+      inset-inline-start: 8px;
+      padding: 6.5px 8px;
+      font-size: 10px;
+    }
+
+    .mazal-rec__add {
+      inset-inline: auto 12px;
+      inset-block-end: 12px;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      transform: none;
+    }
+
+    .mazal-rec__add-text {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    .mazal-rec__name-row {
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .mazal-rec__more {
+      font-size: 10px;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class MazalRecommendations extends HTMLElement {
+    connectedCallback() {
+      this.controller = new AbortController();
+      this.addEventListener('submit', (event) => this.onSubmit(event), { signal: this.controller.signal });
+      if (!this.hasAttribute('data-loaded') && this.dataset.url) this.load();
+    }
+
+    disconnectedCallback() {
+      this.controller?.abort();
+    }
+
+    /* Swap in Shopify's recommendations when there are any; otherwise keep the fallback products. */
+    async load() {
+      try {
+        const response = await fetch(this.dataset.url, { signal: this.controller.signal });
+        if (!response.ok) return;
+        const html = new DOMParser().parseFromString(await response.text(), 'text/html');
+        const grid = html.querySelector('mazal-recommendations [data-grid]');
+        const current = this.querySelector('[data-grid]');
+        if (grid && current && grid.children.length > 0) current.replaceChildren(...grid.children);
+      } catch (error) {
+        if (error.name !== 'AbortError') console.error(error);
+      }
+    }
+
+    async onSubmit(event) {
+      const form = event.target;
+      if (!(form instanceof HTMLFormElement) || !form.hasAttribute('data-rec-add')) return;
+      event.preventDefault();
+      const button = form.querySelector('button');
+      button?.setAttribute('aria-busy', 'true');
+      try {
+        const { CartLinesUpdateEvent } = await import('@shopify/events');
+        const formData = new FormData(form);
+        const sectionIds = Array.from(document.querySelectorAll('cart-items-component'))
+          .map((element) => element.dataset.sectionId)
+          .filter(Boolean);
+        if (sectionIds.length) formData.append('sections', sectionIds.join(','));
+
+        const deferred = CartLinesUpdateEvent.createPromise();
+        this.dispatchEvent(
+          new CartLinesUpdateEvent({
+            action: 'add',
+            context: 'product',
+            lines: [{ merchandiseId: String(formData.get('id')), quantity: 1 }],
+            promise: deferred.promise,
+          })
+        );
+
+        const addUrl = (window.Theme && window.Theme.routes && window.Theme.routes.cart_add_url) || form.action;
+        const response = await fetch(addUrl, {
+          method: 'POST',
+          headers: { Accept: 'application/javascript', 'X-Requested-With': 'XMLHttpRequest' },
+          body: formData,
+        }).then((result) => result.json());
+
+        const cartItems = document.querySelector('cart-items-component');
+        let cart;
+        if (cartItems && typeof cartItems.fetchCartData === 'function') {
+          await customElements.whenDefined('cart-items-component');
+          cart = await cartItems.fetchCartData();
+        } else {
+          cart = await fetch('/cart.js', { headers: { Accept: 'application/json' } }).then((result) => result.json());
+        }
+
+        deferred.resolve({
+          cart: CartLinesUpdateEvent.createCartFromAjaxResponse(cart),
+          detail: {
+            items: cart.items,
+            source: 'mazal-recommendations',
+            sourceId: this.id,
+            itemCount: 1,
+            sections: response.sections,
+            didError: Boolean(response.status),
+          },
+        });
+      } catch (error) {
+        console.error(error);
+        form.submit();
+      } finally {
+        button?.removeAttribute('aria-busy');
+      }
+    }
+  }
+
+  if (!customElements.get('mazal-recommendations')) {
+    customElements.define('mazal-recommendations', MazalRecommendations);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Mazal you might also like",
+  "tag": "section",
+  "class": "section-wrapper",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    { "type": "inline_richtext", "id": "heading", "label": "Heading", "default": "YOU MIGHT ALSO LIKE" },
+    { "type": "range", "id": "heading_size", "label": "Heading size (desktop)", "min": 24, "max": 72, "step": 2, "unit": "px", "default": 48 },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Discover more pieces designed to bring comfort, style, and effortless elegance to your everyday essentials." },
+    { "type": "header", "content": "Products" },
+    {
+      "type": "select",
+      "id": "intent",
+      "label": "Recommendations",
+      "options": [
+        { "value": "related", "label": "Related" },
+        { "value": "complementary", "label": "Complementary" }
+      ],
+      "default": "related"
+    },
+    { "type": "collection", "id": "fallback_collection", "label": "Fallback collection", "info": "Shown when Shopify has no recommendations yet. Empty uses the product's first collection." },
+    { "type": "range", "id": "products_limit", "label": "Products to show", "min": 2, "max": 8, "step": 1, "default": 4 },
+    { "type": "header", "content": "Card" },
+    { "type": "text", "id": "badge_text", "label": "Image label", "default": "NEW ARRIVAL", "info": "Leave empty to hide." },
+    { "type": "text", "id": "add_label", "label": "Add to cart text", "default": "ADD TO CART" },
+    { "type": "text", "id": "color_option_name", "label": "Color option name", "default": "Color" },
+    { "type": "text", "id": "more_label", "label": "More colors text", "default": "[count]+ More", "info": "[count] is replaced by the colors not shown." },
+    { "type": "textarea", "id": "swatch_colors", "label": "Swatch colors", "default": "Pink: #f6c9d1\nGrey: #dbdada\nPeach: #f6ddc9\nMint: #c9f6e0", "info": "One per line as Name: #hex." },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "presets": [
+    { "name": "Mazal you might also like" }
+  ]
+}
+{% endschema %}
