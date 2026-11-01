@@ -7,7 +7,7 @@
         "reviews_anchor": "mazal-reviews",
         "shipping_text": "Fast Shipping",
         "size_option_name": "size",
-        "size_guide_url": "",
+        "size_guide_url": "shopify://pages/size-guide",
         "size_guide_label": "Size Guide",
         "color_option_name": "Color",
         "color_label": "COLOR",
