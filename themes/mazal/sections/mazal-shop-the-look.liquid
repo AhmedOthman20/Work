@@ -1,0 +1,720 @@
+{%- comment -%}
+  Mazal shop the look (Figma: Homepage / Full Section 3:913, hover card 3:1141, phone card 6:3622).
+  Full-width image with hotspots; hovering a hotspot shows a product card centered on it.
+  On phones a tap opens a smaller card with a close button and every color swatch.
+  Heading row with link above; title, text and button over the bottom of the image.
+{%- endcomment -%}
+{%- liquid
+  assign color_option_name = section.settings.color_option_name | downcase | strip
+  assign title_font = settings.type_body_font | font_modify: 'weight', '600'
+-%}
+
+{% style %}
+  {%- if title_font -%}
+    {{ title_font | font_face: font_display: 'swap' }}
+  {%- endif -%}
+{% endstyle %}
+
+<div class="section-background"></div>
+<div
+  class="section section--full-width mazal-stl"
+  style="
+    --mazal-stl-height: {{ section.settings.image_height }}px;
+    --mazal-stl-height-mobile: {{ section.settings.image_height_mobile }}px;
+    --mazal-stl-row-gap: {{ section.settings.section_gap }}px;
+    --mazal-stl-heading-size: {{ section.settings.heading_size }}px;
+    --mazal-stl-title-size: {{ section.settings.title_size }}px;
+    --mazal-stl-link-color: {{ section.settings.link_color }};
+    --mazal-stl-overlay: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --mazal-stl-pt: {{ section.settings.padding_top }}px;
+    --mazal-stl-pb: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="mazal-stl__inner">
+    {%- if section.settings.heading != blank or section.settings.link_label != blank -%}
+      <div class="mazal-stl__header">
+        {%- if section.settings.heading != blank -%}
+          <h2 class="h2 mazal-stl__heading">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+        {%- if section.settings.link_label != blank -%}
+          <a class="mazal-stl__link" href="{{ section.settings.link_url | default: routes.collections_url }}">
+            {{- section.settings.link_label -}}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <mazal-shop-the-look class="mazal-stl__stage">
+      <div class="mazal-stl__media">
+        {%- if section.settings.image != blank -%}
+          {{
+            section.settings.image
+            | image_url: width: 3000
+            | image_tag:
+              widths: '750, 1100, 1500, 1920, 2400, 3000',
+              sizes: '100vw',
+              loading: 'lazy',
+              class: 'mazal-stl__image'
+          }}
+        {%- else -%}
+          {{ 'hero-apparel-1' | placeholder_svg_tag: 'mazal-stl__image' }}
+        {%- endif -%}
+        <div class="mazal-stl__overlay" aria-hidden="true"></div>
+      </div>
+
+      <div class="mazal-stl__hotspots">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign product = block.settings.product
+            assign color_option = null
+            assign color_value = blank
+            if product != blank
+              for option in product.options_with_values
+                assign option_name = option.name | downcase | strip
+                if option_name == color_option_name or option_name == 'color' or option_name == 'colour'
+                  assign color_option = option
+                  assign color_value = option.values | where: 'selected', true | first
+                  if color_value == blank
+                    assign color_value = option.values | first
+                  endif
+                  break
+                endif
+              endfor
+            endif
+          -%}
+          {%- if product != blank or request.design_mode -%}
+            <div
+              class="mazal-stl__hotspot"
+              data-hotspot
+              style="--x: {{ block.settings.x_position }}%; --y: {{ block.settings.y_position }}%;"
+              {{ block.shopify_attributes }}
+            >
+              <button
+                type="button"
+                class="mazal-stl__dot"
+                data-dot
+                aria-label="{{ product.title | default: 'Product' | escape }}"
+                aria-expanded="false"
+              >
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 38 38" fill="none">
+                  <circle cx="19" cy="19" r="11.25" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="19" cy="19" r="6" fill="currentColor"/>
+                </svg>
+              </button>
+
+              <div class="mazal-stl__card" data-card>
+                <a class="mazal-stl__card-link" href="{{ product.url | default: '#' }}" tabindex="-1" data-card-link>
+                  <div class="mazal-stl__card-media">
+                    {%- if product.featured_image != blank -%}
+                      {{
+                        product.featured_image
+                        | image_url: width: 700
+                        | image_tag:
+                          widths: '200, 324, 486, 648',
+                          sizes: '(min-width: 750px) 324px, 191px',
+                          loading: 'lazy',
+                          alt: product.title,
+                          class: 'mazal-stl__card-image'
+                        }}
+                    {%- else -%}
+                      {{ 'product-apparel-1' | placeholder_svg_tag: 'mazal-stl__card-image' }}
+                    {%- endif -%}
+                  </div>
+                  <div class="mazal-stl__card-body">
+                    {%- if color_value != blank -%}
+                      <div class="mazal-stl__color">
+                        <span class="mazal-stl__swatches">
+                          {%- for value in color_option.values -%}
+                            {%- liquid
+                              assign swatch_class = 'mazal-stl__swatch'
+                              if value.name == color_value.name
+                                assign swatch_class = 'mazal-stl__swatch is-selected'
+                              endif
+                            -%}
+                            {%- render 'mazal-swatch', value: value, class: swatch_class -%}
+                          {%- endfor -%}
+                        </span>
+                        <span class="mazal-stl__color-name">{{ color_value }}</span>
+                      </div>
+                    {%- endif -%}
+                    <span class="mazal-stl__card-title">{{ product.title | default: 'Product title' }}</span>
+                    <span class="mazal-stl__card-price">
+                      {%- if product != blank -%}
+                        {%- if product.price_varies -%}
+                          {{ product.price_min | money }}<span class="mazal-stl__price-sep">-</span>{{ product.price_max | money }}
+                        {%- else -%}
+                          {{ product.price | money }}
+                        {%- endif -%}
+                      {%- endif -%}
+                    </span>
+                  </div>
+                </a>
+                <button type="button" class="mazal-stl__close" data-close aria-label="Close">
+                  <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" fill="#000" fill-opacity="0.3"/>
+                    <path d="M15 9l-6 6M9 9l6 6" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      {%- if section.settings.title != blank or section.settings.text != blank or section.settings.button_label != blank -%}
+        <div class="mazal-stl__content">
+          <div class="mazal-stl__copy">
+            {%- if section.settings.title != blank -%}
+              <h3 class="h2 mazal-stl__title">{{ section.settings.title }}</h3>
+            {%- endif -%}
+            {%- if section.settings.text != blank -%}
+              <p class="mazal-stl__text">{{ section.settings.text }}</p>
+            {%- endif -%}
+          </div>
+          {%- if section.settings.button_label != blank -%}
+            <a class="mazal-stl__button" href="{{ section.settings.button_link | default: routes.collections_url }}">
+              {{- section.settings.button_label -}}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </mazal-shop-the-look>
+  </div>
+</div>
+
+{% stylesheet %}
+  .mazal-stl {
+    padding-block: var(--mazal-stl-pt) var(--mazal-stl-pb);
+  }
+
+  .mazal-stl__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mazal-stl-row-gap);
+    min-width: 0;
+  }
+
+  .mazal-stl__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding-inline: var(--page-margin, 16px);
+    width: 100%;
+    max-width: calc(var(--page-content-width, 120rem) + var(--page-margin, 16px) * 2);
+    margin-inline: auto;
+  }
+
+  .mazal-stl__heading.h2 {
+    margin: 0;
+    font-size: var(--mazal-stl-heading-size);
+    line-height: 1.21;
+    text-transform: uppercase;
+  }
+
+  .mazal-stl__link,
+  .mazal-stl__text,
+  .mazal-stl__button {
+    font-family: var(--font-accent--family);
+    font-weight: var(--font-accent--weight);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .mazal-stl__link {
+    flex-shrink: 0;
+    color: var(--mazal-stl-link-color);
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .mazal-stl__link:hover {
+    opacity: 0.8;
+  }
+
+  .mazal-stl__stage {
+    position: relative;
+    display: block;
+    height: var(--mazal-stl-height);
+    overflow: hidden;
+  }
+
+  .mazal-stl__media,
+  .mazal-stl__hotspots {
+    position: absolute;
+    inset: 0;
+  }
+
+  .mazal-stl__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .mazal-stl__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(226.24deg, rgb(255 255 255 / 0) 34.28%, rgb(0 0 0 / var(--mazal-stl-overlay)) 100%);
+    pointer-events: none;
+  }
+
+  .mazal-stl__hotspots {
+    z-index: 2;
+  }
+
+  .mazal-stl__hotspot {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: 0;
+    height: 0;
+  }
+
+  .mazal-stl__hotspot:is(:hover, :focus-within, .is-open) {
+    z-index: 2;
+  }
+
+  .mazal-stl__dot {
+    position: absolute;
+    left: -19px;
+    top: -19px;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    line-height: 0;
+  }
+
+  .mazal-stl__dot svg {
+    width: 38px;
+    height: 38px;
+    filter: drop-shadow(0 0 2px rgb(0 0 0 / 0.25));
+  }
+
+  .mazal-stl__card {
+    --sx: 0px;
+    --sy: 0px;
+
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 324px;
+    background: #fff;
+    color: #000;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(0.96);
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s linear 0.25s;
+  }
+
+  .mazal-stl__hotspot:is(:focus-within, .is-open) .mazal-stl__card {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(1);
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s;
+  }
+
+  @media (hover: hover) {
+    .mazal-stl__hotspot:hover .mazal-stl__card {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(1);
+      transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s;
+    }
+  }
+
+  .mazal-stl__card-link {
+    display: flex;
+    flex-direction: column;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .mazal-stl__card-media {
+    height: 195px;
+    overflow: hidden;
+    background: #f7f7f7;
+  }
+
+  .mazal-stl__card-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .mazal-stl__card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 240px;
+    margin-inline: auto;
+    padding-block: 24px;
+    text-align: center;
+  }
+
+  .mazal-stl__color {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mazal-stl__swatches {
+    display: flex;
+    gap: 4px;
+  }
+
+  .mazal-stl__swatch {
+    display: block;
+    width: 24px;
+    height: 24px;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .mazal-stl__swatch.is-selected {
+    border: 0.5px solid #000;
+  }
+
+  /* Desktop card (3:1141) shows only the current color. */
+  .mazal-stl__swatch:not(.is-selected) {
+    display: none;
+  }
+
+  .mazal-stl__color-name,
+  .mazal-stl__card-price {
+    font-family: var(--font-body--family);
+    font-weight: 400;
+    line-height: 1.45;
+  }
+
+  .mazal-stl__color-name {
+    font-size: 12px;
+  }
+
+  .mazal-stl__card-title {
+    font-family: var(--font-body--family);
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .mazal-stl__card-price {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+  }
+
+  .mazal-stl__card-price:empty {
+    display: none;
+  }
+
+  .mazal-stl__close {
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    display: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    line-height: 0;
+  }
+
+  .mazal-stl__close svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .mazal-stl__content {
+    position: absolute;
+    inset-inline: var(--page-margin, 16px);
+    inset-block-end: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    color: #fff;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  .mazal-stl__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .mazal-stl__title.h2 {
+    margin: 0;
+    font-size: var(--mazal-stl-title-size);
+    line-height: 1.21;
+    text-transform: uppercase;
+    color: inherit;
+  }
+
+  .mazal-stl__text {
+    margin: 0;
+    color: inherit;
+  }
+
+  .mazal-stl__button {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--button-padding-block, 11px) var(--button-padding-inline, 24px);
+    border: 1px solid currentColor;
+    color: inherit;
+    text-transform: uppercase;
+    text-decoration: none;
+    pointer-events: auto;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .mazal-stl__button:hover {
+    background-color: #fff;
+    color: #000;
+  }
+
+  /* Phones: smaller type, and the 191px tap card (Figma 6:3622). */
+  @media screen and (max-width: 749px) {
+    .mazal-stl {
+      padding-block: 32px;
+    }
+
+    .mazal-stl__inner {
+      gap: 16px;
+    }
+
+    .mazal-stl__heading.h2 {
+      font-size: 24px;
+    }
+
+    .mazal-stl__link {
+      font-size: 12px;
+    }
+
+    .mazal-stl__stage {
+      height: var(--mazal-stl-height-mobile);
+    }
+
+    .mazal-stl__content {
+      inset-block-end: 24px;
+      gap: 16px;
+      align-items: flex-end;
+    }
+
+    .mazal-stl__copy {
+      gap: 8px;
+    }
+
+    .mazal-stl__title.h2 {
+      font-size: 24px;
+    }
+
+    .mazal-stl__text {
+      font-size: 10px;
+    }
+
+    .mazal-stl__button {
+      padding: 6px 12px;
+      font-size: 10px;
+    }
+
+    .mazal-stl__card {
+      width: 191px;
+    }
+
+    .mazal-stl__card-media {
+      height: 124px;
+    }
+
+    .mazal-stl__card-body {
+      gap: 12px;
+      width: auto;
+      padding: 16px 24px;
+    }
+
+    .mazal-stl__swatch:not(.is-selected) {
+      display: block;
+    }
+
+    .mazal-stl__color-name,
+    .mazal-stl__card-price {
+      font-size: 10px;
+    }
+
+    .mazal-stl__card-title {
+      font-size: 12px;
+      line-height: normal;
+    }
+
+    .mazal-stl__close {
+      display: block;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mazal-stl__card {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class MazalShopTheLook extends HTMLElement {
+    connectedCallback() {
+      this.hotspots = Array.from(this.querySelectorAll('[data-hotspot]'));
+      this.hoverQuery = window.matchMedia('(hover: hover)');
+
+      this.onEnter = (event) => this.fit(event.currentTarget);
+      this.onDotClick = (event) => {
+        const hotspot = event.currentTarget.closest('[data-hotspot]');
+        if (this.hoverQuery.matches) {
+          hotspot.querySelector('[data-card-link]')?.click();
+          return;
+        }
+        const willOpen = !hotspot.classList.contains('is-open');
+        this.closeAll();
+        if (willOpen) {
+          this.fit(hotspot);
+          hotspot.classList.add('is-open');
+          event.currentTarget.setAttribute('aria-expanded', 'true');
+        }
+      };
+      this.onClose = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.closeAll();
+        document.activeElement?.blur();
+      };
+      this.onOutside = (event) => {
+        if (!this.contains(event.target)) this.closeAll();
+      };
+
+      this.hotspots.forEach((hotspot) => {
+        hotspot.addEventListener('pointerenter', this.onEnter);
+        hotspot.addEventListener('focusin', this.onEnter);
+        hotspot.querySelector('[data-dot]')?.addEventListener('click', this.onDotClick);
+        hotspot.querySelector('[data-close]')?.addEventListener('click', this.onClose);
+      });
+      document.addEventListener('click', this.onOutside);
+    }
+
+    disconnectedCallback() {
+      this.hotspots?.forEach((hotspot) => {
+        hotspot.removeEventListener('pointerenter', this.onEnter);
+        hotspot.removeEventListener('focusin', this.onEnter);
+        hotspot.querySelector('[data-dot]')?.removeEventListener('click', this.onDotClick);
+        hotspot.querySelector('[data-close]')?.removeEventListener('click', this.onClose);
+      });
+      document.removeEventListener('click', this.onOutside);
+    }
+
+    closeAll() {
+      this.hotspots.forEach((hotspot) => {
+        hotspot.classList.remove('is-open');
+        hotspot.querySelector('[data-dot]')?.setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    /* Keep the card inside the image when the hotspot sits near an edge */
+    fit(hotspot) {
+      const card = hotspot.querySelector('[data-card]');
+      if (!card) return;
+      const stage = this.getBoundingClientRect();
+      const anchor = hotspot.getBoundingClientRect();
+      const width = card.offsetWidth;
+      const height = card.offsetHeight;
+      const gap = 16;
+      const left = anchor.left - width / 2;
+      const top = anchor.top - height / 2;
+      let sx = 0;
+      let sy = 0;
+      if (left < stage.left + gap) sx = stage.left + gap - left;
+      if (left + width > stage.right - gap) sx = stage.right - gap - (left + width);
+      if (top < stage.top + gap) sy = stage.top + gap - top;
+      if (top + height > stage.bottom - gap) sy = stage.bottom - gap - (top + height);
+      card.style.setProperty('--sx', `${sx}px`);
+      card.style.setProperty('--sy', `${sy}px`);
+    }
+  }
+
+  if (!customElements.get('mazal-shop-the-look')) {
+    customElements.define('mazal-shop-the-look', MazalShopTheLook);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Mazal shop the look",
+  "tag": "section",
+  "class": "section-wrapper",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "max_blocks": 6,
+  "settings": [
+    { "type": "header", "content": "Heading" },
+    { "type": "inline_richtext", "id": "heading", "label": "Heading", "default": "SHOP THE LOOK" },
+    { "type": "range", "id": "heading_size", "label": "Heading size", "min": 24, "max": 72, "step": 2, "unit": "px", "default": 48 },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "SHOP NOW" },
+    { "type": "url", "id": "link_url", "label": "Link", "default": "/collections/all" },
+    { "type": "color", "id": "link_color", "label": "Link color", "default": "#BB955A" },
+    { "type": "header", "content": "Image" },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "range", "id": "image_height", "label": "Image height", "min": 304, "max": 904, "step": 6, "unit": "px", "default": 724 },
+    { "type": "range", "id": "image_height_mobile", "label": "Image height on phones", "min": 240, "max": 640, "step": 8, "unit": "px", "default": 424, "info": "Keep it above 300px so the product card fits." },
+    { "type": "range", "id": "overlay_opacity", "label": "Corner shading", "min": 0, "max": 80, "step": 5, "unit": "%", "default": 20 },
+    { "type": "header", "content": "Text on image" },
+    { "type": "inline_richtext", "id": "title", "label": "Title", "default": "THE DETAILS MATTER" },
+    { "type": "range", "id": "title_size", "label": "Title size", "min": 24, "max": 72, "step": 2, "unit": "px", "default": 48 },
+    { "type": "textarea", "id": "text", "label": "Text" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "SHOP THE LOOK" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "header", "content": "Product card" },
+    { "type": "text", "id": "color_option_name", "label": "Color option name", "default": "Color", "info": "The product option shown as swatches on the card." },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "section_gap", "label": "Space under heading", "min": 16, "max": 120, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "blocks": [
+    {
+      "type": "hotspot",
+      "name": "Hotspot",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Product" },
+        { "type": "range", "id": "x_position", "label": "Horizontal position", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 50 },
+        { "type": "range", "id": "y_position", "label": "Vertical position", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 50 }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Mazal shop the look",
+      "blocks": [
+        { "type": "hotspot", "settings": { "x_position": 30, "y_position": 34 } },
+        { "type": "hotspot", "settings": { "x_position": 47, "y_position": 41 } },
+        { "type": "hotspot", "settings": { "x_position": 78, "y_position": 50 } }
+      ]
+    }
+  ]
+}
+{% endschema %}
