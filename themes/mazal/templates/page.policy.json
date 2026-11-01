@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "main": {
+      "type": "mazal-policy",
+      "settings": {
+        "show_date": true,
+        "date_label": "Last Updated :",
+        "date_format": "%b %d, %Y, %I:%M %p"
+      }
+    }
+  },
+  "order": ["main"]
+}

@@ -38,3 +38,10 @@ To show a different photo for a color, set the image on that variant in the prod
 subtitle is the collection description or the section setting. Category links are blocks (collection + label); the current
 collection is underlined. **FILTERS** opens a panel under the bar on desktop (a popup with search on phones) with sorting, a price slider and the filters set in the Search & Discovery app.
 16 products per load; the next page loads by itself when "Showing X of N products" scrolls into view.
+
+## Policy pages
+
+`templates/page.policy.json` → `sections/mazal-policy.liquid` (Figma 1:1906, 1:1972, 1:2044, 1:2101; mobile 6:3209).
+Pages **Terms & Services**, **Privacy Policy**, **Shipping & Delivery**, **Returns & Exchanges** (template "policy").
+Write the text in the page editor: Heading 2 = numbered point, Heading 3 = small subheading, then paragraphs / bullets;
+links show gold and underlined. "Last Updated" is the page's last edit date. Linked from the "Footer – Customer service" menu.

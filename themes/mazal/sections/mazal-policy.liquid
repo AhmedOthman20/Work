@@ -1,0 +1,205 @@
+{%- comment -%}
+  Section contract.
+  Mazal policy page (Figma: Terms & Services 1:1906, Privacy Policy 1:1972, Shipping & Delivery 1:2044,
+  Returns & Exchanges 1:2101; mobile 6:3209). "Last Updated" date, the page title, then the page content
+  from the admin: each Heading 2 starts a numbered point, Heading 3 / bold lines are the small
+  subheadings, paragraphs and bullet lists follow. Links show gold and underlined (e.g. CONTACT US).
+  @example
+  <!-- templates/page.policy.json -->
+{%- endcomment -%}
+<div class="section-background"></div>
+<div class="mazal-policy">
+  <div class="mazal-policy__header">
+    {%- if section.settings.show_date -%}
+      {%- assign policy_date = page.updated_at | default: page.published_at -%}
+      <p class="mazal-policy__date">
+        {{- section.settings.date_label | escape }}
+        {{ policy_date | date: section.settings.date_format -}}
+      </p>
+    {%- endif -%}
+    <h1 class="mazal-policy__title">{{ page.title | escape }}</h1>
+  </div>
+
+  <div class="mazal-policy__content">
+    {{ page.content }}
+  </div>
+</div>
+
+{% stylesheet %}
+  .mazal-policy {
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+    padding: 64px;
+    color: #000;
+    font-family: var(--font-body--family);
+  }
+
+  .mazal-policy__header {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .mazal-policy__date {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .mazal-policy__title {
+    margin: 0;
+    color: #000;
+    font-family: var(--font-heading--family);
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 1.21;
+    letter-spacing: normal;
+    text-transform: uppercase;
+  }
+
+  .mazal-policy__content {
+    color: #1c191a;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .mazal-policy__content > :first-child {
+    margin-block-start: 0;
+  }
+
+  .mazal-policy__content > :last-child {
+    margin-block-end: 0;
+  }
+
+  /* Point titles: 32px between points, 16px to their text. */
+  .mazal-policy__content h2 {
+    margin: 32px 0 16px;
+    color: #000;
+    font-family: var(--font-body--family);
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 1.45;
+    letter-spacing: normal;
+    text-transform: uppercase;
+  }
+
+  .mazal-policy__content h3,
+  .mazal-policy__content h4 {
+    margin: 0 0 20px;
+    color: #1c191a;
+    font-family: var(--font-body--family);
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  .mazal-policy__content p,
+  .mazal-policy__content ul,
+  .mazal-policy__content ol {
+    margin: 0 0 20px;
+  }
+
+  .mazal-policy__content h2 + p:last-child,
+  .mazal-policy__content p:has(+ h2),
+  .mazal-policy__content ul:has(+ h2),
+  .mazal-policy__content ol:has(+ h2) {
+    margin-block-end: 0;
+  }
+
+  .mazal-policy__content ul,
+  .mazal-policy__content ol {
+    padding-inline-start: 21px;
+  }
+
+  .mazal-policy__content ul {
+    list-style: disc;
+  }
+
+  .mazal-policy__content li {
+    margin: 0;
+  }
+
+  .mazal-policy__content strong {
+    font-weight: 500;
+  }
+
+  .mazal-policy__content a {
+    color: var(--mazal-gold, #bb955a);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .mazal-policy__content a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  /* Phones (Figma 6:3209) */
+  @media screen and (max-width: 749px) {
+    .mazal-policy {
+      gap: 32px;
+      padding: 32px 16px;
+    }
+
+    .mazal-policy__header {
+      gap: 8px;
+    }
+
+    .mazal-policy__date {
+      font-size: 10px;
+    }
+
+    .mazal-policy__title {
+      font-size: 24px;
+    }
+
+    .mazal-policy__content {
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .mazal-policy__content h2 {
+      margin: 16px 0 8px;
+      font-size: 14px;
+    }
+
+    .mazal-policy__content h3,
+    .mazal-policy__content h4 {
+      margin-block-end: 16px;
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .mazal-policy__content p,
+    .mazal-policy__content ul,
+    .mazal-policy__content ol {
+      margin-block-end: 16px;
+    }
+
+    .mazal-policy__content ul,
+    .mazal-policy__content ol {
+      padding-inline-start: 18px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Mazal policy page",
+  "tag": "section",
+  "class": "section-wrapper",
+  "enabled_on": {
+    "templates": ["page"]
+  },
+  "settings": [
+    { "type": "checkbox", "id": "show_date", "label": "Show last updated date", "default": true },
+    { "type": "text", "id": "date_label", "label": "Date label", "default": "Last Updated :" },
+    { "type": "text", "id": "date_format", "label": "Date format", "default": "%b %d, %Y, %I:%M %p", "info": "Uses the page's last edit date." }
+  ],
+  "presets": [
+    { "name": "Mazal policy page" }
+  ]
+}
+{% endschema %}
