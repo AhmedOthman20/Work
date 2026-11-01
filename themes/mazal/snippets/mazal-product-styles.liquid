@@ -1,0 +1,1029 @@
+{%- doc -%}
+  Styles for sections/mazal-product.liquid (kept here so the section file stays small).
+
+  @example
+  {% render 'mazal-product-styles' %}
+{%- enddoc -%}
+{% stylesheet %}
+  .mazal-pdp {
+    --mazal-gold: #bb955a;
+    --mazal-soft: #f7f7f7;
+    --mazal-grey: #a1a1a1;
+    padding-block: var(--mazal-pdp-pt) var(--mazal-pdp-pb);
+    font-family: var(--font-body--family);
+    color: #000;
+  }
+
+  .mazal-pdp__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 744fr) minmax(0, 768fr);
+    align-items: start;
+  }
+
+  /* ---------- Gallery ---------- */
+  .mazal-pdp__gallery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-width: 0;
+  }
+
+  .mazal-pdp__main-media {
+    grid-column: 1 / -1;
+    aspect-ratio: 744 / 624;
+    overflow: hidden;
+    background: var(--mazal-soft);
+  }
+
+  .mazal-pdp__main-image,
+  .mazal-pdp__thumb-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Desktop: the thumbnails are the 2-column image grid under the main image (first image is the main one). */
+  .mazal-pdp__thumbs {
+    display: contents;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .mazal-pdp__thumb-item--first {
+    display: none;
+  }
+
+  .mazal-pdp__thumb {
+    display: block;
+    width: 100%;
+    aspect-ratio: 372 / 312;
+    padding: 0;
+    border: 0;
+    background: var(--mazal-soft);
+    cursor: pointer;
+    overflow: hidden;
+  }
+
+  /* ---------- Info column ---------- */
+  .mazal-pdp__info {
+    position: sticky;
+    top: calc(var(--header-height, 0px) + 24px);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 0;
+    max-width: 768px;
+    padding-inline: 24px 64px;
+  }
+
+  .mazal-pdp__head {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .mazal-pdp__title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .mazal-pdp__title {
+    margin: 0;
+    font-family: var(--mazal-pdp-title-family);
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 1.21;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+
+  .mazal-pdp__wishlist {
+    display: inline-flex;
+    flex-shrink: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #000;
+    cursor: pointer;
+  }
+
+  .mazal-pdp__wishlist svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .mazal-pdp__wishlist[aria-pressed='true'] svg path {
+    fill: currentColor;
+  }
+
+  .mazal-pdp__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .mazal-pdp__rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .mazal-pdp__rating-value {
+    text-decoration: underline;
+  }
+
+  .mazal-pdp__rating-count {
+    margin-inline-start: -4px;
+    color: var(--mazal-grey);
+    font-size: 12px;
+  }
+
+  .mazal-pdp__meta-sep {
+    font-size: 10px;
+  }
+
+  .mazal-pdp__shipping {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .mazal-pdp__shipping-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+  }
+
+  .mazal-pdp__price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    line-height: 1.45;
+  }
+
+  .mazal-pdp__price-current {
+    font-family: var(--font-accent--family);
+    font-weight: var(--font-accent--weight);
+    font-size: 20px;
+    text-transform: uppercase;
+  }
+
+  .mazal-pdp__price-compare {
+    color: var(--mazal-grey);
+    font-size: 14px;
+  }
+
+  .mazal-pdp__divider {
+    width: 100%;
+    height: 0;
+    margin: 0;
+    border: 0;
+    border-block-start: 1px solid var(--mazal-soft);
+  }
+
+  /* ---------- Options ---------- */
+  .mazal-pdp__options {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .mazal-pdp__option {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .mazal-pdp__option-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .mazal-pdp__option-label {
+    font-size: 14px;
+    line-height: 1.45;
+    text-transform: uppercase;
+  }
+
+  .mazal-pdp__size-guide {
+    font-size: 14px;
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .mazal-pdp__pills,
+  .mazal-pdp__swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .mazal-pdp__pill {
+    padding: 6px 16px;
+    border: 1px solid var(--mazal-grey);
+    background: transparent;
+    color: var(--mazal-grey);
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.45;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+  }
+
+  .mazal-pdp__pill:hover {
+    color: #000;
+    border-color: #000;
+  }
+
+  .mazal-pdp__pill.is-selected {
+    background: #000;
+    border-color: #000;
+    color: #fff;
+  }
+
+  .mazal-pdp__pill.is-unavailable:not(.is-selected) {
+    text-decoration: line-through;
+  }
+
+  .mazal-pdp__swatch {
+    display: inline-flex;
+    padding: 3px;
+    border: 1px solid transparent;
+    background: none;
+    cursor: pointer;
+  }
+
+  .mazal-pdp__swatch.is-selected {
+    border-color: #000;
+  }
+
+  .mazal-pdp__swatch.is-unavailable {
+    opacity: 0.4;
+  }
+
+  .mazal-pdp__swatch-fill {
+    display: block;
+    width: 32px;
+    height: 24px;
+    background-position: center;
+    background-size: cover;
+  }
+
+  /* ---------- Accordions ---------- */
+  .mazal-pdp__accordions {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .mazal-pdp__accordion-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 14px;
+    line-height: 1.45;
+    text-transform: uppercase;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .mazal-pdp__accordion-title::-webkit-details-marker {
+    display: none;
+  }
+
+  .mazal-pdp__accordion-icon {
+    display: inline-flex;
+    transition: transform 0.2s;
+  }
+
+  .mazal-pdp__accordion[open] .mazal-pdp__accordion-icon {
+    transform: rotate(45deg);
+  }
+
+  .mazal-pdp__accordion-body {
+    padding-block-start: 24px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  /* Rich text: paragraphs, then lists shown as "·  — item" (Figma: Product details / Care instructions open) */
+  .mazal-pdp__accordion-body p {
+    margin-block: 0 16px;
+  }
+
+  .mazal-pdp__accordion-body ul,
+  .mazal-pdp__accordion-body ol {
+    margin-block: 0 16px;
+    padding-inline-start: 24px;
+  }
+
+  .mazal-pdp__accordion-body ul {
+    list-style: disc;
+  }
+
+  .mazal-pdp__accordion-body ul > li::marker {
+    color: var(--mazal-grey);
+    font-size: 0.7em;
+  }
+
+  .mazal-pdp__accordion-body ul > li::before {
+    content: '\2014\00a0';
+  }
+
+  .mazal-pdp__accordion-body > :first-child {
+    margin-block-start: 0;
+  }
+
+  .mazal-pdp__accordion-body > :last-child {
+    margin-block-end: 0;
+  }
+
+  /* ---------- Buttons ---------- */
+  .mazal-pdp__ctas {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .mazal-pdp__buy-row {
+    display: flex;
+    gap: 16px;
+  }
+
+  .mazal-pdp__qty {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    width: 123px;
+    height: 44px;
+    background: var(--mazal-soft);
+  }
+
+  .mazal-pdp__qty-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 42px;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #000;
+    cursor: pointer;
+  }
+
+  .mazal-pdp__qty-input {
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--font-accent--family);
+    font-size: 12px;
+    text-align: center;
+    -moz-appearance: textfield;
+  }
+
+  .mazal-pdp__qty-input::-webkit-inner-spin-button,
+  .mazal-pdp__qty-input::-webkit-outer-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+  }
+
+  .mazal-pdp__buy-now,
+  .mazal-pdp__add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 12px 16px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.45;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s, background-color 0.2s, color 0.2s;
+  }
+
+  .mazal-pdp__buy-now {
+    flex: 1 1 auto;
+    border: 1px solid var(--mazal-gold);
+    background: var(--mazal-gold);
+    color: #fff;
+  }
+
+  .mazal-pdp__buy-now:hover {
+    opacity: 0.9;
+  }
+
+  .mazal-pdp__add {
+    width: 100%;
+    border: 1px solid var(--mazal-gold);
+    background: transparent;
+    color: var(--mazal-gold);
+  }
+
+  .mazal-pdp__add:hover {
+    background: rgb(187 149 90 / 0.08);
+  }
+
+  .mazal-pdp__add-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+  }
+
+  .mazal-pdp__buy-now:disabled,
+  .mazal-pdp__add:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .mazal-pdp__add[aria-busy='true'] {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  /* ---------- Related products ---------- */
+  .mazal-pdp__related {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .mazal-pdp__related-heading {
+    margin: 0;
+    font-family: var(--font-body--family);
+    font-weight: var(--font-body--weight);
+    font-size: 16px;
+    line-height: 1.45;
+    letter-spacing: normal;
+    text-transform: uppercase;
+  }
+
+  .mazal-pdp__related-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .mazal-pdp__related-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px;
+    background: var(--mazal-soft);
+    color: #000;
+    text-decoration: none;
+  }
+
+  .mazal-pdp__related-media {
+    flex: 0 0 92px;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .mazal-pdp__related-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .mazal-pdp__related-text {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .mazal-pdp__related-name {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 1.45;
+    text-transform: uppercase;
+  }
+
+  .mazal-pdp__related-save {
+    padding: 6.5px 12px;
+    background: rgb(187 149 90 / 0.1);
+    color: var(--mazal-gold);
+    font-size: 10px;
+    line-height: 1;
+    text-transform: none;
+  }
+
+  .mazal-pdp__related-desc {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .mazal-pdp__related-cta {
+    color: var(--mazal-gold);
+    font-size: 12px;
+    line-height: 1.45;
+    text-decoration: underline;
+    text-transform: uppercase;
+  }
+
+  .mazal-pdp__related-price {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 4px;
+    padding-inline-end: 8px;
+    line-height: 1.45;
+    white-space: nowrap;
+  }
+
+  .mazal-pdp__related-price-current {
+    font-family: var(--font-accent--family);
+    font-weight: var(--font-accent--weight);
+    font-size: 14px;
+  }
+
+  .mazal-pdp__related-price-compare {
+    color: var(--mazal-grey);
+    font-size: 12px;
+  }
+
+  /* ---------- Share ---------- */
+  .mazal-pdp__share {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mazal-pdp__share-label {
+    font-size: 16px;
+    line-height: 1.45;
+    text-transform: uppercase;
+  }
+
+  .mazal-pdp__share-icons {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .mazal-pdp__share-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #000;
+    cursor: pointer;
+  }
+
+  .mazal-pdp__share-link svg {
+    max-width: 20px;
+    max-height: 20px;
+  }
+
+  .mazal-pdp__share-link:hover {
+    opacity: 0.7;
+  }
+
+  /* ---------- Sticky add to cart (Figma: Add to Cart Reminder 1:1701) ---------- */
+  .mazal-pdp__sticky {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px;
+    background: var(--mazal-soft);
+    box-shadow: 0 -1px 0 rgb(0 0 0 / 0.04);
+    opacity: 0;
+    transform: translateY(100%);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .mazal-pdp__sticky.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .mazal-pdp__sticky-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .mazal-pdp__sticky-media {
+    flex: 0 0 92px;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .mazal-pdp__sticky-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .mazal-pdp__sticky-text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    color: #000;
+    line-height: 1.45;
+  }
+
+  .mazal-pdp__sticky-name {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mazal-pdp__sticky-title {
+    color: #160a0d;
+    font-size: 16px;
+    text-transform: uppercase;
+  }
+
+  .mazal-pdp__sticky-save {
+    padding: 8px 16px;
+    background: rgb(187 149 90 / 0.1);
+    color: var(--mazal-gold);
+    font-size: 12px;
+    line-height: 1;
+  }
+
+  .mazal-pdp__sticky-options {
+    font-size: 14px;
+  }
+
+  .mazal-pdp__sticky-price {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .mazal-pdp__sticky-price-current {
+    color: #160a0d;
+    font-size: 16px;
+  }
+
+  .mazal-pdp__sticky-price-compare {
+    color: var(--mazal-grey);
+    font-size: 12px;
+  }
+
+  .mazal-pdp__sticky-add {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 64px;
+    border: 1px solid var(--mazal-gold);
+    background: var(--mazal-gold);
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.45;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .mazal-pdp__sticky-add-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+  }
+
+  .mazal-pdp__sticky-add-icon svg {
+    width: 14px;
+    height: auto;
+  }
+
+  .mazal-pdp__sticky-add:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .mazal-pdp__sticky-add[aria-busy='true'] {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mazal-pdp__sticky {
+      transition: none;
+    }
+  }
+
+  /* ---------- Phones (Figma 6:2738) ---------- */
+  @media screen and (max-width: 749px) {
+    .mazal-pdp {
+      padding-block: 0 var(--mazal-pdp-pb);
+    }
+
+    .mazal-pdp__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .mazal-pdp__gallery {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mazal-pdp__main-media {
+      aspect-ratio: 430 / 262;
+    }
+
+    .mazal-pdp__thumbs {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+
+    .mazal-pdp__thumbs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mazal-pdp__thumb-item,
+    .mazal-pdp__thumb-item--first {
+      display: block;
+      flex: 0 0 148px;
+      scroll-snap-align: start;
+    }
+
+    .mazal-pdp__thumb {
+      aspect-ratio: 148 / 126;
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+
+    .mazal-pdp__thumb.is-active {
+      border-color: #000;
+    }
+
+    .mazal-pdp__info {
+      position: static;
+      gap: 16px;
+      max-width: none;
+      padding: 32px 16px 0;
+    }
+
+    .mazal-pdp__head {
+      gap: 8px;
+    }
+
+    .mazal-pdp__title {
+      font-size: 16px;
+    }
+
+    .mazal-pdp__wishlist svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .mazal-pdp__meta {
+      gap: 4px;
+      font-size: 12px;
+    }
+
+    .mazal-pdp__rating {
+      gap: 4px;
+    }
+
+    .mazal-pdp__rating .mazal-stars {
+      width: 68px;
+      height: 12px;
+    }
+
+    .mazal-pdp__rating-count {
+      margin-inline-start: 0;
+      font-size: 10px;
+    }
+
+    .mazal-pdp__meta-sep {
+      font-size: 8px;
+    }
+
+    .mazal-pdp__shipping-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .mazal-pdp__shipping-icon svg {
+      width: 14px;
+      height: auto;
+    }
+
+    .mazal-pdp__price-current {
+      font-size: 12px;
+    }
+
+    .mazal-pdp__price-compare {
+      font-size: 10px;
+    }
+
+    .mazal-pdp__options,
+    .mazal-pdp__accordions {
+      gap: 16px;
+    }
+
+    .mazal-pdp__option-label,
+    .mazal-pdp__accordion-title {
+      font-size: 12px;
+    }
+
+    .mazal-pdp__accordion-icon svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .mazal-pdp__accordion-body {
+      padding-block-start: 16px;
+    }
+
+    .mazal-pdp__size-guide {
+      font-size: 10px;
+    }
+
+    .mazal-pdp__pills,
+    .mazal-pdp__swatches {
+      gap: 8px;
+    }
+
+    .mazal-pdp__pill {
+      padding: 5px 8px;
+      font-size: 10px;
+    }
+
+    .mazal-pdp__swatch-fill {
+      width: 24px;
+      height: 16px;
+    }
+
+    .mazal-pdp__qty {
+      width: 105px;
+      height: 32px;
+    }
+
+    .mazal-pdp__qty-btn {
+      flex-basis: 40px;
+    }
+
+    .mazal-pdp__qty-input {
+      font-size: 10px;
+    }
+
+    .mazal-pdp__buy-now,
+    .mazal-pdp__add {
+      min-height: 32px;
+      padding-block: 8px;
+      font-size: 10px;
+    }
+
+    .mazal-pdp__add-icon {
+      width: 14px;
+      height: 14px;
+    }
+
+    .mazal-pdp__related {
+      gap: 16px;
+    }
+
+    .mazal-pdp__related-heading {
+      font-size: 12px;
+    }
+
+    .mazal-pdp__related-card {
+      gap: 8px;
+    }
+
+    .mazal-pdp__related-media {
+      flex-basis: 48px;
+    }
+
+    .mazal-pdp__related-text {
+      gap: 4px;
+    }
+
+    .mazal-pdp__related-name {
+      font-size: 12px;
+    }
+
+    .mazal-pdp__related-desc,
+    .mazal-pdp__related-cta {
+      font-size: 10px;
+    }
+
+    .mazal-pdp__related-price {
+      flex-direction: column;
+      padding-inline-end: 0;
+    }
+
+    .mazal-pdp__related-price-current {
+      font-size: 12px;
+    }
+
+    .mazal-pdp__related-price-compare {
+      font-size: 10px;
+    }
+
+    .mazal-pdp__share-label {
+      font-size: 12px;
+    }
+
+    .mazal-pdp__share-link {
+      width: 16px;
+      height: 16px;
+    }
+
+    .mazal-pdp__share-link svg {
+      max-width: 16px;
+      max-height: 16px;
+    }
+
+    .mazal-pdp__sticky {
+      gap: 8px;
+      padding: 8px 16px;
+    }
+
+    .mazal-pdp__sticky-left {
+      gap: 8px;
+    }
+
+    .mazal-pdp__sticky-media {
+      flex-basis: 56px;
+    }
+
+    .mazal-pdp__sticky-text {
+      gap: 4px;
+    }
+
+    .mazal-pdp__sticky-title,
+    .mazal-pdp__sticky-price-current {
+      font-size: 12px;
+    }
+
+    .mazal-pdp__sticky-save {
+      padding: 4px 8px;
+      font-size: 10px;
+    }
+
+    .mazal-pdp__sticky-options,
+    .mazal-pdp__sticky-price-compare {
+      font-size: 10px;
+    }
+
+    .mazal-pdp__sticky-add {
+      padding: 9px 12px;
+      font-size: 10px;
+    }
+
+    .mazal-pdp__sticky-add-icon {
+      width: 14px;
+      height: 14px;
+    }
+  }
+{% endstylesheet %}

@@ -8,10 +8,11 @@ Files added to the **copy 29/10** theme (Horizon) on `mazal-cpmhc506.myshopify.c
 | `sections/mazal-product.liquid` | Main product section: gallery, title + wishlist, Judge.me rating, price, size buttons, colors / stripes / checks swatches, details + care accordions, quantity + Buy now + Add to cart, related products, share |
 | `sections/mazal-recommendations.liquid` | "You might also like" cards (Shopify recommendations, fallback collection) |
 | `sections/mazal-reviews.liquid` | Wraps the Judge.me review widget app block and restyles it to the design |
+| `snippets/mazal-product-styles.liquid`, `assets/mazal-product.js` | Styles and script for `mazal-product` (incl. sticky add-to-cart bar) |
 | `snippets/mazal-stars.liquid` | Star rating (partial fill) |
 | `snippets/mazal-swatch.liquid` | Swatch fill: option swatch → "Name: #hex" list → `swatch-<name>.png` in Files |
 | `assets/mazal-icon-*.svg` | Icons exported from the Figma file |
 | `templates/product.json` | main → recommendations → reviews (Judge.me block) → `mazal-follow-us` (same as home) |
 
-Product metafields used: `custom.related_products` (list of products), `custom.care_instructions` (multi-line text).
+Product metafields used: `custom.related_products` (list of products), `custom.care_instructions` (rich text: paragraphs + bullet lists).
 Judge.me fills `reviews.rating` / `reviews.rating_count`.
