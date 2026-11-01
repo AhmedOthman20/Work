@@ -7,7 +7,7 @@
 {%- endcomment -%}
 <div class="section-background"></div>
 <div
-  class="section mazal-ah"
+  class="mazal-ah"
   style="
     --mazal-ah-height: {{ section.settings.height }}px;
     --mazal-ah-height-mobile: {{ section.settings.height_mobile }}px;
@@ -74,7 +74,8 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    max-width: 640px;
+    width: min-content;
+    max-width: calc(100% - 128px);
   }
 
   .mazal-ah__title {
@@ -86,6 +87,7 @@
     line-height: 1.21;
     letter-spacing: normal;
     text-transform: uppercase;
+    white-space: nowrap;
   }
 
   .mazal-ah__text {
@@ -103,6 +105,8 @@
     .mazal-ah__content {
       inset-inline: 16px;
       inset-block-end: 24px;
+      width: auto;
+      max-width: none;
     }
 
     .mazal-ah__title {
